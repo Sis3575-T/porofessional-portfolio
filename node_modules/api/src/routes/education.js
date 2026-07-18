@@ -38,6 +38,7 @@ router.post("/", authenticateToken, requireAdmin, async (req, res) => {
       startDate,
       endDate,
       gpa,
+      enabled,
     } = req.body;
 
     const edu = await prisma.education.create({
@@ -50,6 +51,8 @@ router.post("/", authenticateToken, requireAdmin, async (req, res) => {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         gpa,
+        order: await prisma.education.count(),
+        enabled: enabled !== undefined ? enabled : true,
       },
     });
 
@@ -79,6 +82,8 @@ router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
       startDate,
       endDate,
       gpa,
+      enabled,
+      order,
     } = req.body;
 
     const edu = await prisma.education.update({
@@ -92,6 +97,8 @@ router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
         startDate: startDate ? new Date(startDate) : undefined,
         endDate: endDate ? new Date(endDate) : undefined,
         gpa: gpa || undefined,
+        enabled: enabled !== undefined ? enabled : undefined,
+        order: order !== undefined ? order : undefined,
       },
     });
 

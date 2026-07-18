@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "name": "portfolio-pro-monorepo",
+  "problems": [
+    "extraneous: lucide-react@ C:\\Users\\hp\\OneDrive\\Desktop\\portfolios\\portfolio-app\\node_modules\\lucide-react"
+  ],
+  "dependencies": {
+    "lucide-react": {
+      "overridden": false,
+      "extraneous": true,
+      "problems": [
+        "extraneous: lucide-react@ C:\\Users\\hp\\OneDrive\\Desktop\\portfolios\\portfolio-app\\node_modules\\lucide-react"
+      ]
+    }
+  }
+}

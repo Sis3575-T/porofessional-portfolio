@@ -43,12 +43,13 @@ router.post("/", async (req, res) => {
 // GET /api/v1/contact (admin)
 router.get("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { page = "1", limit = "10" } = req.query;
-    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+    const pageNum = parseInt(req.query.page) || 1;
+    const limitNum = parseInt(req.query.limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
 
     const messages = await prisma.contactMessage.findMany({
       skip,
-      take: parseInt(limit as string),
+      take: limitNum,
       orderBy: { createdAt: "desc" },
     });
 
@@ -59,8 +60,8 @@ router.get("/", authenticateToken, requireAdmin, async (req, res) => {
       data: messages,
       pagination: {
         total,
-        page: parseInt(page as string),
-        limit: parseInt(limit as string),
+        page: pageNum,
+        limit: limitNum,
       },
     });
   } catch (error) {

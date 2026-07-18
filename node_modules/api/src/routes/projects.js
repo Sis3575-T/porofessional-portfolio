@@ -9,17 +9,19 @@ const prisma = new PrismaClient();
 // GET /api/v1/projects (public)
 router.get("/", async (req, res) => {
   try {
-    const { page = "1", limit = "9", category, featured } = req.query;
-    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+    const pageNum = parseInt(req.query.page) || 1;
+    const limitNum = parseInt(req.query.limit) || 9;
+    const { category, featured } = req.query;
+    const skip = (pageNum - 1) * limitNum;
 
-    const where: any = { enabled: true };
+    const where = { enabled: true };
     if (category) where.category = category;
     if (featured === "true") where.featured = true;
 
     const projects = await prisma.project.findMany({
       where,
       skip,
-      take: parseInt(limit as string),
+      take: limitNum,
       orderBy: { order: "asc" },
     });
 
@@ -30,9 +32,9 @@ router.get("/", async (req, res) => {
       data: projects,
       pagination: {
         total,
-        page: parseInt(page as string),
-        limit: parseInt(limit as string),
-        pages: Math.ceil(total / parseInt(limit as string)),
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(total / limitNum),
       },
     });
   } catch (error) {

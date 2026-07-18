@@ -1,61 +1,90 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { heroAPI } from '../../services/api';
+import { Save, Loader2 } from 'lucide-react';
 
 export default function HeroEditor() {
-  const [formData, setFormData] = useState({
-    name: 'Developer Name',
-    title: 'Full Stack Developer',
-    description: 'Building amazing experiences',
+  const [form, setForm] = useState({
+    greeting: '', name: '', title: '', description: '',
+    primaryCTA: '', secondaryCTA: '', profileImage: '', backgroundImage: '',
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await heroAPI.get();
+        if (res.data.data) setForm(res.data.data);
+      } catch (err) {
+        toast.error('Failed to load hero data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Save to backend
-    alert('Hero section updated!');
+    setSaving(true);
+    try {
+      await heroAPI.update(form);
+      toast.success('Hero section updated successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">Edit Hero Section</h1>
-      <form onSubmit={handleSubmit} className="space-y-6 card">
-        <div>
-          <label className="block text-sm mb-2">Developer Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full"
-          />
+    <div>
+      <h2 className="text-2xl font-bold text-white mb-8">Hero Section</h2>
+      <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Greeting</label>
+            <input value={form.greeting} onChange={(e) => setForm({...form, greeting: e.target.value})} className="w-full" />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Name</label>
+            <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full" />
+          </div>
         </div>
         <div>
-          <label className="block text-sm mb-2">Professional Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full"
-          />
+          <label className="block text-sm text-slate-400 mb-2">Title</label>
+          <input value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} className="w-full" />
         </div>
         <div>
-          <label className="block text-sm mb-2">Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            className="w-full"
-          />
+          <label className="block text-sm text-slate-400 mb-2">Description</label>
+          <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={3} className="w-full" />
         </div>
-        <button type="submit" className="btn-primary">
-          Save Changes
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Primary CTA</label>
+            <input value={form.primaryCTA} onChange={(e) => setForm({...form, primaryCTA: e.target.value})} className="w-full" />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Secondary CTA</label>
+            <input value={form.secondaryCTA} onChange={(e) => setForm({...form, secondaryCTA: e.target.value})} className="w-full" />
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Profile Image URL</label>
+            <input value={form.profileImage || ''} onChange={(e) => setForm({...form, profileImage: e.target.value})} className="w-full" placeholder="https://..." />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Background Image URL</label>
+            <input value={form.backgroundImage || ''} onChange={(e) => setForm({...form, backgroundImage: e.target.value})} className="w-full" placeholder="https://..." />
+          </div>
+        </div>
+        <button type="submit" disabled={saving} className="btn-primary flex items-center gap-2">
+          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+          {saving ? 'Saving...' : 'Save Changes'}
         </button>
       </form>
     </div>

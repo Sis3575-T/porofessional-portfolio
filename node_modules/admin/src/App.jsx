@@ -1,11 +1,23 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import HeroEditor from './pages/editors/HeroEditor';
 import AboutEditor from './pages/editors/AboutEditor';
 import SkillsEditor from './pages/editors/SkillsEditor';
+import ServicesEditor from './pages/editors/ServicesEditor';
+import ExperienceEditor from './pages/editors/ExperienceEditor';
+import EducationEditor from './pages/editors/EducationEditor';
 import ProjectsEditor from './pages/editors/ProjectsEditor';
+import TestimonialsEditor from './pages/editors/TestimonialsEditor';
+import MessagesPage from './pages/editors/MessagesPage';
+import SettingsEditor from './pages/editors/SettingsEditor';
+
+function ProtectedRoute({ children, isAuthenticated }) {
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  return children;
+}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,39 +30,59 @@ export default function App() {
   }, []);
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-950">
+        <div className="animate-spin w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full" />
+      </div>
+    );
   }
+
+  const wrap = (element) => <Dashboard>{element}</Dashboard>;
 
   return (
     <Router>
-      <div className="min-h-screen bg-slate-950 text-slate-50">
-        <Routes>
-          <Route 
-            path="/login" 
-            element={isAuthenticated ? <Navigate to="/admin" /> : <Login setIsAuthenticated={setIsAuthenticated} />}
-          />
-          <Route
-            path="/admin"
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/hero"
-            element={isAuthenticated ? <HeroEditor /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/about"
-            element={isAuthenticated ? <AboutEditor /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/skills"
-            element={isAuthenticated ? <SkillsEditor /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/projects"
-            element={isAuthenticated ? <ProjectsEditor /> : <Navigate to="/login" />}
-          />
-        </Routes>
-      </div>
+      <Toaster position="top-right" toastOptions={{
+        style: { background: '#1e293b', color: '#f8fafc', border: '1px solid #334155' },
+      }} />
+      <Routes>
+        <Route path="/login" element={
+          isAuthenticated ? <Navigate to="/admin" /> : <Login setIsAuthenticated={setIsAuthenticated} />
+        } />
+        <Route path="/admin" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}><Dashboard /></ProtectedRoute>
+        } />
+        <Route path="/admin/hero" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<HeroEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/about" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<AboutEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/skills" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<SkillsEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/services" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<ServicesEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/experience" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<ExperienceEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/education" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<EducationEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/projects" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<ProjectsEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/testimonials" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<TestimonialsEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/messages" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<MessagesPage />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/settings" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<SettingsEditor />)}</ProtectedRoute>
+        } />
+        <Route path="*" element={<Navigate to="/admin" />} />
+      </Routes>
     </Router>
   );
 }

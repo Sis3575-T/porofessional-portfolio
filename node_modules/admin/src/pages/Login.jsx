@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { authAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { Loader2, LogIn } from 'lucide-react';
 
 export default function Login({ setIsAuthenticated }) {
   const [email, setEmail] = useState('admin@portfolio.dev');
@@ -13,14 +14,10 @@ export default function Login({ setIsAuthenticated }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/v1/auth/login',
-        { email, password }
-      );
-
-      localStorage.setItem('token', response.data.token);
+      const res = await authAPI.login({ email, password });
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       setIsAuthenticated(true);
       navigate('/admin');
     } catch (err) {
@@ -31,41 +28,53 @@ export default function Login({ setIsAuthenticated }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-dark">
-      <div className="card max-w-md w-full">
-        <h1 className="text-3xl font-bold mb-8 text-center">Admin Login</h1>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 rounded px-4 py-2 text-red-200">
-              {error}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            Admin Dashboard
+          </h1>
+          <p className="text-slate-400 mt-2">Sign in to manage your portfolio</p>
+        </div>
+        <div className="card">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm">
+                {error}
+              </div>
+            )}
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full"
+                placeholder="admin@portfolio.dev"
+                required
+              />
             </div>
-          )}
-          <div>
-            <label className="block text-sm mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-sm mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full disabled:opacity-50"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

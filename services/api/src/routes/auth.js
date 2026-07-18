@@ -1,4 +1,3 @@
-// services/api/src/routes/auth.ts
 import express from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
@@ -8,7 +7,6 @@ import { authenticateToken } from "../middleware/auth.js";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// POST /api/v1/auth/login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -16,7 +14,7 @@ router.post("/login", async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password required",
+        message: "Email and password are required",
       });
     }
 
@@ -34,12 +32,11 @@ router.post("/login", async (req, res) => {
     if (!user.isActive) {
       return res.status(403).json({
         success: false,
-        message: "Account disabled",
+        message: "Account disabled. Contact administrator.",
       });
     }
 
-    // For now, compare passwords directly (in production, use bcrypt)
-    const isPasswordValid = password === user.password;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -48,13 +45,20 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Update last login
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLogin: new Date() },
     });
 
-    // Generate token
+    await prisma.activity.create({
+      data: {
+        userId: user.id,
+        action: "LOGIN",
+        entity: "User",
+        entityId: user.id,
+      },
+    });
+
     const token = generateToken(user.id, user.email, user.role);
 
     res.json({
@@ -76,7 +80,29 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// GET /api/v1/auth/me
+router.post("/logout", authenticateToken, async (req, res) => {
+  try {
+    await prisma.activity.create({
+      data: {
+        userId: req.userId,
+        action: "LOGOUT",
+        entity: "User",
+        entityId: req.userId,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Logout failed",
+    });
+  }
+});
+
 router.get("/me", authenticateToken, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -87,8 +113,16 @@ router.get("/me", authenticateToken, async (req, res) => {
         role: true,
         isActive: true,
         lastLogin: true,
+        createdAt: true,
       },
     });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     res.json({
       success: true,
