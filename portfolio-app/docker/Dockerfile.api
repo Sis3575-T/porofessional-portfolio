@@ -1,0 +1,21 @@
+# Dockerfile for API service
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy workspace files
+COPY package.json .
+COPY services/api ./services/api
+COPY prisma ./prisma
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Generate Prisma client
+RUN npm run --workspace=services/api prisma:generate
+
+# Expose port
+EXPOSE 5000
+
+# Start API
+CMD ["npm", "run", "--workspace=services/api", "start"]

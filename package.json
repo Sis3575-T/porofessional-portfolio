@@ -1,0 +1,14 @@
+{
+  "name": "portfolio-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up --build",
+    "dev:web": "npm --workspace apps/web run dev",
+    "dev:admin": "npm --workspace apps/admin run dev",
+    "dev:api": "npm --workspace services/api run dev"
+  }
+}

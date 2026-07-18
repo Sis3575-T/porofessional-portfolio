@@ -1,0 +1,81 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: portfolio_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: portfolio_user
+      POSTGRES_PASSWORD: portfolio_password
+      POSTGRES_DB: portfolio_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Express API Service
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: portfolio_api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://portfolio_user:portfolio_password@postgres:5432/portfolio_db}
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRY: 7d
+      ADMIN_EMAIL: admin@portfolio.dev
+      ADMIN_PASSWORD: AdminPassword123!
+      NODE_ENV: development
+      API_PORT: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/api/src:/app/services/api/src
+    command: npm run --workspace=services/api dev
+
+  # React Web App
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: portfolio_web
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+      - ./apps/web/public:/app/apps/web/public
+
+  # React Admin App
+  admin:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.admin
+    container_name: portfolio_admin
+    restart: unless-stopped
+    ports:
+      - "5174:5174"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    depends_on:
+      - api
+    volumes:
+      - ./apps/admin/src:/app/apps/admin/src
+      - ./apps/admin/public:/app/apps/admin/public
+
+volumes:
+  postgres_data:
+    driver: local

@@ -1,0 +1,277 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============== Authentication ==============
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  role          UserRole  @default(EDITOR)
+  isActive      Boolean   @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  activities    Activity[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
+// ============== Portfolio Content ==============
+model Hero {
+  id              String    @id @default(cuid())
+  greeting        String    @default("Hello, I'm")
+  name            String    @default("Developer Name")
+  title           String    @default("Full Stack Developer")
+  description     String    @default("Crafting digital experiences with modern technology")
+  primaryCTA      String    @default("View My Work")
+  secondaryCTA    String    @default("Get In Touch")
+  profileImage    String?
+  backgroundImage String?
+  enabled         Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("hero")
+}
+
+model About {
+  id              String    @id @default(cuid())
+  biography       String    @db.Text
+  summary         String    @db.Text
+  profileImage    String?
+  yearsOfExperience Int     @default(5)
+  downloadCVUrl   String?
+  location        String?
+  email           String?
+  phone           String?
+  nationality     String?
+  languages       String?
+  enabled         Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("about")
+}
+
+model Skill {
+  id          String    @id @default(cuid())
+  name        String
+  icon        String?
+  category    SkillCategory
+  proficiency Int       @default(80) // 0-100
+  description String?
+  order       Int       @default(0)
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("skills")
+}
+
+enum SkillCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  DEVOPS
+  TOOLS
+  LANGUAGES
+  SOFT_SKILLS
+  OTHER
+}
+
+model Service {
+  id          String    @id @default(cuid())
+  icon        String?
+  title       String
+  description String    @db.Text
+  features    String?   @db.Text // JSON array as string
+  order       Int       @default(0)
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("services")
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  company     String
+  position    String
+  description String    @db.Text
+  logo        String?
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean   @default(false)
+  technologies String?  @db.Text // JSON array as string
+  order       Int       @default(0)
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("experiences")
+}
+
+model Education {
+  id          String    @id @default(cuid())
+  institution String
+  degree      String
+  field       String
+  description String    @db.Text
+  logo        String?
+  startDate   DateTime
+  endDate     DateTime
+  gpa         String?
+  order       Int       @default(0)
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("education")
+}
+
+model Project {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  description     String    @db.Text
+  thumbnail       String?
+  images          String?   @db.Text // JSON array
+  category        ProjectCategory
+  technologies    String    @db.Text // JSON array
+  features        String    @db.Text // JSON array
+  challenge       String    @db.Text
+  solution        String    @db.Text
+  lessonsLearned  String    @db.Text
+  liveUrl         String?
+  githubUrl       String?
+  featured        Boolean   @default(false)
+  order           Int       @default(0)
+  enabled         Boolean   @default(true)
+  viewCount       Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("projects")
+}
+
+enum ProjectCategory {
+  FRONTEND
+  BACKEND
+  FULLSTACK
+  MOBILE
+  UIUX
+  AI
+  OTHER
+}
+
+model Testimonial {
+  id          String    @id @default(cuid())
+  name        String
+  position    String
+  company     String
+  avatar      String?
+  rating      Int       @default(5) // 1-5
+  review      String    @db.Text
+  order       Int       @default(0)
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("testimonials")
+}
+
+model ContactMessage {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String    @db.Text
+  isRead    Boolean   @default(false)
+  isArchived Boolean  @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("contact_messages")
+}
+
+model Setting {
+  id              String    @id @default(cuid())
+  siteTitle       String    @default("Portfolio Pro")
+  siteDescription String    @db.Text @default("Professional Portfolio")
+  siteUrl         String?
+  favicon         String?
+  logo            String?
+  logo_dark       String?
+  socialLinks     String?   @db.Text // JSON
+  contactEmail    String?
+  contactPhone    String?
+  address         String?
+  metaKeywords    String?
+  metaDescription String?
+  ogImage         String?
+  googleAnalytics String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("settings")
+}
+
+model MediaAsset {
+  id        String    @id @default(cuid())
+  filename  String
+  url       String
+  publicId  String?   // For Cloudinary
+  mimeType  String?
+  size      Int?
+  width     Int?
+  height    Int?
+  usedIn    String?   @db.Text // JSON array of sections using it
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("media_assets")
+}
+
+model Activity {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    ActivityAction
+  entity    String    // Model name
+  entityId  String
+  changes   String?   @db.Text // JSON diff
+  createdAt DateTime  @default(now())
+
+  @@map("activities")
+}
+
+enum ActivityAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+}
+
+// ============== Helper Models ==============
+model Statistic {
+  id              String    @id @default(cuid())
+  yearsOfExp      Int       @default(5)
+  projectsCount   Int       @default(0)
+  clientsCount    Int       @default(0)
+  technologiesCount Int    @default(0)
+
+  @@map("statistics")
+}
