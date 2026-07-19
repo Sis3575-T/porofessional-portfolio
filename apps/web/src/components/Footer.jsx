@@ -9,20 +9,20 @@ export default function Footer() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer className="bg-slate-950 border-t border-slate-800/50">
+    <footer className="bg-slate-950 border-t border-slate-800/50" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2">
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent mb-4">
+            <h3 className="text-2xl font-bold text-cyan-400 mb-4">
               Portfolio
             </h3>
             <p className="text-slate-400 max-w-md">
-              Building digital experiences with modern technology. Available for freelance projects and full-time opportunities.
+              Building digital experiences with modern technology.
             </p>
           </div>
           <div>
             <h4 className="font-semibold text-white mb-4">Quick Links</h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2" aria-label="Quick links">
               {["Home", "About", "Skills", "Projects", "Contact"].map((link) => (
                 <li key={link}>
                   <a
@@ -37,29 +37,33 @@ export default function Footer() {
           </div>
           <div>
             <h4 className="font-semibold text-white mb-4">Connect</h4>
-            <div className="flex gap-3">
+            <div className="flex gap-3" aria-label="Social media links">
               {socialLinks.github && (
                 <a href={socialLinks.github} target="_blank" rel="noopener noreferrer"
-                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition">
-                  <Github size={20} />
+                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                  aria-label="GitHub profile">
+                  <Github size={20} aria-hidden="true" />
                 </a>
               )}
               {socialLinks.linkedin && (
                 <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
-                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition">
-                  <Linkedin size={20} />
+                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                  aria-label="LinkedIn profile">
+                  <Linkedin size={20} aria-hidden="true" />
                 </a>
               )}
               {socialLinks.twitter && (
                 <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer"
-                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition">
-                  <Twitter size={20} />
+                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                  aria-label="Twitter profile">
+                  <Twitter size={20} aria-hidden="true" />
                 </a>
               )}
               {settings?.contactEmail && (
                 <a href={`mailto:${settings.contactEmail}`}
-                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition">
-                  <Mail size={20} />
+                  className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                  aria-label="Send email">
+                  <Mail size={20} aria-hidden="true" />
                 </a>
               )}
             </div>
@@ -72,10 +76,10 @@ export default function Footer() {
           </p>
           <button
             onClick={scrollToTop}
-            className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+            className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition focus:outline-none focus:ring-2 focus:ring-cyan-400"
             aria-label="Back to top"
           >
-            <ArrowUp size={20} />
+            <ArrowUp size={20} aria-hidden="true" />
           </button>
         </div>
       </div>

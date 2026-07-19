@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Send, Mail, MapPin, Phone, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Send, Mail, MapPin, Phone, Loader2, User, MessageSquare, Tag } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { contactAPI } from "../../services/api";
+import { AnimatedSection } from "../AnimatedSection";
 
 export default function Contact() {
   const { settings } = usePortfolio();
@@ -36,18 +38,47 @@ export default function Contact() {
   const socialLinks = settings?.socialLinks ? JSON.parse(settings.socialLinks) : {};
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent" />
+    <AnimatedSection id="contact" className="py-32 relative overflow-hidden" aria-label="Contact section">
+      <div className="absolute inset-0 bg-cyan-950/20" />
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
-        <h2 className="text-center mb-4 text-white">
-          Get In <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Touch</span>
-        </h2>
-        <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto">
+        <motion.p
+          className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          Contact
+        </motion.p>
+        <motion.h2
+          className="text-center text-white"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          Get In <span className="text-cyan-400">Touch</span>
+        </motion.h2>
+        <motion.div
+          className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4"
+          initial={{ width: 0 }}
+          whileInView={{ width: 64 }}
+          viewport={{ once: true }}
+        />
+        <motion.p
+          className="text-center text-slate-400 mb-16 max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+        >
           Have a project in mind? Let's work together
-        </p>
+        </motion.p>
 
         <div className="grid lg:grid-cols-5 gap-12">
           <div className="lg:col-span-2 space-y-8">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm text-slate-300">Available for freelance & full-time opportunities</span>
+            </div>
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center shrink-0">
@@ -104,69 +135,94 @@ export default function Contact() {
                 <p className="text-slate-400 mb-6">Thank you for reaching out. I'll get back to you soon.</p>
                 <button
                   onClick={() => setSuccess(false)}
-                  className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-950 rounded-lg font-semibold"
+                  className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg font-semibold"
                 >
                   Send Another Message
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 space-y-6">
+              <form onSubmit={handleSubmit} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 space-y-6" aria-label="Contact form" noValidate>
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm">
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm" role="alert">
                     {error}
                   </div>
                 )}
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm text-slate-400 mb-2">Full Name *</label>
-                    <input
-                      type="text"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
-                      placeholder="John Doe"
-                    />
+                    <label htmlFor="contact-name" className="block text-sm text-slate-400 mb-2">Full Name *</label>
+                    <div className="relative">
+                      <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                      <input
+                        id="contact-name"
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        className="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                        placeholder="John Doe"
+                        aria-required="true"
+                        required
+                      />
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-400 mb-2">Email *</label>
+                    <label htmlFor="contact-email" className="block text-sm text-slate-400 mb-2">Email *</label>
+                    <div className="relative">
+                      <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                      <input
+                        id="contact-email"
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        className="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                        placeholder="john@example.com"
+                        aria-required="true"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="contact-subject" className="block text-sm text-slate-400 mb-2">Subject *</label>
+                  <div className="relative">
+                    <Tag size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
                     <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
-                      placeholder="john@example.com"
+                      id="contact-subject"
+                      type="text"
+                      value={form.subject}
+                      onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                      placeholder="Project Inquiry"
+                      aria-required="true"
+                      required
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Subject *</label>
-                  <input
-                    type="text"
-                    value={form.subject}
-                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
-                    placeholder="Project Inquiry"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-400 mb-2">Message *</label>
-                  <textarea
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    rows={5}
-                    className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition resize-none"
-                    placeholder="Tell me about your project..."
-                  />
+                  <label htmlFor="contact-message" className="block text-sm text-slate-400 mb-2">Message *</label>
+                  <div className="relative">
+                    <MessageSquare size={16} className="absolute left-3.5 top-4 text-slate-500 pointer-events-none" />
+                    <textarea
+                      id="contact-message"
+                      value={form.message}
+                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      rows={5}
+                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition resize-none"
+                      placeholder="Tell me about your project..."
+                      aria-required="true"
+                      required
+                    />
+                  </div>
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-950 rounded-lg font-semibold hover:from-cyan-400 hover:to-cyan-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-busy={loading}
                 >
                   {loading ? (
-                    <><Loader2 size={18} className="animate-spin" /> Sending...</>
+                    <><Loader2 size={18} className="animate-spin" aria-hidden="true" /> Sending...</>
                   ) : (
-                    <><Send size={18} /> Send Message</>
+                    <><Send size={18} aria-hidden="true" /> Send Message</>
                   )}
                 </button>
               </form>
@@ -174,6 +230,6 @@ export default function Contact() {
           </div>
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }

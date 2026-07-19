@@ -2,6 +2,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { authenticateToken, requireAdmin } from "../middleware/auth.js";
+import { sendContactNotification } from "../services/email.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -19,13 +20,10 @@ router.post("/", async (req, res) => {
     }
 
     const contact = await prisma.contactMessage.create({
-      data: {
-        name,
-        email,
-        subject,
-        message,
-      },
+      data: { name, email, subject, message },
     });
+
+    sendContactNotification({ name, email, subject, message });
 
     res.status(201).json({
       success: true,

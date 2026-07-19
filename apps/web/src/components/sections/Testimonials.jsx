@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { AnimatedSection } from "../AnimatedSection";
 
 export default function Testimonials() {
   const { testimonials, loading } = usePortfolio();
   const [current, setCurrent] = useState(0);
+
+  const prev = useCallback(() => setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1)), [testimonials.length]);
+  const next = useCallback(() => setCurrent((c) => (c === testimonials.length - 1 ? 0 : c + 1)), [testimonials.length]);
+
+  useEffect(() => {
+    if (testimonials.length < 2) return;
+    const timer = setInterval(next, 5000);
+    return () => clearInterval(timer);
+  }, [next, testimonials.length]);
 
   if (loading) {
     return (
@@ -21,54 +32,119 @@ export default function Testimonials() {
 
   if (testimonials.length === 0) return null;
 
-  const prev = () => setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1));
-  const next = () => setCurrent((c) => (c === testimonials.length - 1 ? 0 : c + 1));
   const t = testimonials[current];
 
   return (
-    <section id="testimonials" className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
+    <AnimatedSection id="testimonials" className="py-32 relative overflow-hidden" aria-label="Testimonials section">
+      <div className="absolute inset-0 bg-purple-950/20" />
       <div className="max-w-3xl mx-auto px-4 sm:px-8 relative z-10">
-        <h2 className="text-center mb-4 text-white">
-          What <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Clients</span> Say
-        </h2>
-        <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto">
+        <motion.p
+          className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          Testimonials
+        </motion.p>
+        <motion.h2
+          className="text-center text-white"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          What <span className="text-cyan-400">Clients</span> Say
+        </motion.h2>
+        <motion.div
+          className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4"
+          initial={{ width: 0 }}
+          whileInView={{ width: 64 }}
+          viewport={{ once: true }}
+        />
+        <motion.p
+          className="text-center text-slate-400 mb-16 max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+        >
           Testimonials from people I've worked with
-        </p>
+        </motion.p>
 
         <div className="relative">
-          <Quote className="absolute -top-4 left-0 text-cyan-500/10" size={80} />
+          <motion.div
+            className="absolute -top-4 left-0 text-cyan-500/10"
+            initial={{ opacity: 0, rotate: -20 }}
+            whileInView={{ opacity: 1, rotate: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <Quote size={80} />
+          </motion.div>
 
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 sm:p-12 text-center">
-            <div className="flex justify-center gap-1 mb-6">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={18} className={i < t.rating ? "text-yellow-400 fill-yellow-400" : "text-slate-600"} />
-              ))}
-            </div>
-
-            <blockquote className="text-lg text-slate-300 mb-8 leading-relaxed italic">
-              &ldquo;{t.review}&rdquo;
-            </blockquote>
-
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-                {t.name.charAt(0)}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current}
+              className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 sm:p-12 text-center"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex justify-center gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <Star size={18} className={i < t.rating ? "text-yellow-400 fill-yellow-400" : "text-slate-600"} />
+                  </motion.div>
+                ))}
               </div>
-              <div className="text-left">
-                <p className="font-semibold text-white">{t.name}</p>
-                <p className="text-sm text-slate-400">{t.position} at {t.company}</p>
-              </div>
-            </div>
-          </div>
+
+              <motion.blockquote
+                className="text-lg text-slate-300 mb-8 leading-relaxed italic"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                &ldquo;{t.review}&rdquo;
+              </motion.blockquote>
+
+              <motion.div
+                className="flex items-center justify-center gap-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <div className="w-12 h-12 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold text-lg">
+                  {t.name.charAt(0)}
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold text-white">{t.name}</p>
+                  <p className="text-sm text-slate-400">{t.position} at {t.company}</p>
+                </div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
 
           {testimonials.length > 1 && (
-            <div className="flex justify-center gap-4 mt-8">
-              <button
+            <motion.div
+              className="flex justify-center gap-4 mt-8"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              <motion.button
                 onClick={prev}
                 className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Previous testimonial"
               >
                 <ChevronLeft size={20} />
-              </button>
+              </motion.button>
               <div className="flex items-center gap-2">
                 {testimonials.map((_, i) => (
                   <button
@@ -77,19 +153,24 @@ export default function Testimonials() {
                     className={`w-2 h-2 rounded-full transition-all ${
                       i === current ? "bg-cyan-400 w-6" : "bg-slate-600"
                     }`}
+                    aria-label={`Go to testimonial ${i + 1}`}
+                    aria-current={i === current ? "true" : undefined}
                   />
                 ))}
               </div>
-              <button
+              <motion.button
                 onClick={next}
                 className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Next testimonial"
               >
                 <ChevronRight size={20} />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }

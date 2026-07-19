@@ -2,15 +2,13 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache openssl
+COPY services/api/package*.json ./services/api/
 
-COPY package*.json ./
+WORKDIR /app/services/api
 RUN npm install
 
-COPY . .
-
-RUN npx prisma generate
+COPY services/api/ .
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "npx prisma db push && npm run dev"]
+CMD ["npm", "run", "dev"]

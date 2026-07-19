@@ -9,6 +9,11 @@
     "dev": "docker compose up --build",
     "dev:web": "npm --workspace apps/web run dev",
     "dev:admin": "npm --workspace apps/admin run dev",
-    "dev:api": "npm --workspace services/api run dev"
+    "dev:gateway": "npm --workspace services/api run dev",
+    "dev:auth": "npm --workspace services/auth-service run dev",
+    "dev:portfolio": "npm --workspace services/portfolio-service run dev",
+    "dev:media": "npm --workspace services/media-service run dev",
+    "dev:dashboard": "npm --workspace services/dashboard-service run dev",
+    "test": "npm --workspace services/api run test"
   }
 }

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { heroAPI, aboutAPI, skillsAPI, servicesAPI, experienceAPI, educationAPI, projectsAPI, testimonialsAPI, settingsAPI, contactAPI } from "../services/api";
 
-const PortfolioContext = createContext();
+export const PortfolioContext = createContext();
 
 export function PortfolioProvider({ children }) {
   const [hero, setHero] = useState(null);

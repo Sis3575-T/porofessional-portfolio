@@ -42,40 +42,46 @@ export default function Projects() {
   }
 
   return (
-    <section id="projects" className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent" />
+    <section id="projects" className="py-32 relative overflow-hidden">
+      <div className="absolute inset-0 bg-cyan-950/20" />
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
-        <h2 className="text-center mb-4 text-white">
-          Featured <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Projects</span>
+        <p className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3">
+          Portfolio
+        </p>
+        <h2 className="text-center text-white">
+          Featured <span className="text-cyan-400">Projects</span>
         </h2>
+        <div className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4" />
         <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
           A showcase of my recent work
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter projects by category">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilter(cat)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   filter === cat
-                    ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white"
+                    ? "bg-cyan-600 text-white"
                     : "bg-slate-800/50 text-slate-400 hover:text-white border border-slate-700/50"
                 }`}
+                aria-pressed={filter === cat}
               >
                 {cat === "ALL" ? "All" : categoryLabels[cat] || cat}
               </button>
             ))}
           </div>
           <div className="relative w-full sm:w-64">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              aria-label="Search projects"
             />
           </div>
         </div>
@@ -88,9 +94,9 @@ export default function Projects() {
                 key={project.id}
                 className="group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition-all hover:-translate-y-1"
               >
-                <div className="h-48 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 flex items-center justify-center relative overflow-hidden">
+                <div className="h-48 bg-slate-800/50 flex items-center justify-center relative overflow-hidden">
                   {project.thumbnail ? (
-                    <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover" />
+                    <img src={project.thumbnail} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-center">
                       <div className="text-4xl mb-2">📁</div>
@@ -98,11 +104,11 @@ export default function Projects() {
                     </div>
                   )}
                   {project.featured && (
-                    <span className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full">
+                    <span className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-cyan-600 text-white rounded-full">
                       Featured
                     </span>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-3">
+                  <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-3">
                     {project.liveUrl && (
                       <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
                         className="p-2 bg-white/10 backdrop-blur rounded-lg text-white hover:bg-white/20 transition">

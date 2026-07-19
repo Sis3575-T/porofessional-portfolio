@@ -13,6 +13,9 @@ import ProjectsEditor from './pages/editors/ProjectsEditor';
 import TestimonialsEditor from './pages/editors/TestimonialsEditor';
 import MessagesPage from './pages/editors/MessagesPage';
 import SettingsEditor from './pages/editors/SettingsEditor';
+import MediaManager from './pages/editors/MediaManager';
+import ActivityLogs from './pages/editors/ActivityLogs';
+import NotFound from './pages/NotFound';
 
 function ProtectedRoute({ children, isAuthenticated }) {
   if (!isAuthenticated) return <Navigate to="/login" />;
@@ -40,7 +43,7 @@ export default function App() {
   const wrap = (element) => <Dashboard>{element}</Dashboard>;
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Toaster position="top-right" toastOptions={{
         style: { background: '#1e293b', color: '#f8fafc', border: '1px solid #334155' },
       }} />
@@ -81,7 +84,13 @@ export default function App() {
         <Route path="/admin/settings" element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<SettingsEditor />)}</ProtectedRoute>
         } />
-        <Route path="*" element={<Navigate to="/admin" />} />
+        <Route path="/admin/media" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<MediaManager />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/activity" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<ActivityLogs />)}</ProtectedRoute>
+        } />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

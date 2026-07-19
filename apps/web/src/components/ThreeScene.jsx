@@ -1,0 +1,116 @@
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Environment } from "@react-three/drei";
+import { AnimatePresence, motion } from "framer-motion";
+import { useDeviceDetect } from "../hooks/useDeviceDetect";
+import AbstractScene from "./three/AbstractScene";
+import Hero3DLoading from "./three/Hero3DLoading";
+
+const PhotoCard = lazy(() => import("./three/PhotoCard"));
+const OfficeScene = lazy(() => import("./three/office/OfficeScene"));
+
+const MODES = {
+  abstract: "abstract",
+  photoCard: "photoCard",
+  office: "office",
+};
+
+const DEFAULT_CONFIG = {
+  mode: "photoCard",
+  rotationSpeed: 0.3,
+  floatSpeed: 0.5,
+  floatIntensity: 0.3,
+  autoRotate: true,
+  autoRotateSpeed: 0.3,
+  mouseInteraction: true,
+  particleDensity: 80,
+  shadowQuality: "medium",
+  backgroundColor: "transparent",
+};
+
+export default function ThreeScene({ profileImage, config: userConfig = {} }) {
+  const { isLowEnd, prefersReducedMotion } = useDeviceDetect();
+  const mouse = useRef({ x: 0, y: 0 });
+  const canvasRef = useRef();
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  const config = { ...DEFAULT_CONFIG, ...userConfig };
+  const mode = config.mode === MODES.office ? MODES.office
+    : (profileImage && !error ? MODES.photoCard : MODES.abstract);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const onMove = (e) => {
+      if (!config.mouseInteraction) return;
+      mouse.current = {
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      };
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [prefersReducedMotion, config.mouseInteraction]);
+
+  if (prefersReducedMotion) {
+    return profileImage ? (
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <img src={profileImage} alt="Profile" className="w-48 h-56 object-cover rounded-2xl border border-slate-700 shadow-lg" />
+      </div>
+    ) : null;
+  }
+
+  if (mode === MODES.office) {
+    return (
+      <Canvas
+        camera={{ position: [1.5, 0.65, 2.5], fov: 45 }}
+        dpr={isLowEnd ? [1, 1] : [1, 1.5]}
+        gl={{ antialias: !isLowEnd, alpha: false }}
+        style={{ background: "#0a0a14" }}
+        shadows={!isLowEnd}
+        onCreated={() => setLoaded(true)}
+      >
+        <Suspense fallback={null}>
+          <OfficeScene profileImage={profileImage} config={config} />
+        </Suspense>
+      </Canvas>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full" ref={canvasRef}>
+      <AnimatePresence>
+        {!loaded && !error && <Hero3DLoading progress={0} />}
+      </AnimatePresence>
+
+      {error && profileImage ? (
+        <div className="w-full h-full flex items-center justify-center p-8">
+          <img src={profileImage} alt="Profile" className="w-48 h-56 object-cover rounded-2xl border border-slate-700 shadow-lg" />
+        </div>
+      ) : (
+        <Canvas
+          camera={{ position: [0, 0, 4], fov: 45 }}
+          dpr={isLowEnd ? [1, 1] : [1, 1.5]}
+          gl={{ antialias: !isLowEnd, alpha: true }}
+          style={{ background: "transparent" }}
+          onCreated={() => setLoaded(true)}
+        >
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[5, 5, 5]} intensity={isLowEnd ? 0.5 : 1} />
+          {!isLowEnd && <pointLight position={[-5, -5, -5]} intensity={0.5} color="#8b5cf6" />}
+          {!isLowEnd && <hemisphereLight args={["#22d3ee", "#8b5cf6", 0.2]} />}
+
+          {mode === MODES.photoCard ? (
+            <Suspense fallback={null}>
+              <PhotoCard imageUrl={profileImage} config={config} mouse={mouse} isLowEnd={isLowEnd} />
+            </Suspense>
+          ) : (
+            <AbstractScene mouse={mouse} isLowEnd={isLowEnd} />
+          )}
+
+          {!isLowEnd && <Environment preset="city" />}
+        </Canvas>
+      )}
+    </div>
+  );
+}

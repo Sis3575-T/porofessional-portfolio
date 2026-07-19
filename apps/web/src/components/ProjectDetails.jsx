@@ -49,7 +49,7 @@ export default function ProjectDetails() {
           <div className="text-6xl mb-4">🔍</div>
           <h2 className="text-2xl font-bold text-white mb-2">Project Not Found</h2>
           <p className="text-slate-400 mb-6">{error}</p>
-          <Link to="/" className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-950 rounded-lg font-semibold inline-flex items-center gap-2">
+          <Link to="/" className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg font-semibold inline-flex items-center gap-2">
             <ArrowLeft size={18} /> Back Home
           </Link>
         </div>
@@ -69,9 +69,9 @@ export default function ProjectDetails() {
         </Link>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden mb-8">
-          <div className="h-64 sm:h-80 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 flex items-center justify-center">
+          <div className="h-64 sm:h-80 bg-slate-800/50 flex items-center justify-center">
             {project.thumbnail ? (
-              <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover" />
+              <img src={project.thumbnail} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
             ) : (
               <div className="text-center">
                 <div className="text-6xl mb-2">🚀</div>
@@ -99,7 +99,7 @@ export default function ProjectDetails() {
             <div className="flex gap-3">
               {project.liveUrl && (
                 <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-950 rounded-lg font-semibold text-sm hover:from-cyan-400 hover:to-cyan-500 transition flex items-center gap-2">
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg font-semibold text-sm transition flex items-center gap-2">
                   <ExternalLink size={16} /> Live Demo
                 </a>
               )}

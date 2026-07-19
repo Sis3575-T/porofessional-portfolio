@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, User, Code2, Briefcase, GraduationCap,
   FolderKanban, MessageSquare, Settings, LogOut, Menu, X,
-  Star, Wrench, FileText
+  Star, Wrench, FileText, Image, Activity
 } from "lucide-react";
 import { dashboardAPI } from "../services/api";
 
@@ -18,6 +18,8 @@ const sidebarItems = [
   { label: "Projects", path: "/admin/projects", icon: FolderKanban },
   { label: "Testimonials", path: "/admin/testimonials", icon: Star },
   { label: "Messages", path: "/admin/messages", icon: MessageSquare },
+  { label: "Media", path: "/admin/media", icon: Image },
+  { label: "Activity", path: "/admin/activity", icon: Activity },
   { label: "Settings", path: "/admin/settings", icon: Settings },
 ];
 

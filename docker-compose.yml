@@ -2,6 +2,8 @@ version: '3.9'
 services:
   db:
     image: postgres:16-alpine
+    container_name: portfolio_db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: portfolio
       POSTGRES_USER: postgres
@@ -16,40 +18,128 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
+  gateway:
     build:
-      context: ./services/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/api/Dockerfile
+    container_name: portfolio_gateway
+    restart: unless-stopped
     ports:
       - '5000:5000'
     environment:
-      API_PORT: 5000
+      GATEWAY_PORT: 5000
+      AUTH_SERVICE_URL: http://auth-service:5001
+      PORTFOLIO_SERVICE_URL: http://portfolio-service:5002
+      MEDIA_SERVICE_URL: http://media-service:5003
+      DASHBOARD_SERVICE_URL: http://dashboard-service:5004
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5175
+    depends_on:
+      - auth-service
+      - portfolio-service
+      - media-service
+      - dashboard-service
+    volumes:
+      - ./services/api/src:/app/services/api/src
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: portfolio_auth
+    restart: unless-stopped
+    expose:
+      - '5001'
+    environment:
+      AUTH_SERVICE_PORT: 5001
       DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       JWT_EXPIRY: 7d
-      ADMIN_EMAIL: admin@portfolio.dev
-      ADMIN_PASSWORD: AdminPassword123!
       NODE_ENV: development
-      FRONTEND_URL: http://localhost:5173
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./services/api/src:/app/src
-      - ./services/api/package.json:/app/package.json
+      - ./services/auth-service/src:/app/services/auth-service/src
+      - ./services/shared:/app/services/shared
       - ./prisma:/app/prisma
-      - api_uploads:/app/uploads
+
+  portfolio-service:
+    build:
+      context: .
+      dockerfile: services/portfolio-service/Dockerfile
+    container_name: portfolio_content
+    restart: unless-stopped
+    expose:
+      - '5002'
+    environment:
+      PORTFOLIO_SERVICE_PORT: 5002
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio
+      JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
+      JWT_EXPIRY: 7d
+      ADMIN_EMAIL: sisay3575@gmail.com
+      NODE_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./services/portfolio-service/src:/app/services/portfolio-service/src
+      - ./services/shared:/app/services/shared
+      - ./prisma:/app/prisma
+
+  media-service:
+    build:
+      context: .
+      dockerfile: services/media-service/Dockerfile
+    container_name: portfolio_media
+    restart: unless-stopped
+    expose:
+      - '5003'
+    environment:
+      MEDIA_SERVICE_PORT: 5003
+      JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
+      NODE_ENV: development
+    depends_on:
+      - db
+    volumes:
+      - ./services/media-service/src:/app/services/media-service/src
+      - ./services/media-service/uploads:/app/services/media-service/uploads
+      - ./services/shared:/app/services/shared
+
+  dashboard-service:
+    build:
+      context: .
+      dockerfile: services/dashboard-service/Dockerfile
+    container_name: portfolio_dashboard
+    restart: unless-stopped
+    expose:
+      - '5004'
+    environment:
+      DASHBOARD_SERVICE_PORT: 5004
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio
+      JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
+      JWT_EXPIRY: 7d
+      NODE_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./services/dashboard-service/src:/app/services/dashboard-service/src
+      - ./services/shared:/app/services/shared
+      - ./prisma:/app/prisma
 
   web:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
+    container_name: portfolio_web
+    restart: unless-stopped
     ports:
-      - '5173:5173'
+      - '5175:5175'
     environment:
       VITE_API_URL: http://localhost:5000
     depends_on:
-      - api
+      - gateway
     volumes:
       - ./apps/web/src:/app/src
       - ./apps/web/package.json:/app/package.json
@@ -59,12 +149,14 @@ services:
     build:
       context: ./apps/admin
       dockerfile: Dockerfile
+    container_name: portfolio_admin
+    restart: unless-stopped
     ports:
       - '5174:5174'
     environment:
       VITE_API_URL: http://localhost:5000
     depends_on:
-      - api
+      - gateway
     volumes:
       - ./apps/admin/src:/app/src
       - ./apps/admin/package.json:/app/package.json
@@ -72,4 +164,3 @@ services:
 
 volumes:
   pgdata:
-  api_uploads:

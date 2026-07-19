@@ -58,6 +58,21 @@ model About {
   phone           String?
   nationality     String?
   languages       String?
+  subtitle        String    @default("ABOUT ME")
+  heading         String    @default("Crafting Digital Experiences That Make an Impact")
+  name            String    @default("Sisay Temesgen")
+  degree          String?
+  availability    String    @default("Available for projects")
+  freelance       String    @default("Available")
+  glbModel        String?   // GLB 3D avatar URL
+  statistics      String?   @db.Text // JSON: {projects, clients, yearsExp, technologies}
+  featureCards    String?   @db.Text // JSON array of {icon, title, description, order}
+  techIcons       String?   @db.Text // JSON array of tech icon names/urls
+  background      String?   @db.Text // JSON: {noise, grid, radialLights, blurredCircles}
+  decoration      String?   @db.Text // JSON: {particles, geometricShapes, animatedLines, glowCircles}
+  animationSettings String? @db.Text // JSON: {scrollReveal, hoverEffects, floatSpeed, parallaxIntensity}
+  visibility      String    @default("visible") // visible, hidden
+  order           Int       @default(0)
   enabled         Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -222,6 +237,8 @@ model Setting {
   metaDescription String?
   ogImage         String?
   googleAnalytics String?
+  hero3dConfig    String?   @db.Text // JSON: mode, rotationSpeed, floatSpeed, etc.
+  uiConfig        String?   @db.Text // JSON: customCursor, backgroundEffects, etc.
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
