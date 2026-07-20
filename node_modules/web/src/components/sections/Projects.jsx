@@ -43,15 +43,17 @@ export default function Projects() {
 
   return (
     <section id="projects" className="py-32 relative overflow-hidden">
-      <div className="absolute inset-0 bg-cyan-950/20" />
+      <div className="section-bg section-projects-bg">
+        <div className="section-bg-pattern section-projects-pattern" />
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
-        <p className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3">
+        <p className="text-center text-sm font-medium text-slate-400 tracking-widest uppercase mb-3">
           Portfolio
         </p>
         <h2 className="text-center text-white">
-          Featured <span className="text-cyan-400">Projects</span>
+          Featured Projects
         </h2>
-        <div className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4" />
+        <div className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4" />
         <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
           A showcase of my recent work
         </p>
@@ -64,8 +66,8 @@ export default function Projects() {
                 onClick={() => setFilter(cat)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   filter === cat
-                    ? "bg-cyan-600 text-white"
-                    : "bg-slate-800/50 text-slate-400 hover:text-white border border-slate-700/50"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-500 hover:text-gray-900 border border-gray-200"
                 }`}
                 aria-pressed={filter === cat}
               >
@@ -74,13 +76,13 @@ export default function Projects() {
             ))}
           </div>
           <div className="relative w-full sm:w-64">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
               aria-label="Search projects"
             />
           </div>
@@ -92,9 +94,9 @@ export default function Projects() {
             return (
               <div
                 key={project.id}
-                className="group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition-all hover:-translate-y-1"
+                className="group bg-white border border-gray-200 card-concrete rounded-xl overflow-hidden hover:border-gray-300 transition-all hover:-translate-y-1"
               >
-                <div className="h-48 bg-slate-800/50 flex items-center justify-center relative overflow-hidden">
+                <div className="h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
                   {project.thumbnail ? (
                     <img src={project.thumbnail} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
                   ) : (
@@ -104,44 +106,44 @@ export default function Projects() {
                     </div>
                   )}
                   {project.featured && (
-                    <span className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-cyan-600 text-white rounded-full">
+                    <span className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-gray-900/10 text-gray-700 rounded-full">
                       Featured
                     </span>
                   )}
-                  <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-3">
+                  <div className="absolute inset-0 bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-3">
                     {project.liveUrl && (
                       <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
-                        className="p-2 bg-white/10 backdrop-blur rounded-lg text-white hover:bg-white/20 transition">
+                        className="p-2 bg-gray-900/10 rounded-lg text-gray-700 hover:bg-gray-900/20 transition">
                         <ExternalLink size={18} />
                       </a>
                     )}
                     {project.githubUrl && (
                       <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
-                        className="p-2 bg-white/10 backdrop-blur rounded-lg text-white hover:bg-white/20 transition">
+                        className="p-2 bg-gray-900/10 rounded-lg text-gray-700 hover:bg-gray-900/20 transition">
                         <Github size={18} />
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="p-6">
-                  <span className="text-xs text-cyan-400 font-medium">{categoryLabels[project.category]}</span>
+                  <span className="text-xs text-gray-500 font-medium">{categoryLabels[project.category]}</span>
                   <h3 className="text-lg font-semibold text-white mt-1 mb-2">{project.title}</h3>
-                  <p className="text-sm text-slate-400 mb-4 line-clamp-2">{project.description}</p>
+                  <p className="text-sm text-gray-500 mb-4 line-clamp-2">{project.description}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {techs.slice(0, 4).map((tech) => (
-                      <span key={tech} className="px-2 py-0.5 text-xs bg-slate-800 text-slate-300 rounded">
+                      <span key={tech} className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
                         {tech}
                       </span>
                     ))}
                     {techs.length > 4 && (
-                      <span className="px-2 py-0.5 text-xs bg-slate-800 text-slate-500 rounded">
+                      <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-400 rounded">
                         +{techs.length - 4}
                       </span>
                     )}
                   </div>
                   <a
                     href={`/projects/${project.slug}`}
-                    className="text-sm text-cyan-400 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+                    className="text-sm text-gray-700 font-medium flex items-center gap-1 hover:gap-2 transition-all"
                   >
                     View Details <ArrowRight size={14} />
                   </a>
@@ -153,7 +155,7 @@ export default function Projects() {
 
         {filtered.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-slate-500">No projects found</p>
+            <p className="text-gray-400">No projects found</p>
           </div>
         )}
       </div>

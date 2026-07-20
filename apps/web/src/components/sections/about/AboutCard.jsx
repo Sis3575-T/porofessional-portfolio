@@ -14,7 +14,7 @@ export default function AboutCard({
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
       whileHover={hover ? { y: -4, transition: { duration: 0.2 } } : undefined}
-      className={`bg-slate-900/40 backdrop-blur-sm border border-slate-800/60 rounded-2xl shadow-lg shadow-black/10 ${className}`}
+      className={`bg-white border border-gray-200 rounded-2xl shadow-sm ${className}`}
     >
       {children}
     </Tag>

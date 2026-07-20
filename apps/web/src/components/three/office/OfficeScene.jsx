@@ -8,8 +8,6 @@ import Laptop from "./Laptop";
 import Monitor from "./Monitor";
 import Chair from "./Chair";
 import Person from "./Person";
-import FloatingTechIcons from "./FloatingTechIcons";
-import Particles from "./Particles";
 import OfficeLighting from "./OfficeLighting";
 
 export default function OfficeScene({ profileImage, config = {}, mouse = { current: { x: 0, y: 0 } } }) {
@@ -48,8 +46,6 @@ export default function OfficeScene({ profileImage, config = {}, mouse = { curre
       </group>
       <Person typingSpeed={config.typingSpeed ?? 2} breathingSpeed={config.breathingSpeed ?? 0.8} />
       <FloatingPhoto imageUrl={config.profileImagePlacement === 'floating' ? profileImage : null} />
-      <FloatingTechIcons config={config} />
-      <Particles config={config} />
       <OfficeLighting config={config} />
     </group>
   );

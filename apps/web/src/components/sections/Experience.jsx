@@ -20,11 +20,10 @@ export default function Experience() {
   }
 
   return (
-    <AnimatedSection id="experience" className="py-32 relative overflow-hidden" aria-label="Experience section">
-      <div className="absolute inset-0 bg-cyan-950/20" />
-      <div className="max-w-3xl mx-auto px-4 sm:px-8 relative z-10">
+    <AnimatedSection id="experience" theme="experience" className="py-32 overflow-hidden" aria-label="Experience section">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8 relative">
         <motion.p
-          className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3"
+          className="text-center text-sm font-medium text-slate-400 tracking-widest uppercase mb-3"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -37,10 +36,10 @@ export default function Experience() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <span className="text-cyan-400">Experience</span>
+          Experience
         </motion.h2>
         <motion.div
-          className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4"
+          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
           initial={{ width: 0 }}
           whileInView={{ width: 64 }}
           viewport={{ once: true }}
@@ -57,7 +56,7 @@ export default function Experience() {
 
         <div className="relative">
           <motion.div
-            className="absolute left-8 top-0 bottom-0 w-px bg-cyan-500/50"
+            className="absolute left-8 top-0 bottom-0 w-px bg-slate-700"
             initial={{ height: 0 }}
             whileInView={{ height: "100%" }}
             viewport={{ once: true }}
@@ -79,7 +78,7 @@ export default function Experience() {
                 <motion.div
                   className={`absolute left-4 w-9 h-9 rounded-full border-2 flex items-center justify-center ${
                     exp.isCurrent
-                      ? "bg-cyan-500/20 border-cyan-500"
+                      ? "bg-slate-800 border-slate-500"
                       : "bg-slate-800 border-slate-600"
                   }`}
                   initial={{ scale: 0 }}
@@ -87,26 +86,26 @@ export default function Experience() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.15 + 0.2, type: "spring" }}
                 >
-                  <Briefcase size={16} className={exp.isCurrent ? "text-cyan-400" : "text-slate-400"} />
+                  <Briefcase size={16} className={exp.isCurrent ? "text-slate-300" : "text-slate-400"} />
                 </motion.div>
 
                 <motion.div
                   className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-all"
-                  whileHover={{ x: 5, borderColor: "rgba(34,211,238,0.2)" }}
+                  whileHover={{ x: 5 }}
                 >
                   <div className="flex flex-wrap items-center gap-3 mb-2">
                     {exp.isCurrent && (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-cyan-500/20 text-cyan-400 rounded-full">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-gray-200 text-gray-700 rounded-full">
                         Current
                       </span>
                     )}
                   </div>
                   <h3 className="text-lg font-semibold text-white">{exp.position}</h3>
-                  <p className="text-cyan-400 text-sm mb-2">{exp.company}</p>
+                  <p className="text-slate-300 text-sm mb-2">{exp.company}</p>
                   <p className="text-slate-500 text-sm mb-3">
                     {formatDate(exp.startDate)} - {exp.isCurrent ? "Present" : formatDate(exp.endDate)}
                   </p>
-                  <p className="text-slate-400 text-sm mb-4">{exp.description}</p>
+                  <p className="text-gray-500 text-sm mb-4">{exp.description}</p>
                   {techs.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {techs.map((tech, ti) => (

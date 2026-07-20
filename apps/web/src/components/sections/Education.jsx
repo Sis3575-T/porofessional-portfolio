@@ -20,10 +20,10 @@ export default function Education() {
   }
 
   return (
-    <AnimatedSection id="education" className="py-32" aria-label="Education section">
-      <div className="max-w-3xl mx-auto px-4 sm:px-8">
+    <AnimatedSection id="education" theme="education" className="py-32" aria-label="Education section">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8 relative">
         <motion.p
-          className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3"
+          className="text-center text-sm font-medium text-slate-400 tracking-widest uppercase mb-3"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -36,16 +36,16 @@ export default function Education() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <span className="text-cyan-400">Education</span>
+          Education
         </motion.h2>
         <motion.div
-          className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4"
+          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
           initial={{ width: 0 }}
           whileInView={{ width: 64 }}
           viewport={{ once: true }}
         />
         <motion.p
-          className="text-center text-slate-400 mb-16 max-w-2xl mx-auto"
+          className="text-center text-gray-500 mb-16 max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -56,7 +56,7 @@ export default function Education() {
 
         <div className="relative">
           <motion.div
-            className="absolute left-8 top-0 bottom-0 w-px bg-purple-500/50"
+            className="absolute left-8 top-0 bottom-0 w-px bg-slate-700"
             initial={{ height: 0 }}
             whileInView={{ height: "100%" }}
             viewport={{ once: true }}
@@ -75,20 +75,20 @@ export default function Education() {
                 transition={{ delay: idx * 0.2 }}
               >
                 <motion.div
-                  className="absolute left-4 w-9 h-9 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center"
+                  className="absolute left-4 w-9 h-9 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center"
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.2 + 0.2, type: "spring" }}
                 >
-                  <GraduationCap size={16} className="text-purple-400" />
+                  <GraduationCap size={16} className="text-slate-400" />
                 </motion.div>
                 <motion.div
                   className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-all"
                   whileHover={{ x: 5 }}
                 >
                   <h3 className="text-lg font-semibold text-white">{edu.degree}</h3>
-                  <p className="text-purple-400 text-sm mb-1">{edu.institution}</p>
+                  <p className="text-slate-300 text-sm mb-1">{edu.institution}</p>
                   <p className="text-slate-500 text-sm mb-3">
                     {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                   </p>

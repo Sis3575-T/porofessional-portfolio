@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
   cardHeight: 2.4,
   cornerRadius: 0.08,
   borderWidth: 0.02,
-  borderColor: "#22d3ee",
+  borderColor: "#888888",
 };
 
 function loadTexture(url) {

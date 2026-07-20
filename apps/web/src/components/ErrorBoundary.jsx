@@ -17,12 +17,12 @@ export default class ErrorBoundary extends Component {
           <div className="text-center max-w-md px-4">
             <div className="text-6xl mb-4" aria-hidden="true">!</div>
             <h1 className="text-3xl font-bold text-white mb-2">Something went wrong</h1>
-            <p className="text-slate-400 mb-6">
+            <p className="text-gray-500 mb-6">
               An unexpected error occurred. Please try refreshing the page.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg font-semibold transition"
+              className="btn-ceramic"
             >
               Refresh Page
             </button>

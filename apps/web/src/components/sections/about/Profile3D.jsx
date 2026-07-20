@@ -58,9 +58,9 @@ function OrbitingIcons({ count = 8 }) {
 
 function AvatarPlaceholder({ initials }) {
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-900/40 to-purple-900/40">
-      <div className="w-28 h-28 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border-2 border-cyan-500/30">
-        <span className="text-4xl font-bold text-cyan-400/80">
+    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+      <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center border-2 border-gray-200">
+        <span className="text-4xl font-bold text-gray-900">
           {initials || "?"}
         </span>
       </div>
@@ -109,18 +109,14 @@ export default function Profile3D({ profileImage, glbModel, isLowEnd: _isLowEnd 
           className="relative"
         >
           <div
-            className="aspect-[3/4] rounded-3xl overflow-hidden border border-slate-700/60 bg-slate-900 shadow-2xl shadow-cyan-500/10 relative group"
+            className="aspect-[3/4] rounded-3xl overflow-hidden border border-gray-200 bg-gray-50 shadow-sm relative group"
             style={{ transformStyle: "preserve-3d", perspective: "800px" }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 z-10 pointer-events-none" />
-            <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/5 to-transparent z-10 pointer-events-none rounded-t-3xl" />
-
             {profileImage && !imgError ? (
               <>
                 {!imgLoaded && (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                    <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
                   </div>
                 )}
                 <img
@@ -133,24 +129,22 @@ export default function Profile3D({ profileImage, glbModel, isLowEnd: _isLowEnd 
                 />
               </>
             ) : glbModel ? (
-              <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                <p className="text-slate-400 text-sm">3D Model Loader</p>
+              <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                <p className="text-gray-400 text-sm">3D Model Loader</p>
               </div>
             ) : (
               <AvatarPlaceholder initials={getInitials("Sisay Temesgen")} />
             )}
 
-            <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-slate-900/80 to-transparent z-10 pointer-events-none rounded-b-3xl" />
             <div className="absolute bottom-4 left-4 right-4 z-20">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs text-slate-300 font-medium">Available for work</span>
+                <span className="text-xs text-gray-500 font-medium">Available for work</span>
               </div>
             </div>
           </div>
         </motion.div>
 
-        <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 blur-xl -z-10" />
       </motion.div>
     </div>
   );

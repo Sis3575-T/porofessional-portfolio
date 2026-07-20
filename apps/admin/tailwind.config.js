@@ -9,8 +9,8 @@ export default {
         'slate-950': '#050816',
         'slate-900': '#0f172a',
       },
-      backgroundImage: {
-        'gradient-dark': 'linear-gradient(135deg, #050816 0%, #0f172a 100%)',
+      backgroundColor: {
+        'solid-dark': '#0a0d1a',
       },
     },
   },

@@ -6,7 +6,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="p-2 text-slate-400 hover:text-cyan-400 transition rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+      className="p-2 text-gray-500 hover:text-gray-900 transition rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {dark ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}

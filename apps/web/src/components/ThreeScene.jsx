@@ -68,7 +68,7 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
         camera={{ position: [1.5, 0.65, 2.5], fov: 45 }}
         dpr={isLowEnd ? [1, 1] : [1, 1.5]}
         gl={{ antialias: !isLowEnd, alpha: false }}
-        style={{ background: "#0a0a14" }}
+        style={{ background: "#151515" }}
         shadows={!isLowEnd}
         onCreated={() => setLoaded(true)}
       >
@@ -99,8 +99,8 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={isLowEnd ? 0.5 : 1} />
-          {!isLowEnd && <pointLight position={[-5, -5, -5]} intensity={0.5} color="#8b5cf6" />}
-          {!isLowEnd && <hemisphereLight args={["#22d3ee", "#8b5cf6", 0.2]} />}
+          {!isLowEnd && <pointLight position={[-5, -5, -5]} intensity={0.3} color="#ffffff" />}
+          {!isLowEnd && <hemisphereLight args={["#ffffff", "#666666", 0.2]} />}
 
           {mode === MODES.photoCard ? (
             <Suspense fallback={null}>

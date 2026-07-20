@@ -57,7 +57,7 @@ function TorusKnot({ mouse }) {
   return (
     <mesh ref={ref} position={[0, 0.5, 0]}>
       <torusKnotGeometry args={[0.6, 0.2, 64, 8]} />
-      <meshStandardMaterial color="#22d3ee" wireframe transparent opacity={0.25} />
+      <meshStandardMaterial color="#888888" wireframe transparent opacity={0.15} />
     </mesh>
   );
 }
@@ -84,7 +84,7 @@ function Particles({ count = 80, mouse }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.02} color="#22d3ee" transparent opacity={0.35} sizeAttenuation />
+      <pointsMaterial size={0.02} color="#888888" transparent opacity={0.15} sizeAttenuation />
     </points>
   );
 }
@@ -93,7 +93,7 @@ function SimpleGlow() {
   return (
     <mesh position={[0, 0, -1]}>
       <sphereGeometry args={[1, 16, 16]} />
-      <meshBasicMaterial color="#22d3ee" transparent opacity={0.04} />
+      <meshBasicMaterial color="#888888" transparent opacity={0.02} />
     </mesh>
   );
 }
@@ -111,10 +111,10 @@ export default function AbstractScene({ mouse, isLowEnd }) {
   return (
     <>
       <TorusKnot mouse={mouse} />
-      <FloatingCube position={[-1.5, 0.8, -1]} color="#22d3ee" speed={0.8} mouse={mouse} />
-      <FloatingCube position={[1.8, -0.5, -1.5]} color="#8b5cf6" speed={1.2} size={0.25} mouse={mouse} />
-      <FloatingSphere position={[-1.2, -1, -2]} color="#f472b6" speed={0.6} mouse={mouse} />
-      <FloatingSphere position={[1.5, 1.2, -2]} color="#22d3ee" speed={0.9} size={0.15} mouse={mouse} />
+      <FloatingCube position={[-1.5, 0.8, -1]} color="#888888" speed={0.8} mouse={mouse} />
+      <FloatingCube position={[1.8, -0.5, -1.5]} color="#888888" speed={1.2} size={0.25} mouse={mouse} />
+      <FloatingSphere position={[-1.2, -1, -2]} color="#888888" speed={0.6} mouse={mouse} />
+      <FloatingSphere position={[1.5, 1.2, -2]} color="#888888" speed={0.9} size={0.15} mouse={mouse} />
       <Particles count={80} mouse={mouse} />
       <ContactShadows position={[0, -1.5, 0]} opacity={0.3} scale={5} blur={2} />
     </>

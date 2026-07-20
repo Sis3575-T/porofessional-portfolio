@@ -35,11 +35,10 @@ export default function Testimonials() {
   const t = testimonials[current];
 
   return (
-    <AnimatedSection id="testimonials" className="py-32 relative overflow-hidden" aria-label="Testimonials section">
-      <div className="absolute inset-0 bg-purple-950/20" />
-      <div className="max-w-3xl mx-auto px-4 sm:px-8 relative z-10">
+    <AnimatedSection id="testimonials" theme="testimonials" className="py-32 overflow-hidden" aria-label="Testimonials section">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8 relative">
         <motion.p
-          className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3"
+          className="text-center text-sm font-medium text-slate-400 tracking-widest uppercase mb-3"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -52,10 +51,10 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          What <span className="text-cyan-400">Clients</span> Say
+          What Clients Say
         </motion.h2>
         <motion.div
-          className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4"
+          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
           initial={{ width: 0 }}
           whileInView={{ width: 64 }}
           viewport={{ once: true }}
@@ -72,7 +71,7 @@ export default function Testimonials() {
 
         <div className="relative">
           <motion.div
-            className="absolute -top-4 left-0 text-cyan-500/10"
+            className="absolute -top-4 left-0 text-white/5"
             initial={{ opacity: 0, rotate: -20 }}
             whileInView={{ opacity: 1, rotate: 0 }}
             viewport={{ once: true }}
@@ -98,7 +97,7 @@ export default function Testimonials() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <Star size={18} className={i < t.rating ? "text-yellow-400 fill-yellow-400" : "text-slate-600"} />
+                    <Star size={18} className={i < t.rating ? "text-white fill-white" : "text-slate-600"} />
                   </motion.div>
                 ))}
               </div>
@@ -118,7 +117,7 @@ export default function Testimonials() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <div className="w-12 h-12 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-lg">
                   {t.name.charAt(0)}
                 </div>
                 <div className="text-left">
@@ -138,7 +137,7 @@ export default function Testimonials() {
             >
               <motion.button
                 onClick={prev}
-                className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                className="p-2 bg-gray-100 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 aria-label="Previous testimonial"
@@ -151,7 +150,7 @@ export default function Testimonials() {
                     key={i}
                     onClick={() => setCurrent(i)}
                     className={`w-2 h-2 rounded-full transition-all ${
-                      i === current ? "bg-cyan-400 w-6" : "bg-slate-600"
+                      i === current ? "bg-gray-900 w-6" : "bg-gray-300"
                     }`}
                     aria-label={`Go to testimonial ${i + 1}`}
                     aria-current={i === current ? "true" : undefined}
@@ -160,7 +159,7 @@ export default function Testimonials() {
               </div>
               <motion.button
                 onClick={next}
-                className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                className="p-2 bg-gray-100 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 aria-label="Next testimonial"

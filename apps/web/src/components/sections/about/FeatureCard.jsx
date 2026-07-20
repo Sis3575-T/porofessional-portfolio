@@ -41,16 +41,16 @@ export default function FeatureCard({ cards: cardsJson }) {
             transition={{ delay: 0.2 + i * 0.1, duration: 0.4 }}
             whileHover={{
               y: -6,
-              borderColor: "rgba(6, 182, 212, 0.3)",
+              borderColor: "rgba(0, 0, 0, 0.12)",
               transition: { duration: 0.2 },
             }}
-            className="group bg-slate-900/30 backdrop-blur-sm border border-slate-800/50 rounded-2xl p-5 hover:shadow-xl hover:shadow-cyan-500/5 transition-all"
+            className="group bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-lg hover:shadow-gray-200/50 transition-all"
           >
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4 group-hover:bg-cyan-500/20 transition-colors">
-              <IconComp size={20} className="text-cyan-400" />
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4 group-hover:bg-gray-200 transition-colors">
+              <IconComp size={20} className="text-gray-600" />
             </div>
-            <h4 className="text-base font-semibold text-white mb-2">{card.title}</h4>
-            <p className="text-sm text-slate-400 leading-relaxed">{card.description}</p>
+            <h4 className="text-base font-semibold text-gray-900 mb-2">{card.title}</h4>
+            <p className="text-sm text-gray-500 leading-relaxed">{card.description}</p>
           </motion.div>
         );
       })}

@@ -36,7 +36,7 @@ button {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #22d3ee, #06b6d4);
+  background: #22d3ee;
   color: #050816;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -57,7 +57,7 @@ button {
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: #ef4444;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;

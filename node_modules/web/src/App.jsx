@@ -1,19 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { lazy, Suspense, useContext } from "react";
+import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PortfolioProvider, PortfolioContext } from "./context/PortfolioContext";
+import { PortfolioProvider } from "./context/PortfolioContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SEO from "./components/SEO";
 import ErrorBoundary from "./components/ErrorBoundary";
 import SkipLink from "./components/SkipLink";
 import BackToTop from "./components/BackToTop";
-import CustomCursor from "./components/CustomCursor";
-import BackgroundEffects from "./components/BackgroundEffects";
+
 import NotFoundPage from "./components/NotFoundPage";
 
 const Hero = lazy(() => import("./components/sections/Hero"));
+const AboutPreview = lazy(() => import("./components/sections/AboutPreview"));
 const About = lazy(() => import("./components/sections/About"));
 const Skills = lazy(() => import("./components/sections/Skills"));
 const Services = lazy(() => import("./components/sections/Services"));
@@ -26,7 +27,7 @@ const ProjectDetails = lazy(() => import("./components/ProjectDetails"));
 
 const SectionLoader = () => (
   <div className="py-24 flex items-center justify-center">
-    <div className="animate-pulse text-slate-500">Loading...</div>
+    <div className="animate-pulse text-gray-400">Loading...</div>
   </div>
 );
 
@@ -50,6 +51,7 @@ function HomePage() {
       <AnimatedPage>
         <SEO />
         <Hero />
+        <AboutPreview />
         <About />
         <Skills />
         <Services />
@@ -83,34 +85,23 @@ function AppRoutes() {
   );
 }
 
-function UIOverlays() {
-  const { settings } = useContext(PortfolioContext);
-  let uiConfig = {};
-  try { uiConfig = settings?.uiConfig ? JSON.parse(settings.uiConfig) : {}; } catch {}
-
-  return (
-    <>
-      <CustomCursor enabled={uiConfig.customCursorEnabled !== false} />
-      <BackgroundEffects enabled={uiConfig.backgroundEffectsEnabled !== false} />
-    </>
-  );
-}
-
 export default function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider>
       <PortfolioProvider>
         <ErrorBoundary>
-          <div className="min-h-screen relative bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50">
-            <UIOverlays />
+          <div className="min-h-screen relative bg-white text-gray-900">
             <SkipLink />
+            <Sidebar />
             <Navbar />
-            <main id="main-content">
-              <AppRoutes />
-            </main>
+            <div className="ml-[125px] xl:ml-[130px] 2xl:ml-[140px]">
+              <main id="main-content">
+                <AppRoutes />
+              </main>
+              <Footer />
+            </div>
             <BackToTop />
-            <Footer />
           </div>
         </ErrorBoundary>
       </PortfolioProvider>

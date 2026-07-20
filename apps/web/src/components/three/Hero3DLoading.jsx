@@ -7,11 +7,11 @@ export default function Hero3DLoading({ progress }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="w-16 h-16 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mb-6" />
+      <div className="w-16 h-16 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin mb-6" />
       {progress > 0 && (
         <div className="w-32 h-1 bg-slate-800 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-cyan-600 rounded-full"
+            className="h-full bg-gray-200 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
           />

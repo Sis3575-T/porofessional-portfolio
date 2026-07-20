@@ -1,12 +1,12 @@
 export default function OfficeLighting({ config = {} }) {
   return (
     <>
-      <ambientLight intensity={config.ambientIntensity ?? 0.15} color="#6688aa" />
+      <ambientLight intensity={config.ambientIntensity ?? 0.12} color="#fff5e6" />
 
       <directionalLight
         position={[4, 6, 3]}
-        intensity={config.directionalIntensity ?? 0.5}
-        color="#ddeeff"
+        intensity={config.directionalIntensity ?? 0.6}
+        color="#fff8f0"
         castShadow
         shadow-mapSize-width={config.shadowQuality === "high" ? 2048 : 1024}
         shadow-mapSize-height={config.shadowQuality === "high" ? 2048 : 1024}
@@ -19,45 +19,28 @@ export default function OfficeLighting({ config = {} }) {
       />
 
       <directionalLight
-        position={[-2, 3, -1]}
-        intensity={0.15}
-        color="#4466aa"
+        position={[-3, 4, -1]}
+        intensity={0.08}
+        color="#fff8f0"
       />
 
       <pointLight
         position={[-0.8, 0.85, -0.3]}
-        intensity={config.accentIntensity ?? 0.2}
-        color="#22d3ee"
-        distance={2.5}
+        intensity={0.35}
+        color="#ffd595"
+        distance={2}
         decay={2}
       />
 
       <pointLight
-        position={[0, 0.3, -0.1]}
-        intensity={0.08}
-        color="#88ddff"
-        distance={1}
+        position={[0, 2.8, -1.5]}
+        intensity={0.15}
+        color="#fff8f0"
+        distance={4}
         decay={2}
       />
 
-      <pointLight
-        position={[1.2, 0.3, 0.5]}
-        intensity={0.06}
-        color="#ff8844"
-        distance={1.5}
-        decay={2}
-      />
-
-      <hemisphereLight args={["#4466aa", "#111122", 0.08]} />
-
-      <rectAreaLight
-        position={[0, 2.8, -2.2]}
-        width={2}
-        height={1.5}
-        intensity={0.08}
-        color="#88bbff"
-        rotation={[0.3, 0, 0]}
-      />
+      <hemisphereLight args={["#fff8f0", "#8a7a6a", 0.1]} />
     </>
   );
 }

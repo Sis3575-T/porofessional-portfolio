@@ -28,10 +28,10 @@ export default function Login({ setIsAuthenticated }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-cyan-400">
             Admin Dashboard
           </h1>
           <p className="text-slate-400 mt-2">Sign in to manage your portfolio</p>

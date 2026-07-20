@@ -60,7 +60,7 @@ export default function Dashboard({ children, title }) {
       }`}>
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-slate-800">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-cyan-400">
               Portfolio Pro
             </h1>
             <p className="text-xs text-slate-500 mt-1">Admin Dashboard</p>
@@ -83,7 +83,7 @@ export default function Dashboard({ children, title }) {
           </nav>
           <div className="p-4 border-t border-slate-800 space-y-3">
             <div className="flex items-center gap-3 px-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-xs font-bold">
                 {user.email?.charAt(0).toUpperCase() || "A"}
               </div>
               <div className="flex-1 min-w-0">
@@ -126,14 +126,14 @@ export default function Dashboard({ children, title }) {
                 <div className="space-y-8">
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {[
-                      { label: "Projects", value: stats.projects, color: "from-cyan-500 to-blue-500" },
-                      { label: "Skills", value: stats.skills, color: "from-purple-500 to-pink-500" },
-                      { label: "Messages", value: stats.messages, color: "from-green-500 to-emerald-500" },
-                      { label: "Total Views", value: stats.visitors?.toLocaleString(), color: "from-orange-500 to-red-500" },
+                      { label: "Projects", value: stats.projects },
+                      { label: "Skills", value: stats.skills },
+                      { label: "Messages", value: stats.messages },
+                      { label: "Total Views", value: stats.visitors?.toLocaleString() },
                     ].map((stat) => (
                       <div key={stat.label} className="card">
                         <p className="text-slate-400 text-sm mb-2">{stat.label}</p>
-                        <p className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                        <p className="text-3xl font-bold text-white">
                           {stat.value}
                         </p>
                       </div>

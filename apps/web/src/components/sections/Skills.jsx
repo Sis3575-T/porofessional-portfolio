@@ -15,19 +15,19 @@ const categoryLabels = {
 };
 
 const categoryColors = {
-  FRONTEND: "#22d3ee",
-  BACKEND: "#22c55e",
-  DATABASE: "#eab308",
-  DEVOPS: "#a855f7",
+  FRONTEND: "#94a3b8",
+  BACKEND: "#94a3b8",
+  DATABASE: "#94a3b8",
+  DEVOPS: "#94a3b8",
   TOOLS: "#94a3b8",
-  LANGUAGES: "#ef4444",
-  SOFT_SKILLS: "#2dd4bf",
-  OTHER: "#9ca3af",
+  LANGUAGES: "#94a3b8",
+  SOFT_SKILLS: "#94a3b8",
+  OTHER: "#94a3b8",
 };
 
-function SkillIcon({ name, color }) {
+function SkillIcon({ name }) {
   const key = name?.toLowerCase() || "";
-  const iconColor = color || "#22d3ee";
+  const iconColor = "#94a3b8";
 
   if (key.includes("react")) {
     return (
@@ -236,11 +236,10 @@ export default function Skills() {
   }
 
   return (
-    <AnimatedSection id="skills" className="py-32 relative overflow-hidden" aria-label="Skills section">
-      <div className="absolute inset-0 bg-cyan-950/20" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
+    <AnimatedSection id="skills" theme="skills" className="py-32 overflow-hidden" aria-label="Skills section">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative">
         <motion.p
-          className="text-center text-sm font-medium text-cyan-400 tracking-widest uppercase mb-3"
+          className="text-center text-sm font-medium text-gray-400 tracking-widest uppercase mb-3"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -253,16 +252,16 @@ export default function Skills() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          My <span className="text-cyan-400">Skills</span>
+          My Skills
         </motion.h2>
         <motion.div
-          className="w-16 h-1 bg-cyan-600 rounded-full mx-auto mt-4 mb-4"
+          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
           initial={{ width: 0 }}
           whileInView={{ width: 64 }}
           viewport={{ once: true }}
         />
         <motion.p
-          className="text-center text-slate-400 mb-12 max-w-2xl mx-auto"
+          className="text-center text-gray-400 mb-12 max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -283,8 +282,8 @@ export default function Skills() {
               onClick={() => setActiveCategory(cat)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
                 activeCategory === cat
-                  ? "bg-cyan-600 text-white shadow-lg shadow-cyan-500/25"
-                  : "bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700/50"
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-100 text-gray-500 hover:text-gray-900 hover:bg-gray-200 border border-gray-200"
               }`}
             >
               {cat === "ALL" ? "All" : categoryLabels[cat] || cat}
@@ -294,13 +293,12 @@ export default function Skills() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map((skill, i) => {
-            const dotColor = categoryColors[skill.category] || "#94a3b8";
             return (
-              <AnimatedCard key={skill.id} className="group relative bg-slate-900/50 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-all hover:-translate-y-1" index={i}>
+              <AnimatedCard key={skill.id} className="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 card-stone transition-all hover:-translate-y-1" index={i}>
                 <div className="flex items-center gap-3">
-                  <SkillIcon name={skill.name} color={dotColor} />
+                  <SkillIcon name={skill.name} />
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-white text-sm truncate group-hover:text-cyan-300 transition-colors">{skill.name}</h3>
+                    <h3 className="font-semibold text-white text-sm truncate group-hover:text-white transition-colors">{skill.name}</h3>
                     <span className="text-xs text-slate-500">{categoryLabels[skill.category] || skill.category}</span>
                   </div>
                 </div>

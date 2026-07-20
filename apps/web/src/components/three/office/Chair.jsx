@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 export default function Chair({ config = {} }) {
-  const color = config.chairColor || "#15152a";
+  const color = config.chairColor || "#2a2a2a";
 
   return (
     <group position={[1.15, 0, 0.2]}>

@@ -13,18 +13,28 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-export function AnimatedSection({ children, className, id, ...rest }) {
+export function AnimatedSection({ children, className, id, theme, ...rest }) {
+  const baseClass = "px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 relative";
+  const mergedClassName = className ? `${baseClass} ${className}` : baseClass;
+
   return (
     <motion.section
       id={id}
-      className={className}
+      className={mergedClassName}
       variants={sectionVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-50px" }}
       {...rest}
     >
-      {children}
+      {theme && (
+        <div className={`section-bg section-${theme}-bg`}>
+          <div className={`section-bg-pattern section-${theme}-pattern`} />
+        </div>
+      )}
+      <div className="relative z-10">
+        {children}
+      </div>
     </motion.section>
   );
 }

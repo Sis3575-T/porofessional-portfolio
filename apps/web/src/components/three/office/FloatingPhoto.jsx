@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useState, useEffect } from "react";
 import * as THREE from "three";
 
 function loadTexture(url) {
@@ -12,7 +11,6 @@ function loadTexture(url) {
 
 export default function FloatingPhoto({ imageUrl }) {
   const [texture, setTexture] = useState(null);
-  const meshRef = useRef();
 
   useEffect(() => {
     if (!imageUrl) { setTexture(null); return; }
@@ -23,19 +21,17 @@ export default function FloatingPhoto({ imageUrl }) {
     return () => { cancelled = true; };
   }, [imageUrl]);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    const t = Date.now() * 0.0003;
-    meshRef.current.position.y = 1.4 + Math.sin(t) * 0.015;
-  });
-
   const aspect = 3 / 4;
-  const width = 0.45;
+  const width = 0.35;
   const height = width / aspect;
 
   return (
-    <group>
-      <mesh ref={meshRef} position={[0, 1.4, -0.6]}>
+    <group position={[-1.4, 1.8, -2.45]}>
+      <mesh position={[0, 0, -0.002]}>
+        <planeGeometry args={[width + 0.04, height + 0.04]} />
+        <meshStandardMaterial color="#2a2a2a" roughness={0.5} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, 0, 0]}>
         <planeGeometry args={[width, height]} />
         {texture ? (
           <meshStandardMaterial
@@ -46,15 +42,9 @@ export default function FloatingPhoto({ imageUrl }) {
             side={THREE.DoubleSide}
           />
         ) : (
-          <meshBasicMaterial color="#0a0a2a" transparent opacity={0} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#333" transparent opacity={0.5} side={THREE.DoubleSide} />
         )}
       </mesh>
-      {texture && (
-        <mesh position={[0, 1.4, -0.602]}>
-          <planeGeometry args={[width + 0.01, height + 0.01]} />
-          <meshBasicMaterial color="#22d3ee" transparent opacity={0.06} side={THREE.DoubleSide} />
-        </mesh>
-      )}
     </group>
   );
 }

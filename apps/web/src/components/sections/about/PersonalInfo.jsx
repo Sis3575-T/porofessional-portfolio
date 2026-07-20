@@ -59,19 +59,19 @@ export default function PersonalInfo({ about }) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            className="flex items-center gap-3 p-3 bg-slate-800/20 rounded-xl border border-slate-800/40 hover:border-slate-700/60 transition-all group"
+            className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all group"
           >
-            <div className="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/20 transition-colors">
-              <Icon size={16} className="text-cyan-400" />
+            <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 group-hover:bg-gray-200 transition-colors">
+              <Icon size={16} className="text-gray-500" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wider">{label}</p>
+              <p className="text-[11px] text-gray-400 uppercase tracking-wider">{label}</p>
               {emailHref ? (
-                <a href={emailHref} className="text-sm text-slate-200 hover:text-cyan-400 transition truncate block">
+                <a href={emailHref} className="text-sm text-gray-700 hover:text-gray-900 transition truncate block">
                   {display}
                 </a>
               ) : (
-                <p className="text-sm text-slate-200 truncate">{display}</p>
+                <p className="text-sm text-gray-700 truncate">{display}</p>
               )}
             </div>
           </motion.div>

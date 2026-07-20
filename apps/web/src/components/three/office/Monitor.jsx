@@ -34,16 +34,11 @@ export default function Monitor({ imageUrl }) {
             map={texture}
             roughness={0.2}
             metalness={0.1}
-            emissive={new THREE.Color("#ffffff")}
-            emissiveIntensity={0.08}
-            emissiveMap={texture}
           />
         ) : (
           <meshStandardMaterial
-            color="#0a0a2a"
+            color="#111"
             roughness={0.3}
-            emissive={new THREE.Color("#0a2a4a")}
-            emissiveIntensity={0.15}
           />
         )}
       </mesh>

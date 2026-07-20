@@ -59,13 +59,12 @@ export default function StatsCard({ statistics }) {
           viewport={{ once: true }}
           transition={{ delay: i * 0.1, duration: 0.4 }}
           whileHover={{ y: -6, transition: { duration: 0.2 } }}
-          className="group relative bg-slate-900/50 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-5 overflow-hidden"
+          className="group card-ceramic p-5"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <p className="text-3xl font-bold text-white mb-1 relative z-10 font-mono">
+          <p className="text-3xl font-bold text-gray-900 mb-1 font-mono">
             <AnimatedNumber target={item.target} />
           </p>
-          <p className="text-xs text-slate-500 uppercase tracking-wider relative z-10">
+          <p className="text-xs text-gray-500 uppercase tracking-wider">
             {item.label}
           </p>
         </motion.div>

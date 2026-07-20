@@ -16,7 +16,7 @@ export default function BackToTop() {
       {visible && (
         <motion.button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-40 p-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-full shadow-lg shadow-cyan-500/25 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          className="fixed bottom-6 right-6 z-40 p-3 bg-white text-slate-900 rounded-full shadow-lg focus:outline-none hover:bg-slate-200"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
