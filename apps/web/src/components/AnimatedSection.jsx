@@ -13,7 +13,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-export function AnimatedSection({ children, className, id }) {
+export function AnimatedSection({ children, className, id, ...rest }) {
   return (
     <motion.section
       id={id}
@@ -22,11 +22,13 @@ export function AnimatedSection({ children, className, id }) {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-50px" }}
+      {...rest}
     >
       {children}
     </motion.section>
   );
 }
+
 
 export function AnimatedItem({ children, className, delay = 0 }) {
   return (

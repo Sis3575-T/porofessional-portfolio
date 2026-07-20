@@ -9,7 +9,7 @@ export default function Footer() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer className="bg-slate-950 border-t border-slate-800/50" role="contentinfo">
+    <footer className="lg:ml-64 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800/50" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2">

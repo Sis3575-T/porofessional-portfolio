@@ -102,7 +102,7 @@ export default function App() {
       <ThemeProvider>
       <PortfolioProvider>
         <ErrorBoundary>
-          <div className="bg-slate-950 text-slate-50 min-h-screen relative">
+          <div className="min-h-screen relative bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50">
             <UIOverlays />
             <SkipLink />
             <Navbar />

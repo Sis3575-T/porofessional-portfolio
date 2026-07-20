@@ -43,9 +43,11 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
     if (prefersReducedMotion) return;
     const onMove = (e) => {
       if (!config.mouseInteraction) return;
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
       mouse.current = {
-        x: (e.clientX / window.innerWidth - 0.5) * 2,
-        y: (e.clientY / window.innerHeight - 0.5) * 2,
+        x: Math.max(-1, Math.min(1, x)),
+        y: Math.max(-1, Math.min(1, y)),
       };
     };
     window.addEventListener("mousemove", onMove, { passive: true });
@@ -71,7 +73,7 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
         onCreated={() => setLoaded(true)}
       >
         <Suspense fallback={null}>
-          <OfficeScene profileImage={profileImage} config={config} />
+          <OfficeScene profileImage={profileImage} config={config} mouse={mouse} />
         </Suspense>
       </Canvas>
     );

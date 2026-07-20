@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   db:
     image: postgres:16-alpine
@@ -39,8 +40,6 @@ services:
       - portfolio-service
       - media-service
       - dashboard-service
-    volumes:
-      - ./services/api/src:/app/services/api/src
 
   auth-service:
     build:
@@ -59,10 +58,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./services/auth-service/src:/app/services/auth-service/src
-      - ./services/shared:/app/services/shared
-      - ./prisma:/app/prisma
 
   portfolio-service:
     build:
@@ -82,10 +77,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./services/portfolio-service/src:/app/services/portfolio-service/src
-      - ./services/shared:/app/services/shared
-      - ./prisma:/app/prisma
 
   media-service:
     build:
@@ -100,11 +91,8 @@ services:
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       NODE_ENV: development
     depends_on:
-      - db
-    volumes:
-      - ./services/media-service/src:/app/services/media-service/src
-      - ./services/media-service/uploads:/app/services/media-service/uploads
-      - ./services/shared:/app/services/shared
+      db:
+        condition: service_healthy
 
   dashboard-service:
     build:
@@ -123,10 +111,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./services/dashboard-service/src:/app/services/dashboard-service/src
-      - ./services/shared:/app/services/shared
-      - ./prisma:/app/prisma
 
   web:
     build:
@@ -140,10 +124,6 @@ services:
       VITE_API_URL: http://localhost:5000
     depends_on:
       - gateway
-    volumes:
-      - ./apps/web/src:/app/src
-      - ./apps/web/package.json:/app/package.json
-      - ./apps/web/index.html:/app/index.html
 
   admin:
     build:
@@ -157,10 +137,6 @@ services:
       VITE_API_URL: http://localhost:5000
     depends_on:
       - gateway
-    volumes:
-      - ./apps/admin/src:/app/src
-      - ./apps/admin/package.json:/app/package.json
-      - ./apps/admin/index.html:/app/index.html
 
 volumes:
   pgdata:

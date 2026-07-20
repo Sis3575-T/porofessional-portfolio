@@ -24,7 +24,20 @@ const DEFAULT_3D = {
   mouseInteraction: true,
   particleDensity: 80,
   shadowQuality: 'medium',
+  typingSpeed: 2,
+  breathingSpeed: 0.8,
+  iconCount: 8,
+  ambientIntensity: 0.15,
+  directionalIntensity: 0.5,
+  accentIntensity: 0.2,
+  profileImagePlacement: 'monitor',
 };
+
+const PLACEMENT_OPTIONS = [
+  { value: 'monitor', label: 'Monitor Display' },
+  { value: 'floating', label: 'Floating Frame' },
+  { value: 'both', label: 'Both' },
+];
 
 export default function SettingsEditor() {
   const [form, setForm] = useState({
@@ -163,6 +176,12 @@ export default function SettingsEditor() {
               </select>
             </div>
             <div>
+              <label className={labelClass}>Profile Image Placement</label>
+              <select value={hero3d.profileImagePlacement} onChange={(e) => setHero3d({...hero3d, profileImagePlacement: e.target.value})} className={selectClass}>
+                {PLACEMENT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
               <label className={labelClass}>Auto-Rotate Speed</label>
               <input type="range" min="0" max="1" step="0.1" value={hero3d.autoRotateSpeed}
                 onChange={(e) => setHero3d({...hero3d, autoRotateSpeed: parseFloat(e.target.value)})}
@@ -197,6 +216,60 @@ export default function SettingsEditor() {
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
+            </div>
+            <div>
+              <label className={labelClass}>Icon Count</label>
+              <input type="range" min="2" max="10" step="1" value={hero3d.iconCount}
+                onChange={(e) => setHero3d({...hero3d, iconCount: parseInt(e.target.value)})}
+                className="w-full accent-cyan-500" />
+              <span className="text-xs text-slate-500">{hero3d.iconCount}</span>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800 pt-4">
+            <h4 className="text-sm font-medium text-slate-300 mb-4">Lighting</h4>
+            <div className="grid sm:grid-cols-3 gap-6">
+              <div>
+                <label className={labelClass}>Ambient Intensity</label>
+                <input type="range" min="0" max="0.5" step="0.05" value={hero3d.ambientIntensity}
+                  onChange={(e) => setHero3d({...hero3d, ambientIntensity: parseFloat(e.target.value)})}
+                  className="w-full accent-cyan-500" />
+                <span className="text-xs text-slate-500">{hero3d.ambientIntensity.toFixed(2)}</span>
+              </div>
+              <div>
+                <label className={labelClass}>Directional Intensity</label>
+                <input type="range" min="0" max="1" step="0.1" value={hero3d.directionalIntensity}
+                  onChange={(e) => setHero3d({...hero3d, directionalIntensity: parseFloat(e.target.value)})}
+                  className="w-full accent-cyan-500" />
+                <span className="text-xs text-slate-500">{hero3d.directionalIntensity.toFixed(1)}</span>
+              </div>
+              <div>
+                <label className={labelClass}>Accent Intensity</label>
+                <input type="range" min="0" max="0.5" step="0.05" value={hero3d.accentIntensity}
+                  onChange={(e) => setHero3d({...hero3d, accentIntensity: parseFloat(e.target.value)})}
+                  className="w-full accent-cyan-500" />
+                <span className="text-xs text-slate-500">{hero3d.accentIntensity.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800 pt-4">
+            <h4 className="text-sm font-medium text-slate-300 mb-4">Character Animation</h4>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div>
+                <label className={labelClass}>Typing Speed</label>
+                <input type="range" min="0.5" max="4" step="0.5" value={hero3d.typingSpeed}
+                  onChange={(e) => setHero3d({...hero3d, typingSpeed: parseFloat(e.target.value)})}
+                  className="w-full accent-cyan-500" />
+                <span className="text-xs text-slate-500">{hero3d.typingSpeed.toFixed(1)}x</span>
+              </div>
+              <div>
+                <label className={labelClass}>Breathing Speed</label>
+                <input type="range" min="0.3" max="2" step="0.1" value={hero3d.breathingSpeed}
+                  onChange={(e) => setHero3d({...hero3d, breathingSpeed: parseFloat(e.target.value)})}
+                  className="w-full accent-cyan-500" />
+                <span className="text-xs text-slate-500">{hero3d.breathingSpeed.toFixed(1)}x</span>
+              </div>
             </div>
           </div>
 
