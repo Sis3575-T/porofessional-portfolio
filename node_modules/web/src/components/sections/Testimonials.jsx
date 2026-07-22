@@ -22,8 +22,8 @@ export default function Testimonials() {
       <section id="testimonials" className="py-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-8">
           <div className="animate-pulse space-y-8">
-            <div className="h-10 w-48 bg-slate-800 rounded mx-auto" />
-            <div className="h-48 bg-slate-800 rounded-xl" />
+            <div className="h-10 w-48 bg-gray-100 rounded mx-auto" />
+            <div className="h-48 bg-gray-100 rounded-xl" />
           </div>
         </div>
       </section>
@@ -35,10 +35,10 @@ export default function Testimonials() {
   const t = testimonials[current];
 
   return (
-    <AnimatedSection id="testimonials" theme="testimonials" className="py-32 overflow-hidden" aria-label="Testimonials section">
+    <AnimatedSection id="testimonials" theme="testimonials" className="py-4 overflow-hidden" aria-label="Testimonials section">
       <div className="max-w-3xl mx-auto px-4 sm:px-8 relative">
         <motion.p
-          className="text-center text-sm font-medium text-slate-400 tracking-widest uppercase mb-3"
+          className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -46,21 +46,21 @@ export default function Testimonials() {
           Testimonials
         </motion.p>
         <motion.h2
-          className="text-center text-white"
+          className="text-center text-gray-900 text-4xl font-bold"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          What Clients Say
+          What <span className="text-accent-blue">Clients Say</span>
         </motion.h2>
         <motion.div
-          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
+          className="w-16 h-1 bg-accent-gray rounded-full mx-auto mt-4 mb-4"
           initial={{ width: 0 }}
           whileInView={{ width: 64 }}
           viewport={{ once: true }}
         />
         <motion.p
-          className="text-center text-slate-400 mb-16 max-w-2xl mx-auto"
+          className="text-center text-gray-500 mb-10 max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -71,7 +71,7 @@ export default function Testimonials() {
 
         <div className="relative">
           <motion.div
-            className="absolute -top-4 left-0 text-white/5"
+            className="absolute -top-4 left-0 text-gray-200"
             initial={{ opacity: 0, rotate: -20 }}
             whileInView={{ opacity: 1, rotate: 0 }}
             viewport={{ once: true }}
@@ -83,7 +83,8 @@ export default function Testimonials() {
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 sm:p-12 text-center"
+              className="bg-white border border-gray-200 rounded-[28px] p-8 sm:p-12 text-center"
+              style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)" }}
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -97,13 +98,13 @@ export default function Testimonials() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <Star size={18} className={i < t.rating ? "text-white fill-white" : "text-slate-600"} />
+                    <Star size={18} className={i < t.rating ? "text-gray-900 fill-gray-600" : "text-gray-300"} />
                   </motion.div>
                 ))}
               </div>
 
               <motion.blockquote
-                className="text-lg text-slate-300 mb-8 leading-relaxed italic"
+                className="text-lg text-gray-600 mb-8 leading-relaxed italic"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -117,12 +118,12 @@ export default function Testimonials() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-900 font-bold text-lg">
                   {t.name.charAt(0)}
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold text-white">{t.name}</p>
-                  <p className="text-sm text-slate-400">{t.position} at {t.company}</p>
+                  <p className="font-semibold text-gray-900">{t.name}</p>
+                  <p className="text-sm text-gray-500">{t.position} at {t.company}</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -150,7 +151,7 @@ export default function Testimonials() {
                     key={i}
                     onClick={() => setCurrent(i)}
                     className={`w-2 h-2 rounded-full transition-all ${
-                      i === current ? "bg-gray-900 w-6" : "bg-gray-300"
+                      i === current ? "bg-accent-blue w-6" : "bg-gray-300"
                     }`}
                     aria-label={`Go to testimonial ${i + 1}`}
                     aria-current={i === current ? "true" : undefined}

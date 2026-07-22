@@ -9,9 +9,9 @@ const fadeUp = {
 
 const statItems = [
   { value: "20+", label: "Projects Completed", accent: "text-accent-blue", border: "border-accent-blue" },
-  { value: "15+", label: "Happy Clients", accent: "text-accent-green", border: "border-accent-green" },
-  { value: "1000+", label: "Hours of Coding", accent: "text-accent-amber", border: "border-accent-amber" },
-  { value: "3+", label: "Years of Learning", accent: "text-accent-indigo", border: "border-accent-indigo" },
+  { value: "15+", label: "Happy Clients", accent: "text-accent-blue", border: "border-accent-blue" },
+  { value: "1000+", label: "Hours of Coding", accent: "text-accent-gray", border: "border-accent-gray" },
+  { value: "3+", label: "Years of Learning", accent: "text-accent-blue", border: "border-accent-blue" },
 ];
 
 export default function AboutPreview() {

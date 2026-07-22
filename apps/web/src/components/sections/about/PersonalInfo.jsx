@@ -17,6 +17,19 @@ const iconMap = {
   freelance: Percent,
 };
 
+const colors = {
+  name: { bg: "icon-github", text: "text-accent-blue" },
+  location: { bg: "icon-location", text: "text-accent-purple" },
+  email: { bg: "icon-email", text: "text-accent-blue" },
+  phone: { bg: "icon-phone", text: "text-accent-green" },
+  nationality: { bg: "icon-experience", text: "text-accent-indigo" },
+  languages: { bg: "icon-services", text: "text-accent-teal" },
+  experience: { bg: "icon-skills", text: "text-accent-amber" },
+  availability: { bg: "icon-projects", text: "text-accent-green" },
+  degree: { bg: "icon-email", text: "text-accent-indigo" },
+  freelance: { bg: "icon-phone", text: "text-accent-green" },
+};
+
 const fields = [
   { key: "name", label: "Name" },
   { key: "location", label: "Location" },
@@ -49,29 +62,29 @@ export default function PersonalInfo({ about }) {
         const value = about?.[key];
         const display = formatValue(key, value, about);
         if (!display || display === "-" || display === "") return null;
-
+        const c = colors[key] || colors.name;
         const emailHref = key === "email" ? `mailto:${display}` : null;
 
         return (
           <motion.div
             key={key}
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.05, duration: 0.3 }}
-            className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all group"
+            transition={{ delay: i * 0.04, duration: 0.3 }}
+            className="flex items-center gap-3 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
           >
-            <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 group-hover:bg-gray-200 transition-colors">
-              <Icon size={16} className="text-gray-500" />
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${c.bg}`}>
+              <Icon size={16} />
             </div>
-            <div className="min-w-0">
-              <p className="text-[11px] text-gray-400 uppercase tracking-wider">{label}</p>
+            <div className="min-w-0 flex items-baseline gap-1.5">
+              <span className="text-[11px] text-gray-400 uppercase tracking-wider shrink-0">{label}:</span>
               {emailHref ? (
-                <a href={emailHref} className="text-sm text-gray-700 hover:text-gray-900 transition truncate block">
+                <a href={emailHref} className={`text-sm font-semibold ${c.text} truncate hover:underline`}>
                   {display}
                 </a>
               ) : (
-                <p className="text-sm text-gray-700 truncate">{display}</p>
+                <span className={`text-sm font-semibold ${c.text} truncate`}>{display}</span>
               )}
             </div>
           </motion.div>

@@ -90,6 +90,7 @@ app.use("/api/v1/projects", proxyRequest(PORTFOLIO_SERVICE));
 app.use("/api/v1/testimonials", proxyRequest(PORTFOLIO_SERVICE));
 app.use("/api/v1/contact", proxyRequest(PORTFOLIO_SERVICE));
 app.use("/api/v1/settings", proxyRequest(PORTFOLIO_SERVICE));
+app.use("/api/v1/avatar", proxyRequest(PORTFOLIO_SERVICE));
 app.use("/api/v1/upload", proxyRequest(MEDIA_SERVICE));
 app.use("/api/v1/media", proxyRequest(MEDIA_SERVICE));
 app.use("/api/v1/dashboard", proxyRequest(DASHBOARD_SERVICE));

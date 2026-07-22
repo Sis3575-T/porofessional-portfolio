@@ -189,6 +189,13 @@ export default function SettingsEditor() {
               <span className="text-xs text-slate-500">{hero3d.autoRotateSpeed.toFixed(1)}x</span>
             </div>
             <div>
+              <label className={labelClass}>Rotation Speed</label>
+              <input type="range" min="0" max="1" step="0.1" value={hero3d.rotationSpeed}
+                onChange={(e) => setHero3d({...hero3d, rotationSpeed: parseFloat(e.target.value)})}
+                className="w-full accent-cyan-500" />
+              <span className="text-xs text-slate-500">{hero3d.rotationSpeed.toFixed(1)}x</span>
+            </div>
+            <div>
               <label className={labelClass}>Float Speed</label>
               <input type="range" min="0" max="1.5" step="0.1" value={hero3d.floatSpeed}
                 onChange={(e) => setHero3d({...hero3d, floatSpeed: parseFloat(e.target.value)})}

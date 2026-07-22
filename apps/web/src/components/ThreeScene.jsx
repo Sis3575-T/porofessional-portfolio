@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDeviceDetect } from "../hooks/useDeviceDetect";
 import AbstractScene from "./three/AbstractScene";
@@ -65,16 +65,26 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
   if (mode === MODES.office) {
     return (
       <Canvas
-        camera={{ position: [1.5, 0.65, 2.5], fov: 45 }}
+        camera={{ position: [2.5, 1.5, 3.0], fov: 42 }}
         dpr={isLowEnd ? [1, 1] : [1, 1.5]}
         gl={{ antialias: !isLowEnd, alpha: false }}
-        style={{ background: "#151515" }}
+        style={{ background: "#1a1a1a" }}
         shadows={!isLowEnd}
         onCreated={() => setLoaded(true)}
       >
         <Suspense fallback={null}>
           <OfficeScene profileImage={profileImage} config={config} mouse={mouse} />
         </Suspense>
+        <OrbitControls
+          enablePan={false}
+          enableZoom={true}
+          minDistance={1.5}
+          maxDistance={6}
+          minPolarAngle={Math.PI / 8}
+          maxPolarAngle={Math.PI / 2.2}
+          autoRotate={false}
+          target={[0.3, 0.8, 0]}
+        />
       </Canvas>
     );
   }

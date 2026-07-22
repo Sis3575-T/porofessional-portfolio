@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { usePortfolio } from "../../../context/PortfolioContext";
 import { AnimatedSection } from "../../AnimatedSection";
-import { User, MapPin, Mail, Clock } from "lucide-react";
+import { User, MapPin, Mail, Clock, Code2, Globe, Coffee, Award } from "lucide-react";
 
 const fadeSlideUp = {
   hidden: { opacity: 0, y: 24 },
@@ -13,41 +13,18 @@ const container = {
   show: { transition: { staggerChildren: 0.1 } },
 };
 
-const statIconMap = {
-  code: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="16 18 22 12 16 6"/>
-      <polyline points="8 6 2 12 8 18"/>
-    </svg>
-  ),
-  planet: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="4"/>
-      <path d="M1.05 12.4c0 0 4.3-6.4 10.95-6.4s10.95 6.4 10.95 6.4-4.3 6.4-10.95 6.4S1.05 12.4 1.05 12.4z"/>
-    </svg>
-  ),
-  coffee: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
-      <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
-      <line x1="6" y1="2" x2="6" y2="4"/>
-      <line x1="10" y1="2" x2="10" y2="4"/>
-      <line x1="14" y1="2" x2="14" y2="4"/>
-    </svg>
-  ),
-  award: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="7"/>
-      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
-    </svg>
-  ),
-};
+const infoItems = [
+  { key: "name", icon: User, label: "Name", color: "icon-github", textColor: "text-accent-blue" },
+  { key: "location", icon: MapPin, label: "Location", color: "icon-location", textColor: "text-accent-blue" },
+  { key: "email", icon: Mail, label: "Email", color: "icon-email", textColor: "text-accent-blue" },
+  { key: "availability", icon: Clock, label: "Availability", color: "icon-phone", textColor: "text-accent-blue" },
+];
 
 const statItems = [
-  { icon: "code", value: "20+", label: "Projects Completed" },
-  { icon: "planet", value: "15+", label: "Happy Clients" },
-  { icon: "coffee", value: "1000+", label: "Hours of Coding" },
-  { icon: "award", value: "3+", label: "Years of Learning" },
+  { icon: Code2, value: "20+", label: "Projects Completed", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
+  { icon: Globe, value: "15+", label: "Happy Clients", iconClass: "icon-linkedin", accent: "text-accent-blue", border: "border-accent-blue" },
+  { icon: Coffee, value: "1000+", label: "Hours of Coding", iconClass: "icon-email", accent: "text-accent-gray", border: "border-accent-gray" },
+  { icon: Award, value: "3+", label: "Years of Learning", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
 ];
 
 export default function AboutSection() {
@@ -72,53 +49,85 @@ export default function AboutSection() {
     "I'm a 3rd year Computer Science student at Bahir Dar University. Passionate about building scalable web apps and exploring AI technologies. I love turning ideas into real-world solutions.";
   const profileImage = about?.profileImage || "/about-profile.png";
 
+  const getValue = (key) => {
+    if (key === "name") return name;
+    if (key === "location") return location;
+    if (key === "email") return email;
+    if (key === "availability") return availability;
+    return "";
+  };
+
   return (
-    <AnimatedSection id="about" theme="about" className="py-12 pb-20" aria-label="About section">
+    <AnimatedSection id="about" theme="about" className="py-4 pb-8" aria-label="About section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <motion.p
+          className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          About
+        </motion.p>
+        <motion.h2
+          className="text-center text-gray-900 text-4xl font-bold mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          About <span className="text-accent-blue">Me</span>
+        </motion.h2>
+
         <motion.div
-          className="about-main-card"
+          className="bg-white border border-gray-200 rounded-3xl overflow-hidden"
+          style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)" }}
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
         >
-          <motion.div variants={fadeSlideUp} className="about-col-info">
-            <div className="flex items-center gap-2 mb-5">
-              <span className="w-2 h-2 rounded-full bg-gray-200" />
-              <h2 className="text-xl font-bold text-white" style={{ fontSize: "1.3rem" }}>About Me</h2>
+          <div className="flex flex-col lg:flex-row">
+            {/* LEFT: Info */}
+            <div className="flex-1 p-8 xl:p-10 lg:border-r border-gray-100">
+              <div className="flex items-center gap-2.5 mb-6">
+                <span className="w-2 h-2 rounded-full bg-accent-blue" />
+                <h3 className="text-xl font-bold text-gray-900">About Me</h3>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-lg">
+                {biography}
+              </p>
+              <div className="space-y-3">
+                {infoItems.map((item, i) => {
+                  const val = getValue(item.key);
+                  const isEmail = item.key === "email";
+                  const content = (
+                    <motion.div
+                      key={item.key}
+                      initial={{ opacity: 0, x: -12 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.06, duration: 0.3 }}
+                      className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                    >
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                        <item.icon size={16} />
+                      </div>
+                      <div className="min-w-0 flex items-baseline gap-1.5 flex-wrap">
+                        <span className="text-[11px] text-gray-400 uppercase tracking-wider shrink-0">{item.label}:</span>
+                        <span className={`text-sm font-semibold ${item.textColor} truncate`}>{val}</span>
+                      </div>
+                    </motion.div>
+                  );
+                  if (isEmail) {
+                    return <a key={item.key} href={`mailto:${val}`} className="block">{content}</a>;
+                  }
+                  return content;
+                })}
+              </div>
             </div>
 
-            <p className="text-slate-400 text-sm leading-relaxed mb-7 max-w-sm">
-              {biography}
-            </p>
-
-            <div className="space-y-3.5">
-              <div className="about-info-row">
-                <User size={14} className="text-slate-500 shrink-0" />
-                <span className="about-info-label">Name:</span>
-                <span className="about-info-value">{name}</span>
-              </div>
-              <div className="about-info-row">
-                <MapPin size={14} className="text-slate-500 shrink-0" />
-                <span className="about-info-label">Location:</span>
-                <span className="about-info-value">{location}</span>
-              </div>
-              <div className="about-info-row">
-                <Mail size={14} className="text-slate-500 shrink-0" />
-                <span className="about-info-label">Email:</span>
-                <a href={`mailto:${email}`} className="about-info-value hover:text-white transition-colors">{email}</a>
-              </div>
-              <div className="about-info-row">
-                <Clock size={14} className="text-slate-500 shrink-0" />
-                <span className="about-info-label">Availability:</span>
-                <span className="text-slate-300 text-sm font-medium">{availability}</span>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeSlideUp} className="about-col-photo">
-            <div className="about-photo-wrapper">
-              <div className="about-photo-container">
+            {/* CENTER: Photo */}
+            <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 flex items-stretch p-8 lg:p-6 bg-gray-50">
+              <div className="w-full rounded-2xl overflow-hidden border-2 border-gray-200 shadow-md">
                 {profileImage ? (
                   <img
                     src={profileImage}
@@ -127,35 +136,41 @@ export default function AboutSection() {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                    <span className="text-5xl font-bold text-slate-600">ST</span>
+                  <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-gray-100">
+                    <span className="text-5xl font-bold text-gray-300">ST</span>
                   </div>
                 )}
               </div>
             </div>
-          </motion.div>
 
-          <motion.div variants={fadeSlideUp} className="about-col-stats">
-            <div className="about-stats-grid">
-              {statItems.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  className="about-stat-card"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                >
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-3 text-gray-500">
-                    {statIconMap[stat.icon]}
-                  </div>
-                  <p className="text-3xl font-bold text-white font-mono leading-none mb-1.5">{stat.value}</p>
-                  <p className="text-xs text-slate-500 leading-snug">{stat.label}</p>
-                </motion.div>
-              ))}
+            {/* RIGHT: Stats */}
+            <div className="flex-1 p-8 xl:p-10 lg:border-l border-gray-100">
+              <div className="flex items-center gap-2.5 mb-6">
+                <span className="w-2 h-2 rounded-full bg-accent-blue" />
+                <h3 className="text-xl font-bold text-gray-900">Statistics</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {statItems.map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-200"
+                    style={{ borderLeftWidth: 3, borderLeftColor: "inherit" }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
+                    whileHover={{ y: -4 }}
+                  >
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${stat.iconClass}`}>
+                      <stat.icon size={18} />
+                    </div>
+                    <p className={`text-3xl font-bold ${stat.accent} font-mono leading-none mb-1`}>{stat.value}</p>
+                    <p className="text-xs text-gray-400 leading-snug">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </AnimatedSection>

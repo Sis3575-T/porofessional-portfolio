@@ -13,7 +13,7 @@ export default {
         'slate-900': '#0f172a',
       },
       backgroundImage: {
-        'gradient-dark': 'linear-gradient(135deg, #050816 0%, #0f172a 100%)',
+        'gradient-dark': '#050816',
       },
     },
   },

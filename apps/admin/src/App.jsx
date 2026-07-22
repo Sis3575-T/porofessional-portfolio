@@ -13,6 +13,7 @@ import ProjectsEditor from './pages/editors/ProjectsEditor';
 import TestimonialsEditor from './pages/editors/TestimonialsEditor';
 import MessagesPage from './pages/editors/MessagesPage';
 import SettingsEditor from './pages/editors/SettingsEditor';
+import AvatarEditor from './pages/editors/AvatarEditor';
 import MediaManager from './pages/editors/MediaManager';
 import ActivityLogs from './pages/editors/ActivityLogs';
 import NotFound from './pages/NotFound';
@@ -83,6 +84,9 @@ export default function App() {
         } />
         <Route path="/admin/settings" element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<SettingsEditor />)}</ProtectedRoute>
+        } />
+        <Route path="/admin/avatar" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<AvatarEditor />)}</ProtectedRoute>
         } />
         <Route path="/admin/media" element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>{wrap(<MediaManager />)}</ProtectedRoute>

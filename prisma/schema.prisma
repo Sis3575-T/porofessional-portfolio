@@ -107,15 +107,31 @@ enum SkillCategory {
 }
 
 model Service {
-  id          String    @id @default(cuid())
-  icon        String?
-  title       String
-  description String    @db.Text
-  features    String?   @db.Text // JSON array as string
-  order       Int       @default(0)
-  enabled     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  slug             String?   @unique
+  title            String
+  shortDescription String?
+  description      String    @db.Text
+  fullDescription  String?   @db.Text
+  icon             String?
+  iconUrl          String?
+  heroImage        String?
+  galleryImages    String?   @db.Text // JSON array of image URLs
+  technologies     String?   @db.Text // JSON array
+  features         String?   @db.Text // JSON array
+  tools            String?   @db.Text // JSON array
+  process          String?   @db.Text
+  liveUrl          String?
+  githubUrl        String?
+  docsUrl          String?
+  caseStudyUrl     String?
+  buttonText       String?   @default("Live Demo")
+  buttonColor      String?   @default("#111111")
+  accentColor      String?   @default("#111111")
+  enabled          Boolean   @default(true)
+  order            Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@map("services")
 }
@@ -291,4 +307,22 @@ model Statistic {
   technologiesCount Int    @default(0)
 
   @@map("statistics")
+}
+
+// ============== 3D Avatar ==============
+model Avatar3D {
+  id          String    @id @default(cuid())
+  avatarId    String    @unique
+  photoUrl    String?
+  modelUrl    String?
+  gender      String    @default("male")
+  clothing    String    @default("default")
+  position    String?   @db.Text // JSON: {x, y, z}
+  rotation    String?   @db.Text // JSON: {x, y, z}
+  scale       String?   @db.Text // JSON: {x, y, z}
+  visible     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("avatar3d")
 }

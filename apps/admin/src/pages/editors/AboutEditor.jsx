@@ -200,6 +200,13 @@ export default function AboutEditor() {
             <label className={labelClass}>Download CV URL</label>
             <input value={form.downloadCVUrl || ''} onChange={(e) => set('downloadCVUrl', e.target.value)} className={inputClass} />
           </div>
+          <div>
+            <label className={labelClass}>Visibility</label>
+            <select value={form.visibility || 'visible'} onChange={(e) => set('visibility', e.target.value)} className={inputClass}>
+              <option value="visible">Visible</option>
+              <option value="hidden">Hidden</option>
+            </select>
+          </div>
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">

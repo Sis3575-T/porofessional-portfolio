@@ -68,7 +68,7 @@ export default function ProjectDetails() {
           <ArrowLeft size={18} /> Back to Portfolio
         </Link>
 
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
+        <div className="bg-white border border-gray-200 rounded-[28px] overflow-hidden mb-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
           <div className="h-64 sm:h-80 bg-gray-100 flex items-center justify-center">
             {project.thumbnail ? (
               <img src={project.thumbnail} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
@@ -89,7 +89,7 @@ export default function ProjectDetails() {
                   {categoryLabels[project.category]}
                 </span>
                 {project.featured && (
-                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-medium text-accent-blue bg-blue-50 px-3 py-1 rounded-full">
                     Featured
                   </span>
                 )}
@@ -99,13 +99,13 @@ export default function ProjectDetails() {
             <div className="flex gap-3">
               {project.liveUrl && (
                 <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 btn-ceramic text-gray-900 rounded-lg font-semibold text-sm transition flex items-center gap-2">
+                  className="px-4 py-2 bg-accent-blue text-white rounded-lg font-semibold text-sm transition flex items-center gap-2 shadow-lg shadow-blue-200">
                   <ExternalLink size={16} /> Live Demo
                 </a>
               )}
               {project.githubUrl && (
                 <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg font-semibold text-sm hover:border-gray-400 hover:text-gray-900 transition flex items-center gap-2">
+                  className="px-4 py-2 border border-gray-200 bg-white text-gray-700 rounded-lg font-semibold text-sm hover:border-gray-300 hover:text-gray-900 transition flex items-center gap-2">
                   <Github size={16} /> Source Code
                 </a>
               )}

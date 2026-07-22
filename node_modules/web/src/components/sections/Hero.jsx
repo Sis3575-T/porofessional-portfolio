@@ -60,7 +60,7 @@ export default function Hero() {
   })();
 
   return (
-    <section id="hero" className="relative bg-white overflow-hidden" style={{ minHeight: "72vh" }}>
+    <section id="hero" className="relative bg-white overflow-hidden py-0" style={{ minHeight: "72vh" }}>
       <div className="section-bg section-hero-bg">
         <div className="section-bg-pattern section-hero-pattern" />
       </div>
@@ -76,21 +76,8 @@ export default function Hero() {
               initial="initial"
               animate="animate"
             >
-              {/* Greeting Badge */}
-              <motion.div variants={fadeInUp} transition={{ duration: 0.45 }}>
-                <span
-                  className="badge-blue inline-flex items-center gap-2"
-                  style={{ height: 46, padding: "0 22px", borderRadius: 18, fontSize: 15 }}
-                >
-                  <span className="text-lg" role="img" aria-label="wave">👋</span>
-                  <span className="font-medium">
-                    {hero?.greeting || "Hello, I'm"}
-                  </span>
-                </span>
-              </motion.div>
-
               {/* Name */}
-              <motion.div variants={fadeInUp} transition={{ duration: 0.45 }} className="mt-6">
+              <motion.div variants={fadeInUp} transition={{ duration: 0.45 }}>
                 <h1
                   className="text-[#111111] font-extrabold leading-[1.05] tracking-[-0.02em]"
                   style={{ fontSize: "clamp(3rem, 5.5vw, 5rem)", maxWidth: 560 }}
@@ -104,10 +91,17 @@ export default function Hero() {
               {/* Title */}
               <motion.div variants={fadeInUp} transition={{ duration: 0.45 }} className="mt-4">
                 <p
-                  className="text-gray-500 font-medium leading-snug"
-                  style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.4rem)" }}
+                  className="font-semibold leading-snug"
+                  style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)" }}
                 >
-                  {fullTitle}
+                  {fullTitle.split("&").map((part, i, arr) => (
+                    <span key={i}>
+                      <span className={i === 0 ? "text-accent-blue" : "text-accent-blue"}>
+                        {part.trim()}
+                      </span>
+                      {i < arr.length - 1 && <span className="text-gray-300 mx-2">&</span>}
+                    </span>
+                  ))}
                 </p>
               </motion.div>
 
@@ -147,19 +141,17 @@ export default function Hero() {
                   {socialLinks.map(({ icon: Icon, href, label }) => {
                     const iconClass = label === "GitHub" ? "icon-github"
                       : label === "LinkedIn" ? "icon-linkedin"
-                      : label === "Twitter" ? "bg-accent-blue"
+                      : label === "Twitter" ? "text-gray-700"
                       : "icon-email";
-                    const bgColor = label === "Twitter" ? "#1DA1F2" : "";
                     return (
                       <motion.a
                         key={label}
                         href={href}
                         target={href.startsWith("mailto") ? undefined : "_blank"}
                         rel="noopener noreferrer"
-                        className={`flex items-center justify-center ${iconClass}`}
+                        className={`flex items-center justify-center ${iconClass} hover:opacity-70 transition-opacity`}
                         style={{
                           width: 50, height: 50, borderRadius: 14,
-                          ...(label === "Twitter" ? { background: "#1DA1F2", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 4px 12px rgba(29,161,242,0.2)" } : {})
                         }}
                         whileHover={{ y: -3, scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -177,8 +169,8 @@ export default function Hero() {
           {/* RIGHT COLUMN - 57% */}
           <div className="flex-1 h-full flex items-center justify-center pr-8 xl:pr-12 2xl:pr-16" style={{ maxWidth: "57%" }}>
             <motion.div
-              className="relative w-full overflow-hidden rounded-2xl bg-gray-50 border border-gray-200 shadow-lg"
-              style={{ height: "min(65vh, 680px)" }}
+              className="relative w-full overflow-hidden rounded-2xl bg-gray-50 border border-gray-200"
+              style={{ height: "min(65vh, 680px)", boxShadow: "0 20px 50px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)" }}
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, delay: 0.15 }}

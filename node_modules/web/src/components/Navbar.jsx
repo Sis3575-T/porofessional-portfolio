@@ -4,13 +4,13 @@ import { Download, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
-  { label: "Home", href: "#hero" },
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
+  { label: "Home",     href: "#hero" },
+  { label: "About",    href: "#about" },
+  { label: "Skills",   href: "#skills" },
   { label: "Projects", href: "#projects" },
   { label: "Services", href: "#services" },
   { label: "Experience", href: "#experience" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact",  href: "#contact" },
 ];
 
 export default function Navbar() {
@@ -46,28 +46,24 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto flex items-center h-[70px] px-6 mt-3 rounded-2xl bg-white/80 backdrop-blur-xl border border-gray-200/60 shadow-sm max-w-[900px] w-full mx-4">
+      <nav className="fixed top-0 left-0 right-0 z-30 flex justify-center pointer-events-none">
+        <div className="pointer-events-auto flex items-center h-[60px] px-6 mt-3 rounded-2xl bg-white/80 backdrop-blur-xl border border-gray-200/60 max-w-[900px] w-full mx-4"
+          style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 12px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)" }}>
           {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-[42px] mx-auto">
+          <div className="hidden md:flex items-center gap-2 mx-auto">
             {navItems.map((item) => {
               const isActive = activeSection === item.href.slice(1);
               return (
                 <button
                   key={item.href}
                   onClick={() => handleClick(item.href)}
-                  className={`text-sm font-medium transition-all duration-200 relative ${
-                    isActive ? "text-accent-blue" : "text-gray-500 hover:text-accent-blue"
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-gray-900 text-white shadow-sm"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
                   {item.label}
-                  {isActive && (
-                    <motion.div
-                      className="absolute -bottom-1 left-0 right-0 h-[2px] bg-accent-blue rounded-full"
-                      layoutId="navUnderline"
-                      transition={{ duration: 0.3 }}
-                    />
-                  )}
                 </button>
               );
             })}
@@ -77,7 +73,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3 ml-auto">
             <a
               href="/resume.pdf"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 shadow-sm"
               aria-label="Download CV"
             >
               <Download size={14} />
@@ -86,7 +82,7 @@ export default function Navbar() {
 
             <button
               onClick={toggle}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 transition-all duration-200 shadow-sm"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 transition-all duration-200 shadow-sm"
               aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {dark ? <Sun size={17} /> : <Moon size={17} />}
@@ -94,7 +90,7 @@ export default function Navbar() {
 
             <button
               onClick={() => setMobileOpen(true)}
-              className="md:hidden w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 transition-all"
+              className="md:hidden w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 transition-all"
               aria-label="Open menu"
             >
               <Menu size={18} />
@@ -115,7 +111,7 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
-              className="fixed left-0 top-0 h-full w-72 z-50 bg-white border-r border-gray-200 shadow-2xl flex flex-col"
+              className="fixed left-0 top-0 h-full w-72 z-50 bg-white/80 backdrop-blur-xl border-r border-gray-200/60 shadow-2xl flex flex-col"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -139,8 +135,8 @@ export default function Navbar() {
                       onClick={() => handleClick(item.href)}
                       className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                         isActive
-                          ? "bg-blue-50 text-accent-blue border border-blue-200"
-                          : "text-gray-500 hover:text-accent-blue hover:bg-blue-50"
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-600 hover:bg-gray-100 hover:shadow-sm"
                       }`}
                     >
                       {item.label}
@@ -151,14 +147,14 @@ export default function Navbar() {
               <div className="p-4 border-t border-gray-100 space-y-2">
                 <button
                   onClick={toggle}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all"
                 >
                   {dark ? <Sun size={16} /> : <Moon size={16} />}
                   {dark ? "Light Mode" : "Dark Mode"}
                 </button>
                 <a
                   href="/resume.pdf"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all"
                 >
                   <Download size={16} />
                   Download CV

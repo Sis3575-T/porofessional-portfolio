@@ -1,110 +1,124 @@
-import { motion } from "framer-motion";
-import { Code, Server, Palette, Cloud, ArrowRight } from "lucide-react";
+import { Suspense, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
+import { AnimatePresence } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
-import { AnimatedSection, AnimatedCard } from "../AnimatedSection";
+import { ServiceViewerProvider, useServiceViewer } from "../../context/ServiceViewerContext";
+import ServicePrism from "../three/ServicePrism";
+import ServiceViewer from "../ServiceViewer";
 
-const iconMap = {
-  "Full Stack Web Development": Code,
-  "REST API Development": Server,
-  "UI/UX Implementation": Palette,
-  "Deployment & DevOps": Cloud,
-};
+const defaultServices = [
+  {
+    id: "svc-1",
+    title: "Full Stack Web Development",
+    shortDescription: "End-to-end web applications with modern architecture.",
+    description: "End-to-end web applications with modern architecture.",
+    fullDescription: "I build complete web applications from concept to deployment. Using React, Next.js, Node.js, and modern databases, I create scalable products that feel polished from day one.",
+    features: ["React & Next.js interfaces", "Node.js & Express APIs", "MongoDB & PostgreSQL databases", "Real-time features", "Authentication & authorization", "Automated testing"],
+    technologies: ["React", "Next.js", "Node.js", "Express", "MongoDB", "PostgreSQL", "TypeScript", "Tailwind CSS"],
+    tools: ["VS Code", "Git", "Docker", "Vercel", "AWS"],
+    liveUrl: "https://example.com",
+    githubUrl: "https://github.com",
+  },
+  {
+    id: "svc-2",
+    title: "API Development",
+    shortDescription: "Reliable, documented APIs for web and mobile.",
+    description: "Reliable, documented APIs for web and mobile.",
+    fullDescription: "I design and build RESTful and GraphQL APIs that are secure, well-documented, and performant.",
+    features: ["RESTful API design", "GraphQL schemas", "Authentication (JWT, OAuth)", "Rate limiting & caching", "API documentation", "Database optimization"],
+    technologies: ["Node.js", "Express", "GraphQL", "PostgreSQL", "Redis", "Docker"],
+    tools: ["Postman", "Swagger", "GitHub Actions"],
+  },
+  {
+    id: "svc-3",
+    title: "UI/UX Design & Implementation",
+    shortDescription: "Beautiful interfaces with smooth interactions.",
+    description: "Beautiful interfaces with smooth interactions.",
+    fullDescription: "I transform product ideas into elegant, conversion-focused interfaces.",
+    features: ["Responsive design systems", "Micro-interactions & animations", "Accessibility (WCAG 2.1)", "Design-to-code workflow", "Performance-conscious UI", "Component libraries"],
+    technologies: ["React", "Framer Motion", "Tailwind CSS", "Figma", "Storybook", "CSS Modules"],
+    tools: ["Figma", "Adobe XD", "Storybook", "Chromatic"],
+  },
+  {
+    id: "svc-4",
+    title: "Cloud & DevOps",
+    shortDescription: "Infrastructure that scales with your product.",
+    description: "Infrastructure that scales with your product.",
+    fullDescription: "I set up and manage cloud infrastructure, CI/CD pipelines, and monitoring systems.",
+    features: ["AWS/GCP cloud architecture", "Docker containerization", "CI/CD pipelines", "Monitoring & alerting", "Auto-scaling", "Security hardening"],
+    technologies: ["AWS", "Docker", "GitHub Actions", "Nginx", "Linux", "Terraform"],
+    tools: ["AWS Console", "Docker Desktop", "GitHub Actions", "Grafana"],
+  },
+  {
+    id: "svc-5",
+    title: "AI & Machine Learning",
+    shortDescription: "Intelligent features powered by modern AI.",
+    description: "Intelligent features powered by modern AI.",
+    fullDescription: "I integrate AI capabilities into web applications.",
+    features: ["LLM integration (GPT, Claude)", "Natural language processing", "Image recognition", "Recommendation systems", "AI-powered search", "Automated content generation"],
+    technologies: ["Python", "TensorFlow", "OpenAI API", "LangChain", "FastAPI", "Hugging Face"],
+    tools: ["Jupyter", "Google Colab", "Hugging Face", "OpenAI"],
+  },
+];
 
-export default function Services() {
-  const { services, loading } = usePortfolio();
+function ServicesContent() {
+  const { services } = usePortfolio();
+  const { setServices, isOpen } = useServiceViewer();
+  const serviceList = services && services.length > 0 ? services : defaultServices;
 
-  if (loading) {
-    return (
-      <section id="services" className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-10 w-48 bg-slate-800 rounded mx-auto" />
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1,2,3,4].map(i => <div key={i} className="h-64 bg-slate-800 rounded-xl" />)}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  useEffect(() => {
+    setServices(serviceList);
+  }, [serviceList, setServices]);
 
   return (
-    <AnimatedSection id="services" theme="services" className="py-32 overflow-hidden" aria-label="Services section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative">
-        <motion.p
-          className="text-center text-sm font-medium text-slate-400 tracking-widest uppercase mb-3"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          What I Do
-        </motion.p>
-        <motion.h2
-          className="text-center text-white"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Services I Offer
-        </motion.h2>
-        <motion.div
-          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
-          initial={{ width: 0 }}
-          whileInView={{ width: 64 }}
-          viewport={{ once: true }}
-        />
-        <motion.p
-          className="text-center text-slate-400 mb-16 max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-        >
-          Professional solutions tailored to your needs
-        </motion.p>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((service, i) => {
-            const Icon = iconMap[service.title] || Code;
-            const features = service.features ? JSON.parse(service.features) : [];
-            return (
-              <AnimatedCard key={service.id} index={i} className="group bg-slate-900/50 border border-slate-800 rounded-xl p-8 hover:border-slate-600 transition-all hover:-translate-y-2 flex flex-col">
-                <motion.div
-                  className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gray-200 transition-all"
-                  whileHover={{ rotate: [0, -10, 10, -5, 0], transition: { duration: 0.5 } }}
-                >
-                  <Icon className="text-slate-300" size={28} />
-                </motion.div>
-                <h3 className="text-xl font-semibold text-white mb-3">{service.title}</h3>
-                <p className="text-gray-500 text-sm mb-6 flex-1">{service.description}</p>
-                {features.length > 0 && (
-                  <ul className="space-y-2 mb-6">
-                    {features.map((feature, fi) => (
-                      <motion.li
-                        key={fi}
-                        className="flex items-center gap-2 text-sm text-slate-400"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: fi * 0.1 }}
-                      >
-                        <span className="w-1.5 h-1.5 bg-slate-500 rounded-full" />
-                        {feature}
-                      </motion.li>
-                    ))}
-                  </ul>
-                )}
-                <motion.button
-                  className="text-slate-300 text-sm font-medium flex items-center gap-2 group-hover:gap-3 transition-all"
-                  whileHover={{ x: 5 }}
-                >
-                  Learn More <ArrowRight size={14} />
-                </motion.button>
-              </AnimatedCard>
-            );
-          })}
+    <section id="services" className="py-4 overflow-hidden relative" style={{ background: "#0c1929" }}>
+      {!isOpen && (
+        <div className="px-4 sm:px-8 relative mb-4">
+          <p className="text-center text-sm font-medium text-blue-400 tracking-widest uppercase mb-3">
+            What I Do
+          </p>
+          <h2 className="text-center text-white text-4xl font-bold">
+            Services <span className="text-blue-400">I Offer</span>
+          </h2>
+          <div className="w-16 h-1 bg-blue-500 rounded-full mx-auto mt-4" />
         </div>
+      )}
+
+      <div
+        className="relative w-full transition-all duration-700"
+        style={{ height: isOpen ? "0" : "min(80vh, 700px)" }}
+      >
+        {!isOpen && (
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-10 h-10 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
+              </div>
+            }
+          >
+            <Canvas
+              camera={{ position: [0, 0, 9], fov: 50 }}
+              dpr={[1, 1.5]}
+              gl={{ antialias: true, alpha: false }}
+              style={{ background: "#0c1929" }}
+            >
+              <ServicePrism services={serviceList} />
+            </Canvas>
+          </Suspense>
+        )}
       </div>
-    </AnimatedSection>
+
+      <AnimatePresence>
+        {isOpen && <ServiceViewer />}
+      </AnimatePresence>
+    </section>
+  );
+}
+
+export default function Services() {
+  return (
+    <ServiceViewerProvider>
+      <ServicesContent />
+    </ServiceViewerProvider>
   );
 }

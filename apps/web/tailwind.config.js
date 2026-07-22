@@ -8,6 +8,8 @@ export default {
       colors: {
         'slate-950': 'var(--bg-primary)',
         'slate-900': 'var(--bg-secondary)',
+        'accent-blue': '#2563EB',
+        'accent-gray': '#4B5563',
         'glass': {
           DEFAULT: 'var(--glass-bg)',
           border: 'var(--glass-border)',

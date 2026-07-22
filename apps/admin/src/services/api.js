@@ -53,9 +53,11 @@ export const skillsAPI = {
 
 export const servicesAPI = {
   getAll: () => api.get("/services"),
+  getAllAdmin: () => api.get("/services/all"),
   create: (data) => api.post("/services", data),
   update: (id, data) => api.put(`/services/${id}`, data),
   delete: (id) => api.delete(`/services/${id}`),
+  reorder: (orderedIds) => api.put("/services/reorder/batch", { orderedIds }),
 };
 
 export const experienceAPI = {

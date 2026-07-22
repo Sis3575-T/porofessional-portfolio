@@ -14,7 +14,7 @@ export default function Hero() {
           </div>
         </div>
         <div className="flex justify-center">
-          <div className="w-72 h-72 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center border border-slate-700">
+          <div className="w-72 h-72 bg-cyan-500/20 rounded-2xl flex items-center justify-center border border-slate-700">
             <span className="text-slate-400">3D Scene Coming Soon</span>
           </div>
         </div>

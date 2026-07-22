@@ -3,6 +3,8 @@ import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PortfolioProvider } from "./context/PortfolioContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { AvatarProvider } from "./context/AvatarContext";
+import { Avatar3DProvider } from "./context/Avatar3DContext";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -10,11 +12,13 @@ import SEO from "./components/SEO";
 import ErrorBoundary from "./components/ErrorBoundary";
 import SkipLink from "./components/SkipLink";
 import BackToTop from "./components/BackToTop";
+import LoadingOverlay from "./components/LoadingOverlay";
+import PhotoManager from "./components/PhotoManager";
+import ScreenshotButton from "./components/ScreenshotButton";
 
 import NotFoundPage from "./components/NotFoundPage";
 
 const Hero = lazy(() => import("./components/sections/Hero"));
-const AboutPreview = lazy(() => import("./components/sections/AboutPreview"));
 const About = lazy(() => import("./components/sections/About"));
 const Skills = lazy(() => import("./components/sections/Skills"));
 const Services = lazy(() => import("./components/sections/Services"));
@@ -51,13 +55,12 @@ function HomePage() {
       <AnimatedPage>
         <SEO />
         <Hero />
-        <AboutPreview />
         <About />
         <Skills />
+        <Projects />
         <Services />
         <Experience />
         <Education />
-        <Projects />
         <Testimonials />
         <Contact />
       </AnimatedPage>
@@ -90,20 +93,27 @@ export default function App() {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider>
       <PortfolioProvider>
+      <AvatarProvider>
+      <Avatar3DProvider>
         <ErrorBoundary>
-          <div className="min-h-screen relative bg-white text-gray-900">
+          <div className="min-h-screen relative" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
             <SkipLink />
             <Sidebar />
             <Navbar />
-            <div className="ml-[125px] xl:ml-[130px] 2xl:ml-[140px]">
+            <div className="ml-0 md:ml-[100px] xl:ml-[105px] 2xl:ml-[110px] pt-[80px]">
               <main id="main-content">
                 <AppRoutes />
               </main>
               <Footer />
             </div>
             <BackToTop />
+            <LoadingOverlay />
+            <PhotoManager />
+            <ScreenshotButton />
           </div>
         </ErrorBoundary>
+      </Avatar3DProvider>
+      </AvatarProvider>
       </PortfolioProvider>
       </ThemeProvider>
     </Router>

@@ -17,7 +17,7 @@ export default function Skills() {
             <h3 className="text-lg font-semibold mb-4">{skill.name}</h3>
             <div className="bg-slate-800 rounded-full h-2">
               <div 
-                className="bg-gradient-cyan-purple rounded-full h-2"
+                className="bg-cyan-500 rounded-full h-2"
                 style={{ width: `${skill.level}%` }}
               />
             </div>

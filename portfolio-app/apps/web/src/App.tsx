@@ -14,7 +14,7 @@ import Footer from './components/Footer';
 export default function App() {
   return (
     <Router>
-      <div className="bg-gradient-to-b from-slate-950 to-slate-900 text-slate-50">
+      <div className="bg-slate-950 text-slate-50">
         <Navbar />
         <Routes>
           <Route path="/" element={

@@ -14,7 +14,7 @@ html {
 
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #050816 0%, #0f172a 50%, #05081666 100%);
+  background: #050816;
   color: #f8fafc;
   line-height: 1.6;
 }
@@ -29,12 +29,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  background: #22d3ee;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #06b6d4, #7c3aed);
+  background: #06b6d4;
 }
 
 /* Selection */
@@ -104,7 +104,7 @@ section {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #22d3ee, #06b6d4);
+  background: #22d3ee;
   color: #050816;
 }
 
@@ -130,7 +130,7 @@ section {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  background: #22d3ee;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -163,11 +163,11 @@ section {
   animation: glow 2s ease-in-out infinite;
 }
 
-/* Gradients */
+/* Colors */
 .gradient-cyan-purple {
-  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  background: #22d3ee;
 }
 
 .gradient-dark {
-  background: linear-gradient(135deg, #050816, #0f172a);
+  background: #050816;
 }

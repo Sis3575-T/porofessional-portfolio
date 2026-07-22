@@ -14,20 +14,32 @@ const categoryLabels = {
   OTHER: "Other",
 };
 
-const categoryColors = {
-  FRONTEND: "#94a3b8",
-  BACKEND: "#94a3b8",
-  DATABASE: "#94a3b8",
-  DEVOPS: "#94a3b8",
-  TOOLS: "#94a3b8",
-  LANGUAGES: "#94a3b8",
-  SOFT_SKILLS: "#94a3b8",
-  OTHER: "#94a3b8",
-};
+const defaultSkills = [
+  { id: "skill-react", name: "React", category: "FRONTEND" },
+  { id: "skill-tailwind", name: "Tailwind CSS", category: "FRONTEND" },
+  { id: "skill-html", name: "HTML5", category: "FRONTEND" },
+  { id: "skill-css", name: "CSS3", category: "FRONTEND" },
+  { id: "skill-js", name: "JavaScript", category: "LANGUAGES" },
+  { id: "skill-ts", name: "TypeScript", category: "LANGUAGES" },
+  { id: "skill-node", name: "Node.js", category: "BACKEND" },
+  { id: "skill-express", name: "Express", category: "BACKEND" },
+  { id: "skill-php", name: "PHP", category: "BACKEND" },
+  { id: "skill-java", name: "Java", category: "BACKEND" },
+  { id: "skill-mongodb", name: "MongoDB", category: "DATABASE" },
+  { id: "skill-postgres", name: "PostgreSQL", category: "DATABASE" },
+  { id: "skill-mysql", name: "MySQL", category: "DATABASE" },
+  { id: "skill-docker", name: "Docker", category: "DEVOPS" },
+  { id: "skill-git", name: "Git", category: "TOOLS" },
+  { id: "skill-github", name: "GitHub", category: "TOOLS" },
+  { id: "skill-figma", name: "Figma", category: "TOOLS" },
+  { id: "skill-ai", name: "AI & Automation", category: "OTHER" },
+  { id: "skill-collab", name: "Team Collaboration", category: "SOFT_SKILLS" },
+  { id: "skill-problem", name: "Problem Solving", category: "SOFT_SKILLS" },
+];
 
-function SkillIcon({ name }) {
+function SkillIcon({ name, accentColor = "#94a3b8" }) {
   const key = name?.toLowerCase() || "";
-  const iconColor = "#94a3b8";
+  const iconColor = accentColor;
 
   if (key.includes("react")) {
     return (
@@ -36,6 +48,26 @@ function SkillIcon({ name }) {
         <ellipse cx="20" cy="20" rx="14" ry="5" stroke={iconColor} strokeWidth="1.2" fill="none" opacity="0.6" />
         <ellipse cx="20" cy="20" rx="14" ry="5" stroke={iconColor} strokeWidth="1.2" fill="none" opacity="0.6" transform="rotate(60 20 20)" />
         <ellipse cx="20" cy="20" rx="14" ry="5" stroke={iconColor} strokeWidth="1.2" fill="none" opacity="0.6" transform="rotate(120 20 20)" />
+      </svg>
+    );
+  }
+
+  if (key.includes("html")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <path d="M13 12h14l-1.5 16-5.5 2-5.5-2L13 12z" fill={iconColor} opacity="0.18" />
+        <path d="M15 14l10 1-1 11-4 1.5-4-1.5-1-4" stroke={iconColor} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (key.includes("css")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <path d="M12 11h16l-1.4 16-6.6 3-6.6-3L12 11z" fill={iconColor} opacity="0.16" />
+        <path d="M14 14h12l-.8 10-5.2 2-5.2-2-.8-4" stroke={iconColor} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
@@ -109,6 +141,24 @@ function SkillIcon({ name }) {
         <path d="M20 16v14" stroke={iconColor} strokeWidth="1.5" />
         <path d="M14 20c4-2 8-2 12 0" stroke={iconColor} strokeWidth="1" opacity="0.5" />
         <rect x="18" y="8" width="4" height="10" rx="1" stroke={iconColor} strokeWidth="1" fill={`${iconColor}10`} />
+      </svg>
+    );
+  }
+
+  if (key.includes("figma")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <path d="M16 12c0-2 2-3 4-3s4 1 4 3c0 1.5-1 2.5-2.5 3 1.5.5 2.5 1.5 2.5 3 0 2-2 3-4 3s-4-1-4-3c0-1.5 1-2.5 2.5-3-1.5-.5-2.5-1.5-2.5-3z" fill={iconColor} opacity="0.85" />
+      </svg>
+    );
+  }
+
+  if (key.includes("github")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <path d="M19.5 11c-4.5 0-8.2 3.7-8.2 8.3 0 3.7 2.4 6.8 5.7 7.9.4.1.6-.2.6-.4v-1.4c-2.3.5-2.8-1-2.8-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.2 1.8 0.8 2.2.6.1-.5.3-.8.5-1-1.8-.2-3.7-.9-3.7-4.1 0-.9.3-1.7.8-2.2-.1-.2-.3-.9.1-1.9 0 0 .7-.2 2.3.8.7-.2 1.4-.3 2.1-.3.7 0 1.4.1 2.1.3 1.6-1 2.3-.8 2.3-.8.4 1 .2 1.7.1 1.9.5.5.8 1.3.8 2.2 0 3.2-1.9 3.9-3.7 4.1.3.3.6.8.6 1.5v2.3c0 .2.2.5.6.4 3.3-1.1 5.7-4.2 5.7-7.9 0-4.6-3.7-8.3-8.2-8.3z" fill={iconColor} />
       </svg>
     );
   }
@@ -198,6 +248,37 @@ function SkillIcon({ name }) {
     );
   }
 
+  if (key.includes("tailwind")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <path d="M13 28c2.5-8 6.5-10.5 12-8-2.5 3-5 5-12 8z" fill={iconColor} opacity="0.75" />
+        <path d="M15.5 30c2.3-5.5 6.2-7 10.5-4.5-2.3 2.2-4.7 3.5-10.5 4.5z" fill={iconColor} opacity="0.45" />
+      </svg>
+    );
+  }
+
+  if (key.includes("ai") || key.includes("automation") || key.includes("machine")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <path d="M20 12l6 3v10l-6 3-6-3V15l6-3z" fill={iconColor} opacity="0.2" />
+        <path d="M20 15v10M14 17l12 6M14 23l12-6" stroke={iconColor} strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (key.includes("team") || key.includes("collaboration") || key.includes("problem") || key.includes("solving")) {
+    return (
+      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
+        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
+        <circle cx="16" cy="18" r="3" fill={iconColor} opacity="0.8" />
+        <circle cx="24" cy="18" r="3" fill={iconColor} opacity="0.8" />
+        <path d="M12 28c1.5-3 4.2-4.5 8-4.5s6.5 1.5 8 4.5" stroke={iconColor} strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
   const initial = name?.charAt(0)?.toUpperCase() || "?";
 
   return (
@@ -213,21 +294,22 @@ function SkillIcon({ name }) {
 export default function Skills() {
   const { skills, loading } = usePortfolio();
   const [activeCategory, setActiveCategory] = useState("ALL");
+  const skillList = skills && skills.length > 0 ? skills : defaultSkills;
 
-  const categories = ["ALL", ...new Set(skills.map((s) => s.category))];
-  const filtered = activeCategory === "ALL" ? skills : skills.filter((s) => s.category === activeCategory);
+  const categories = ["ALL", ...new Set(skillList.map((s) => s.category))];
+  const filtered = activeCategory === "ALL" ? skillList : skillList.filter((s) => s.category === activeCategory);
 
   if (loading) {
     return (
       <section id="skills" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="animate-pulse space-y-8">
-            <div className="h-10 w-48 bg-slate-800 rounded mx-auto" />
+            <div className="h-10 w-48 bg-gray-100 rounded mx-auto" />
             <div className="flex gap-4 justify-center">
-              {[1,2,3,4].map(i => <div key={i} className="h-10 w-24 bg-slate-800 rounded-full" />)}
+              {[1,2,3,4].map(i => <div key={i} className="h-10 w-24 bg-gray-100 rounded-full" />)}
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              {[1,2,3,4,5,6].map(i => <div key={i} className="h-32 bg-slate-800 rounded-xl" />)}
+              {[1,2,3,4,5,6].map(i => <div key={i} className="h-32 bg-gray-100 rounded-xl" />)}
             </div>
           </div>
         </div>
@@ -236,10 +318,10 @@ export default function Skills() {
   }
 
   return (
-    <AnimatedSection id="skills" theme="skills" className="py-32 overflow-hidden" aria-label="Skills section">
+    <AnimatedSection id="skills" theme="skills" className="py-4 overflow-hidden" aria-label="Skills section">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative">
         <motion.p
-          className="text-center text-sm font-medium text-gray-400 tracking-widest uppercase mb-3"
+          className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -247,21 +329,21 @@ export default function Skills() {
           Expertise
         </motion.p>
         <motion.h2
-          className="text-center text-white"
+          className="text-center text-gray-900 text-4xl font-bold"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          My Skills
+          My <span className="text-accent-blue">Skills</span>
         </motion.h2>
         <motion.div
-          className="w-16 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-4"
+          className="w-16 h-1 bg-accent-blue rounded-full mx-auto mt-4 mb-4"
           initial={{ width: 0 }}
           whileInView={{ width: 64 }}
           viewport={{ once: true }}
         />
         <motion.p
-          className="text-center text-gray-400 mb-12 max-w-2xl mx-auto"
+          className="text-center text-gray-400 mb-10 max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -282,8 +364,8 @@ export default function Skills() {
               onClick={() => setActiveCategory(cat)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
                 activeCategory === cat
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-500 hover:text-gray-900 hover:bg-gray-200 border border-gray-200"
+                  ? "bg-accent-blue text-white shadow-lg shadow-blue-100"
+                  : "bg-white/80 text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-gray-200"
               }`}
             >
               {cat === "ALL" ? "All" : categoryLabels[cat] || cat}
@@ -293,13 +375,15 @@ export default function Skills() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map((skill, i) => {
+            const accentColor = skill.category === "FRONTEND" ? "#111111" : skill.category === "BACKEND" ? "#2563EB" : skill.category === "DATABASE" ? "#4B5563" : skill.category === "DEVOPS" ? "#111111" : skill.category === "TOOLS" ? "#2563EB" : skill.category === "LANGUAGES" ? "#4B5563" : skill.category === "SOFT_SKILLS" ? "#111111" : "#4B5563";
+            const cardClass = "bg-white border-gray-200";
             return (
-              <AnimatedCard key={skill.id} className="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 card-stone transition-all hover:-translate-y-1" index={i}>
+              <AnimatedCard key={skill.id} className={`group relative bg-white ${cardClass} rounded-2xl p-4 shadow-[0_16px_40px_rgba(15,23,42,0.05)] hover:-translate-y-1`} index={i}>
                 <div className="flex items-center gap-3">
-                  <SkillIcon name={skill.name} />
+                  <SkillIcon name={skill.name} accentColor={accentColor} />
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-white text-sm truncate group-hover:text-white transition-colors">{skill.name}</h3>
-                    <span className="text-xs text-slate-500">{categoryLabels[skill.category] || skill.category}</span>
+                    <h3 className="font-semibold text-gray-900 text-sm truncate group-hover:text-gray-900 transition-colors">{skill.name}</h3>
+                    <span className="text-xs text-gray-400">{categoryLabels[skill.category] || skill.category}</span>
                   </div>
                 </div>
               </AnimatedCard>

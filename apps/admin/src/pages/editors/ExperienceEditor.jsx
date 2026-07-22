@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { experienceAPI } from '../../services/api';
-import { Plus, Save, Loader2, Trash2, Pencil } from 'lucide-react';
+import { Plus, Save, Loader2, Trash2, Pencil, Image as ImageIcon } from 'lucide-react';
+import ImagePicker from '../../components/ImagePicker';
 
 export default function ExperienceEditor() {
   const [items, setItems] = useState([]);
@@ -12,6 +13,7 @@ export default function ExperienceEditor() {
     company: '', position: '', description: '', startDate: '', endDate: '',
     isCurrent: false, technologies: '', logo: '',
   });
+  const [pickerField, setPickerField] = useState(null);
 
   const fetch = async () => {
     try { const res = await experienceAPI.getAll(); setItems(res.data.data); }
@@ -81,6 +83,20 @@ export default function ExperienceEditor() {
             </div>
           </div>
           <input value={form.technologies} onChange={(e) => setForm({...form, technologies: e.target.value})} className="w-full" placeholder="Technologies (comma separated)" />
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Company Logo</label>
+            <div className="flex gap-2">
+              <input value={form.logo} onChange={(e) => setForm({...form, logo: e.target.value})} className="w-full" placeholder="https://..." />
+              <button type="button" onClick={() => setPickerField('logo')} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition shrink-0">
+                <ImageIcon size={16} />
+              </button>
+            </div>
+            {form.logo && (
+              <div className="mt-2 w-20 h-14 rounded-lg overflow-hidden border border-slate-700">
+                <img src={form.logo} alt="" className="w-full h-full object-contain" />
+              </div>
+            )}
+          </div>
           <div className="flex gap-3">
             <button type="submit" className="btn-primary text-sm flex items-center gap-2"><Save size={16} /> {editing ? 'Update' : 'Create'}</button>
             <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 border border-slate-600 text-slate-300 rounded-lg text-sm">Cancel</button>
@@ -105,6 +121,12 @@ export default function ExperienceEditor() {
         ))}
       </div>
       {items.length === 0 && <p className="text-slate-500">No experience added yet</p>}
+
+      <ImagePicker
+        open={!!pickerField}
+        onSelect={(url) => { setForm({...form, [pickerField]: url}); setPickerField(null); }}
+        onClose={() => setPickerField(null)}
+      />
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, User, Code2, Briefcase, GraduationCap,
   FolderKanban, MessageSquare, Settings, LogOut, Menu, X,
-  Star, Wrench, FileText, Image, Activity
+  Star, Wrench, FileText, Image, Activity, Box
 } from "lucide-react";
 import { dashboardAPI } from "../services/api";
 
@@ -12,13 +12,14 @@ const sidebarItems = [
   { label: "Hero", path: "/admin/hero", icon: FileText },
   { label: "About", path: "/admin/about", icon: User },
   { label: "Skills", path: "/admin/skills", icon: Code2 },
+  { label: "Projects", path: "/admin/projects", icon: FolderKanban },
   { label: "Services", path: "/admin/services", icon: Wrench },
   { label: "Experience", path: "/admin/experience", icon: Briefcase },
   { label: "Education", path: "/admin/education", icon: GraduationCap },
-  { label: "Projects", path: "/admin/projects", icon: FolderKanban },
   { label: "Testimonials", path: "/admin/testimonials", icon: Star },
   { label: "Messages", path: "/admin/messages", icon: MessageSquare },
   { label: "Media", path: "/admin/media", icon: Image },
+  { label: "3D Avatar", path: "/admin/avatar", icon: Box },
   { label: "Activity", path: "/admin/activity", icon: Activity },
   { label: "Settings", path: "/admin/settings", icon: Settings },
 ];
@@ -103,7 +104,7 @@ export default function Dashboard({ children, title }) {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 bg-slate-950/90 backdrop-blur border-b border-slate-800 px-6 py-4 lg:hidden">
+        <header className="sticky top-0 z-[60] bg-slate-950/90 backdrop-blur border-b border-slate-800 px-6 py-4 lg:hidden">
           <button onClick={() => setSidebarOpen(true)} className="text-slate-400 hover:text-white">
             <Menu size={24} />
           </button>
