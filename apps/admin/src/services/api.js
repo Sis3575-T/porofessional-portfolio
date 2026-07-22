@@ -49,6 +49,7 @@ export const skillsAPI = {
   create: (data) => api.post("/skills", data),
   update: (id, data) => api.put(`/skills/${id}`, data),
   delete: (id) => api.delete(`/skills/${id}`),
+  reorder: (orderedIds) => api.put("/skills/reorder/batch", { orderedIds }),
 };
 
 export const servicesAPI = {
@@ -61,14 +62,14 @@ export const servicesAPI = {
 };
 
 export const experienceAPI = {
-  getAll: () => api.get("/experience"),
+  getAll: () => api.get("/experience/admin"),
   create: (data) => api.post("/experience", data),
   update: (id, data) => api.put(`/experience/${id}`, data),
   delete: (id) => api.delete(`/experience/${id}`),
 };
 
 export const educationAPI = {
-  getAll: () => api.get("/education"),
+  getAll: () => api.get("/education/all"),
   create: (data) => api.post("/education", data),
   update: (id, data) => api.put(`/education/${id}`, data),
   delete: (id) => api.delete(`/education/${id}`),
@@ -103,4 +104,22 @@ export const settingsAPI = {
 
 export const dashboardAPI = {
   get: () => api.get("/dashboard"),
+};
+
+export const avatarAPI = {
+  get: () => api.get("/avatar"),
+  generate: (formData) => api.post("/avatar/generate", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }),
+  save: (data) => api.post("/avatar", data),
+  delete: () => api.delete("/avatar"),
+};
+
+export const generateAvatarFromPhoto = avatarAPI.generate;
+export const saveAvatar = avatarAPI.save;
+export const deleteAvatar = avatarAPI.delete;
+
+export const mediaAPI = {
+  getAll: () => api.get("/media"),
+  delete: (filename) => api.delete(`/media/${filename}`),
 };

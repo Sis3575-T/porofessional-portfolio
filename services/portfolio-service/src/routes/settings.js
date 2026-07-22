@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
 
 router.put("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { socialLinks, hero3dConfig, uiConfig, ...rest } = req.body;
+    const { socialLinks, hero3dConfig, uiConfig, sectionVisibility, ...rest } = req.body;
 
     const stringify = (val) => val ? (typeof val === "string" ? val : JSON.stringify(val)) : undefined;
 
@@ -27,6 +27,7 @@ router.put("/", authenticateToken, requireAdmin, async (req, res) => {
         socialLinks: stringify(socialLinks),
         hero3dConfig: stringify(hero3dConfig),
         uiConfig: stringify(uiConfig),
+        sectionVisibility: stringify(sectionVisibility),
       },
       create: {
         id: "settings-1",
@@ -36,6 +37,7 @@ router.put("/", authenticateToken, requireAdmin, async (req, res) => {
         socialLinks: stringify(socialLinks),
         hero3dConfig: stringify(hero3dConfig),
         uiConfig: stringify(uiConfig),
+        sectionVisibility: stringify(sectionVisibility),
       },
     });
 

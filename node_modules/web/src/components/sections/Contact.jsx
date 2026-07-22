@@ -1,270 +1,354 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Send, Mail, MapPin, Loader2, Github, Linkedin, Twitter, User, Tag, MessageSquare } from "lucide-react";
+import { useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { contactAPI } from "../../services/api";
-import { AnimatedSection } from "../AnimatedSection";
+import {
+  Send, Mail, MapPin, Phone, Clock, Loader2, CheckCircle,
+  Github, Linkedin, Twitter, User, Tag, MessageSquare,
+  Globe, Zap, ArrowRight, Briefcase, CalendarDays,
+} from "lucide-react";
+
+const defaultContactInfo = {
+  email: "hello@example.com",
+  phone: "+1 (555) 123-4567",
+  location: "Remote / Worldwide",
+  availability: "Available for projects",
+  responseTime: "Within 24 hours",
+  workingHours: "Mon - Fri, 9AM - 6PM",
+};
+
+const defaultSocialLinks = {
+  github: "#",
+  linkedin: "#",
+  twitter: "#",
+  email: "mailto:hello@example.com",
+  telegram: "#",
+  portfolio: "#",
+};
+
+const serviceOptions = [
+  "Frontend Development",
+  "Backend Development",
+  "Full Stack Development",
+  "UI Design",
+  "API Development",
+  "Consultation",
+];
+
+function ContactCard({ icon: Icon, label, value, delay }) {
+  return (
+    <motion.div
+      className="ct-info-card"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <div className="ct-info-icon">
+        <Icon size={18} />
+      </div>
+      <div className="ct-info-text">
+        <span className="ct-info-label">{label}</span>
+        <span className="ct-info-value">{value}</span>
+      </div>
+    </motion.div>
+  );
+}
+
+function SocialIcon({ href, icon: Icon, label, delay }) {
+  return (
+    <motion.a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="ct-social-icon"
+      aria-label={label}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <Icon size={20} />
+    </motion.a>
+  );
+}
 
 export default function Contact() {
   const { settings } = usePortfolio();
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({
+    name: "", email: "", subject: "", message: "", service: "",
+  });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const sectionRef = useRef(null);
+  const headerInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+  const contactInfo = {
+    email: settings?.contactEmail || defaultContactInfo.email,
+    phone: settings?.contactPhone || defaultContactInfo.phone,
+    location: settings?.address || defaultContactInfo.location,
+    availability: settings?.availability || defaultContactInfo.availability,
+    responseTime: settings?.responseTime || defaultContactInfo.responseTime,
+    workingHours: settings?.workingHours || defaultContactInfo.workingHours,
+  };
+
+  let socialLinks = defaultSocialLinks;
+  try {
+    if (settings?.socialLinks) {
+      socialLinks = { ...defaultSocialLinks, ...JSON.parse(settings.socialLinks) };
+    }
+  } catch { /* use defaults */ }
+
+  const validate = () => {
+    const errs = {};
+    if (!form.name.trim()) errs.name = "Name is required";
+    if (!form.email.trim()) errs.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "Invalid email";
+    if (!form.subject.trim()) errs.subject = "Subject is required";
+    if (!form.message.trim()) errs.message = "Message is required";
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.subject || !form.message) {
-      setError("All fields are required");
-      return;
-    }
-    if (!/\S+@\S+\.\S+/.test(form.email)) {
-      setError("Please enter a valid email");
-      return;
-    }
+    if (!validate()) return;
     setLoading(true);
-    setError("");
     try {
-      await contactAPI.send(form);
+      await contactAPI.send({
+        name: form.name,
+        email: form.email,
+        subject: form.subject,
+        message: form.message,
+        service: form.service,
+      });
       setSuccess(true);
-      setForm({ name: "", email: "", subject: "", message: "" });
+      setForm({ name: "", email: "", subject: "", message: "", service: "" });
+      setErrors({});
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to send message");
+      setErrors({ submit: err.response?.data?.message || "Failed to send message" });
     } finally {
       setLoading(false);
     }
   };
 
-  const socialLinks = settings?.socialLinks ? JSON.parse(settings.socialLinks) : {};
+  const handleChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  const inputClass = (field) =>
+    `ct-input ${errors[field ? field : ""] ? "ct-input--error" : ""}`;
 
   return (
-    <AnimatedSection id="contact" theme="contact" className="py-4 overflow-hidden" aria-label="Contact section">
-      <div className="max-w-3xl mx-auto px-4 sm:px-8 relative">
-        <motion.p
-          className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Contact
-        </motion.p>
-        <motion.h2
-          className="text-center text-gray-900 text-4xl font-bold"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Get In <span className="text-accent-blue">Touch</span>
-        </motion.h2>
+    <section
+      id="contact"
+      className="ct-section"
+      style={{ background: "var(--section-contact)" }}
+    >
+      {/* Background decoration */}
+      <div className="ct-bg-decoration" aria-hidden="true">
+        <div className="ct-bg-circle ct-bg-circle--1" />
+        <div className="ct-bg-circle ct-bg-circle--2" />
+        <div className="ct-bg-dots" />
+      </div>
+
+      <div className="ct-section-inner" ref={sectionRef}>
+        {/* Header */}
         <motion.div
-          className="w-16 h-1 bg-accent-blue rounded-full mx-auto mt-4 mb-4"
-          initial={{ width: 0 }}
-          whileInView={{ width: 64 }}
-          viewport={{ once: true }}
-        />
-        <motion.p
-          className="text-center text-gray-500 mb-16 max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
+          className="ct-header"
+          initial={{ opacity: 0, y: 30 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          Have a project in mind? Let&apos;s work together
-        </motion.p>
+          <span className="ct-header-badge">Let&apos;s Connect</span>
+          <h2 className="ct-header-title">
+            Get <span style={{ color: "var(--accent)" }}>In</span> Touch
+          </h2>
+          <div className="ct-header-accent" />
+          <p className="ct-header-desc">
+            Have a project in mind? Let&apos;s build something meaningful together.
+          </p>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-[1fr_1.6fr] gap-10 xl:gap-16 items-start">
-          <div>
-            <motion.h3
-              className="text-xl font-semibold text-gray-900 mb-2"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              Get In Touch
-            </motion.h3>
-            <motion.p
-              className="text-gray-500 text-sm leading-relaxed mb-8"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-            >
-              I&apos;m available for freelance work, consulting, and collaborative product builds focused on thoughtful design and dependable engineering.
-            </motion.p>
-
-            <div className="flex flex-col gap-5 mb-8">
-              <motion.div
-                className="flex items-start gap-3"
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.15 }}
-              >
-                <Mail size={18} className="text-accent-blue mt-0.5 shrink-0" />
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-accent-blue block mb-0.5">Email</span>
-                  <span className="text-sm text-gray-600">{settings?.contactEmail || "hello@example.com"}</span>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="flex items-start gap-3"
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-              >
-                <MapPin size={18} className="text-accent-blue mt-0.5 shrink-0" />
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-accent-blue block mb-0.5">Location</span>
-                  <span className="text-sm text-gray-600">{settings?.address || "Remote • Worldwide"}</span>
-                </div>
-              </motion.div>
-            </div>
-
+        {/* Main Grid */}
+        <div className="ct-grid">
+          {/* ─── Left Side: Info Card ─── */}
+          <div className="ct-left">
             <motion.div
-              className="flex gap-3"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              className="ct-info-panel"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.25 }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              {socialLinks.github && (
-                <a href={socialLinks.github} target="_blank" rel="noopener noreferrer"
-                  className="w-12 h-12 flex items-center justify-center text-gray-700 hover:text-black hover:scale-110 transition-all duration-300 hover:-translate-y-1"
-                  aria-label="GitHub"
-                >
-                  <Github size={22} />
-                </a>
-              )}
-              {socialLinks.linkedin && (
-                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
-                  className="w-12 h-12 flex items-center justify-center text-[#0A66C2] hover:text-[#084d82] hover:scale-110 transition-all duration-300 hover:-translate-y-1"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin size={22} />
-                </a>
-              )}
-              {socialLinks.twitter && (
-                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer"
-                  className="w-12 h-12 flex items-center justify-center text-gray-700 hover:text-black hover:scale-110 transition-all duration-300 hover:-translate-y-1"
-                  aria-label="Twitter"
-                >
-                  <Twitter size={22} />
-                </a>
-              )}
+              <h3 className="ct-info-heading">Get In Touch</h3>
+              <p className="ct-info-desc">
+                I&apos;m available for freelance work, consulting, and collaborative
+                product builds focused on thoughtful design and dependable engineering.
+                Whether you need a full-stack application, a sleek frontend, or
+                technical consultation — let&apos;s talk.
+              </p>
+
+              <div className="ct-info-cards">
+                <ContactCard icon={Mail} label="Email" value={contactInfo.email} delay={0.1} />
+                <ContactCard icon={Phone} label="Phone" value={contactInfo.phone} delay={0.15} />
+                <ContactCard icon={MapPin} label="Location" value={contactInfo.location} delay={0.2} />
+
+              </div>
             </motion.div>
           </div>
 
-          <div>
-            {success ? (
-              <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
-                <div className="w-16 h-16 bg-accent-blue/10 rounded-full flex items-center justify-center mx-auto mb-5">
-                  <Send size={28} className="text-accent-blue" />
+          {/* ─── Right Side: Form ─── */}
+          <div className="ct-right">
+            <motion.div
+              className="ct-form-panel"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+            >
+              {success ? (
+                <div className="ct-success">
+                  <div className="ct-success-icon">
+                    <CheckCircle size={40} />
+                  </div>
+                  <h3 className="ct-success-title">Message Sent!</h3>
+                  <p className="ct-success-desc">
+                    Thank you for reaching out. I&apos;ll get back to you within 24 hours.
+                  </p>
+                  <button
+                    onClick={() => setSuccess(false)}
+                    className="ct-success-btn"
+                  >
+                    Send Another Message
+                  </button>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                <p className="text-gray-500 mb-8 max-w-sm mx-auto">Thank you for reaching out. I&apos;ll get back to you within 24 hours.</p>
-                <button
-                  onClick={() => setSuccess(false)}
-                  className="px-8 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition"
-                >
-                  Send Another Message
-                </button>
-              </div>
-            ) : (
-              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
-                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-                <form onSubmit={handleSubmit} className="p-8 space-y-5" aria-label="Contact form" noValidate>
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3.5 text-red-700 text-sm flex items-center gap-2.5" role="alert">
-                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full shrink-0" />
-                      {error}
-                    </div>
-                  )}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="flex flex-col gap-1.5">
-                      <label htmlFor="contact-name" className="text-sm font-medium text-gray-900">Name *</label>
-                      <div className="relative">
-                        <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              ) : (
+                <form onSubmit={handleSubmit} className="ct-form" aria-label="Contact form" noValidate>
+                  <div className="ct-form-row">
+                    <div className="ct-field">
+                      <label htmlFor="ct-name" className="ct-label">Name *</label>
+                      <div className="ct-input-wrap">
+                        <User size={16} className="ct-input-icon" />
                         <input
-                          id="contact-name"
+                          id="ct-name"
                           type="text"
                           value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value })}
-                          className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 transition"
+                          onChange={(e) => handleChange("name", e.target.value)}
+                          className={inputClass("name")}
                           placeholder="John Doe"
                           aria-required="true"
-                          required
                         />
                       </div>
+                      {errors.name && <span className="ct-error">{errors.name}</span>}
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label htmlFor="contact-email" className="text-sm font-medium text-gray-900">Email *</label>
-                      <div className="relative">
-                        <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <div className="ct-field">
+                      <label htmlFor="ct-email" className="ct-label">Email *</label>
+                      <div className="ct-input-wrap">
+                        <Mail size={16} className="ct-input-icon" />
                         <input
-                          id="contact-email"
+                          id="ct-email"
                           type="email"
                           value={form.email}
-                          onChange={(e) => setForm({ ...form, email: e.target.value })}
-                          className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 transition"
+                          onChange={(e) => handleChange("email", e.target.value)}
+                          className={inputClass("email")}
                           placeholder="john@example.com"
                           aria-required="true"
-                          required
                         />
                       </div>
+                      {errors.email && <span className="ct-error">{errors.email}</span>}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="contact-subject" className="text-sm font-medium text-gray-900">Subject *</label>
-                    <div className="relative">
-                      <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+
+                  <div className="ct-field">
+                    <label htmlFor="ct-subject" className="ct-label">Subject *</label>
+                    <div className="ct-input-wrap">
+                      <Tag size={16} className="ct-input-icon" />
                       <input
-                        id="contact-subject"
+                        id="ct-subject"
                         type="text"
                         value={form.subject}
-                        onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 transition"
+                        onChange={(e) => handleChange("subject", e.target.value)}
+                        className={inputClass("subject")}
                         placeholder="Project Inquiry"
                         aria-required="true"
-                        required
                       />
                     </div>
+                    {errors.subject && <span className="ct-error">{errors.subject}</span>}
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="contact-message" className="text-sm font-medium text-gray-900">Message *</label>
-                    <div className="relative">
-                      <MessageSquare size={16} className="absolute left-3 top-3.5 text-gray-400 pointer-events-none" />
+
+                  <div className="ct-field">
+                    <label htmlFor="ct-message" className="ct-label">Message *</label>
+                    <div className="ct-input-wrap ct-input-wrap--textarea">
+                      <MessageSquare size={16} className="ct-input-icon ct-input-icon--top" />
                       <textarea
-                        id="contact-message"
+                        id="ct-message"
                         value={form.message}
-                        onChange={(e) => setForm({ ...form, message: e.target.value })}
-                        rows={5}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 transition resize-none"
+                        onChange={(e) => handleChange("message", e.target.value)}
+                        rows={6}
+                        className={`${inputClass("message")} ct-textarea`}
                         placeholder="Tell me about your project..."
                         aria-required="true"
-                        required
                       />
                     </div>
+                    {errors.message && <span className="ct-error">{errors.message}</span>}
                   </div>
+
+                  <div className="ct-field">
+                    <label htmlFor="ct-service" className="ct-label">Preferred Service</label>
+                    <div className="ct-input-wrap">
+                      <Briefcase size={16} className="ct-input-icon" />
+                      <select
+                        id="ct-service"
+                        value={form.service}
+                        onChange={(e) => handleChange("service", e.target.value)}
+                        className="ct-input ct-select"
+                      >
+                        <option value="">Select a service...</option>
+                        {serviceOptions.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {errors.submit && (
+                    <div className="ct-error-box" role="alert">
+                      <span className="ct-error-dot" />
+                      {errors.submit}
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-accent-blue text-white font-semibold rounded-lg py-3 text-sm flex items-center justify-center gap-2 hover:brightness-110 hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    className="ct-submit"
                     aria-busy={loading}
                   >
                     {loading ? (
-                      <><Loader2 size={18} className="animate-spin" aria-hidden="true" /> Sending...</>
+                      <>
+                        <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+                        Sending...
+                      </>
                     ) : (
-                      <><Send size={18} aria-hidden="true" /> Send Message</>
+                      <>
+                        <Send size={18} aria-hidden="true" />
+                        Send Message
+                        <ArrowRight size={16} className="ct-submit-arrow" />
+                      </>
                     )}
                   </button>
                 </form>
-              </div>
-            )}
+              )}
+            </motion.div>
+
+
           </div>
         </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }

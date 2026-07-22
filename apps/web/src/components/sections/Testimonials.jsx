@@ -5,7 +5,8 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { AnimatedSection } from "../AnimatedSection";
 
 export default function Testimonials() {
-  const { testimonials, loading } = usePortfolio();
+  const { testimonials: rawTestimonials, loading } = usePortfolio();
+  const testimonials = Array.isArray(rawTestimonials) ? rawTestimonials : [];
   const [current, setCurrent] = useState(0);
 
   const prev = useCallback(() => setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1)), [testimonials.length]);

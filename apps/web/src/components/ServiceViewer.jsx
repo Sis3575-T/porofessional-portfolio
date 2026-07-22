@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ExternalLink, Github, MessageSquare, ArrowRight, Check } from "lucide-react";
 import { useServiceViewer } from "../context/ServiceViewerContext";
+import { useTheme } from "../context/ThemeContext";
 
 function Lightbox({ src, onClose }) {
   return (
@@ -40,6 +41,7 @@ const fadeUp = {
 
 export default function ServiceViewer() {
   const { services, activeIndex, isOpen, closeService, animationDone } = useServiceViewer();
+  const { dark } = useTheme();
   const [lightbox, setLightbox] = useState(null);
 
   const service = services[activeIndex];
@@ -66,7 +68,7 @@ export default function ServiceViewer() {
     <>
       <motion.div
         className="fixed inset-0 z-50 overflow-y-auto"
-        style={{ background: "#0c1929" }}
+        style={{ background: "var(--bg-primary)" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -75,7 +77,8 @@ export default function ServiceViewer() {
         {/* Close button */}
         <motion.button
           onClick={handleClose}
-          className="fixed top-6 right-6 z-50 w-11 h-11 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition shadow-sm"
+          className="fixed top-6 right-6 z-50 w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center transition shadow-sm"
+          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
@@ -91,7 +94,8 @@ export default function ServiceViewer() {
             {/* Back link */}
             <motion.button
               onClick={handleClose}
-              className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 mb-8 transition"
+              className="flex items-center gap-2 text-sm hover:opacity-80 mb-8 transition"
+              style={{ color: "var(--accent)" }}
               variants={fadeUp}
             >
               <ArrowRight size={14} className="rotate-180" /> Back to services
@@ -99,7 +103,8 @@ export default function ServiceViewer() {
 
             {/* Title */}
             <motion.h1
-              className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight"
+              className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
+              style={{ color: "var(--text-primary)" }}
               variants={fadeUp}
             >
               {service.title}
@@ -107,7 +112,8 @@ export default function ServiceViewer() {
 
             {/* Short description */}
             <motion.p
-              className="text-lg text-blue-200/60 mb-8 max-w-2xl"
+              className="text-lg mb-8 max-w-2xl"
+              style={{ color: "var(--text-secondary)" }}
               variants={fadeUp}
             >
               {service.shortDescription || service.description}
@@ -130,12 +136,14 @@ export default function ServiceViewer() {
                   href={service.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white text-sm font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl hover:opacity-80 transition"
+                  style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
                 >
                   <Github size={16} /> GitHub
                 </a>
               )}
-              <button className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white text-sm font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition">
+              <button className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl hover:opacity-80 transition"
+                style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
                 <MessageSquare size={16} /> Contact Me
               </button>
             </motion.div>
@@ -143,8 +151,8 @@ export default function ServiceViewer() {
             {/* Hero image */}
             {service.heroImage && (
               <motion.div
-                className="rounded-2xl overflow-hidden border border-white/10 mb-12"
-                style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}
+                className="rounded-2xl overflow-hidden mb-12"
+                style={{ border: "1px solid var(--border)", boxShadow: "0 4px 20px var(--shadow)" }}
                 variants={fadeUp}
               >
                 <img
@@ -157,8 +165,8 @@ export default function ServiceViewer() {
 
             {/* Full description */}
             <motion.div className="mb-12" variants={fadeUp}>
-              <h2 className="text-2xl font-bold text-white mb-4">About this project</h2>
-              <div className="text-blue-100/60 leading-relaxed whitespace-pre-line text-base">
+              <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>About this project</h2>
+              <div className="leading-relaxed whitespace-pre-line text-base" style={{ color: "var(--text-secondary)" }}>
                 {service.fullDescription || service.description}
               </div>
             </motion.div>
@@ -166,12 +174,13 @@ export default function ServiceViewer() {
             {/* Technologies */}
             {technologies.length > 0 && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold text-white mb-4">Technologies</h2>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Technologies</h2>
                 <div className="flex flex-wrap gap-2">
                   {technologies.map((tech, i) => (
                     <span
                       key={i}
-                      className="px-4 py-2 text-sm font-medium bg-white/10 text-blue-200 rounded-xl border border-white/10"
+                      className="px-4 py-2 text-sm font-medium rounded-xl"
+                      style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
                     >
                       {typeof tech === "string" ? tech : tech.name}
                     </span>
@@ -183,18 +192,19 @@ export default function ServiceViewer() {
             {/* Features */}
             {features.length > 0 && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold text-white mb-4">Features</h2>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Features</h2>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {features.map((feature, i) => (
                     <motion.div
                       key={i}
-                      className="flex items-start gap-3 p-4 bg-white/5 rounded-xl border border-white/10"
+                      className="flex items-start gap-3 p-4 rounded-xl"
+                      style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
                       variants={fadeUp}
                     >
                       <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center shrink-0 mt-0.5">
                         <Check size={12} className="text-white" />
                       </div>
-                      <span className="text-sm text-blue-100/70">{typeof feature === "string" ? feature : feature.name}</span>
+                      <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{typeof feature === "string" ? feature : feature.name}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -204,8 +214,8 @@ export default function ServiceViewer() {
             {/* Development Process */}
             {service.process && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold text-white mb-4">Development Process</h2>
-                <div className="text-blue-100/60 leading-relaxed whitespace-pre-line text-base">
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Development Process</h2>
+                <div className="leading-relaxed whitespace-pre-line text-base" style={{ color: "var(--text-secondary)" }}>
                   {service.process}
                 </div>
               </motion.div>
@@ -214,10 +224,11 @@ export default function ServiceViewer() {
             {/* Tools */}
             {service.tools && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold text-white mb-4">Tools Used</h2>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Tools Used</h2>
                 <div className="flex flex-wrap gap-2">
                   {(typeof service.tools === "string" ? JSON.parse(service.tools) : service.tools || []).map((tool, i) => (
-                    <span key={i} className="px-3 py-1.5 text-xs font-medium bg-white/10 text-blue-200 rounded-lg border border-white/10">
+                    <span key={i} className="px-3 py-1.5 text-xs font-medium rounded-lg"
+                      style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}>
                       {typeof tool === "string" ? tool : tool.name}
                     </span>
                   ))}
@@ -228,12 +239,13 @@ export default function ServiceViewer() {
             {/* Gallery */}
             {gallery.length > 0 && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold text-white mb-4">Gallery</h2>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {gallery.map((img, i) => (
                     <motion.div
                       key={i}
-                      className="rounded-xl overflow-hidden border border-white/10 cursor-pointer hover:opacity-90 transition"
+                      className="rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition"
+                      style={{ border: "1px solid var(--border)" }}
                       onClick={() => setLightbox(img)}
                       whileHover={{ scale: 1.02 }}
                     >

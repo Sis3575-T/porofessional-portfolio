@@ -43,7 +43,8 @@ const statsConfig = [
 export default function StatsCard({ statistics }) {
   let parsed = {};
   try {
-    parsed = typeof statistics === "string" ? JSON.parse(statistics) : (statistics || {});
+    const raw = typeof statistics === "string" ? JSON.parse(statistics) : statistics;
+    parsed = (raw && typeof raw === "object" && !Array.isArray(raw)) ? raw : {};
   } catch { parsed = {}; }
 
   const items = statsConfig.map((s) => ({

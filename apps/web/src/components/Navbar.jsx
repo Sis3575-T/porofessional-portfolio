@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Download, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import Logo from "./Logo";
 
 const navItems = [
   { label: "Home",     href: "#hero" },
@@ -46,9 +47,14 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-30 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto flex items-center h-[60px] px-6 mt-3 rounded-2xl bg-white/80 backdrop-blur-xl border border-gray-200/60 max-w-[900px] w-full mx-4"
-          style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 12px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)" }}>
+      <nav className="fixed top-0 left-0 right-0 z-30 flex justify-start pointer-events-none">
+        <div className="pointer-events-auto flex items-center pl-2 pr-0 mt-3 ml-4 rounded-2xl bg-white/80 backdrop-blur-xl border border-gray-200/60 w-full"
+          style={{ height: 108, boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 12px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)" }}>
+          {/* Logo */}
+          <a href="#hero" onClick={(e) => { e.preventDefault(); handleClick("#hero"); }} className="flex items-center justify-center shrink-0 cursor-pointer mr-8">
+            <Logo />
+          </a>
+
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-2 mx-auto">
             {navItems.map((item) => {
@@ -118,7 +124,10 @@ export default function Navbar() {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
               <div className="flex items-center justify-between px-5 pt-6 pb-4 border-b border-gray-100">
-                <span className="text-lg font-bold text-gray-900">SISAY DEV</span>
+                <div className="flex items-center gap-3">
+                  <Logo />
+                  <span className="text-lg font-bold text-gray-900">SISAY DEV</span>
+                </div>
                 <button
                   onClick={() => setMobileOpen(false)}
                   className="p-2 text-gray-400 hover:text-gray-700 rounded-lg"

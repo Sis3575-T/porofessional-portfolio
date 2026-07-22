@@ -36,4 +36,21 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.delete("/:filename", authenticateToken, async (req, res) => {
+  try {
+    const { filename } = req.params;
+    const filePath = path.join(uploadsDir, filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ success: false, message: "File not found" });
+    }
+
+    fs.unlinkSync(filePath);
+    res.json({ success: true, message: "File deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete file" });
+  }
+});
+
 export default router;

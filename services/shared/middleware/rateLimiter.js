@@ -1,7 +1,10 @@
 const requestCounts = new Map();
 
-export const rateLimiter = (windowMs = 15 * 60 * 1000, maxRequests = 100) => {
+export const rateLimiter = (windowMs = 15 * 60 * 1000, maxRequests = 500) => {
   return (req, res, next) => {
+    if (process.env.NODE_ENV === "development") {
+      return next();
+    }
     const ip = req.ip || req.connection.remoteAddress;
     const now = Date.now();
 

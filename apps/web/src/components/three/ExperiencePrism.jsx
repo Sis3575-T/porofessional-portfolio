@@ -1,19 +1,10 @@
-import { useRef, useMemo, useCallback, useEffect } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useRef, useMemo, useCallback } from "react";
+import { useFrame } from "@react-three/fiber";
 import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
-import PrismFace from "./PrismFace";
-import { useServiceViewer } from "../../context/ServiceViewerContext";
+import ExperienceFace from "./ExperienceFace";
+import { useExperience } from "../../context/ExperienceContext";
 import { useTheme } from "../../context/ThemeContext";
 import { playDoorOpen, playDoorClose } from "../../utils/doorSound";
-import * as THREE from "three";
-
-function SceneBackground({ dark }) {
-  const { scene } = useThree();
-  useEffect(() => {
-    scene.background = new THREE.Color(dark ? "#0F1115" : "#FFFFFF");
-  }, [dark, scene]);
-  return null;
-}
 
 function FloatingParticles({ count = 50 }) {
   const mesh = useRef();
@@ -42,21 +33,24 @@ function FloatingParticles({ count = 50 }) {
   );
 }
 
-export default function ServicePrism({ services }) {
-  const groupRef = useRef();
+export default function ExperiencePrism({ experiences }) {
+  const turntableRef = useRef();
   const currentAngle = useRef(0);
+  const targetAngleRef = useRef(0);
   const { dark } = useTheme();
-  const { hoveredFace, setHovered, openDoor, closeDoor, activeIndex, doorOpen, isAnimating, animationDone } = useServiceViewer();
+  const { hoveredFace, setHovered, openDoor, closeDoor, activeIndex, doorOpen, isAnimating, animationDone } = useExperience();
 
-  const serviceCount = Math.min(4, Math.max(3, services.length));
-  const radius = 3.6 + serviceCount * 0.3;
-  const height = 8;
+  const expCount = Math.min(4, Math.max(3, experiences.length));
+  const radius = 4.2;
+  const faceWidth = 5.8;
+  const faceHeight = 2.0;
 
   const handleFaceOpen = useCallback((index) => {
     if (isAnimating) return;
     if (doorOpen && activeIndex === index) {
       playDoorClose();
       closeDoor();
+      targetAngleRef.current = 0;
       setTimeout(animationDone, 1200);
     } else {
       if (doorOpen) {
@@ -65,53 +59,57 @@ export default function ServicePrism({ services }) {
         setTimeout(() => {
           playDoorOpen();
           openDoor(index);
+          const faceAngle = (index / expCount) * Math.PI * 2;
+          targetAngleRef.current = -faceAngle;
           setTimeout(animationDone, 1200);
         }, 800);
       } else {
         playDoorOpen();
         openDoor(index);
+        const faceAngle = (index / expCount) * Math.PI * 2;
+        targetAngleRef.current = -faceAngle;
         setTimeout(animationDone, 1200);
       }
     }
-  }, [openDoor, closeDoor, animationDone, isAnimating, doorOpen, activeIndex]);
+  }, [openDoor, closeDoor, animationDone, isAnimating, doorOpen, activeIndex, expCount]);
 
   const handleHover = useCallback((index) => {
     setHovered(index);
   }, [setHovered]);
 
   useFrame((_, delta) => {
-    if (!groupRef.current) return;
+    if (!turntableRef.current) return;
 
-    if (doorOpen && activeIndex >= 0) {
-      const targetAngle = -(activeIndex / serviceCount) * Math.PI * 2 + Math.PI / 2;
-      let diff = targetAngle - currentAngle.current;
-      while (diff > Math.PI) diff -= Math.PI * 2;
-      while (diff < -Math.PI) diff += Math.PI * 2;
-
-      const step = diff * Math.min(delta * 2.5, 1);
+    const diff = targetAngleRef.current - currentAngle.current;
+    if (Math.abs(diff) > 0.0005) {
+      const step = diff * Math.min(delta * 2.2, 1);
       currentAngle.current += step;
-      groupRef.current.rotation.y = currentAngle.current;
+      turntableRef.current.rotation.y = currentAngle.current;
+    } else {
+      currentAngle.current = targetAngleRef.current;
+      turntableRef.current.rotation.y = currentAngle.current;
     }
   });
 
   return (
     <>
-      <SceneBackground dark={dark} />
       <ambientLight intensity={0.6} color="#e0e7ff" />
       <directionalLight position={[5, 8, 5]} intensity={1.2} color="#ffffff" castShadow />
       <directionalLight position={[-5, 4, -5]} intensity={0.4} color="#93c5fd" />
       <pointLight position={[0, 6, 3]} intensity={0.6} color="#60a5fa" distance={15} decay={2} />
       <spotLight position={[0, 8, 4]} angle={0.5} penumbra={0.6} intensity={0.8} color="#ffffff" />
 
-      <group ref={groupRef}>
-        {services.slice(0, serviceCount).map((service, i) => (
-          <PrismFace
-            key={service.id || i}
-            service={service}
+      <group ref={turntableRef}>
+        {experiences.slice(0, expCount).map((experience, i) => (
+          <ExperienceFace
+            key={experience.id || i}
+            experience={experience}
             index={i}
-            total={serviceCount}
+            total={expCount}
             radius={radius}
-            height={height}
+            faceWidth={faceWidth}
+            faceHeight={faceHeight}
+            currentAngle={currentAngle}
             isActive={doorOpen && activeIndex === i}
             isOpen={doorOpen && activeIndex === i}
             isHovered={hoveredFace === i}
@@ -120,12 +118,11 @@ export default function ServicePrism({ services }) {
           />
         ))}
 
-        <mesh position={[0, height / 2 + 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[0, faceHeight / 2 + 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[radius + 0.015, 64]} />
           <meshStandardMaterial color="#1e3a5f" roughness={0.3} metalness={0.2} transparent opacity={0.5} />
         </mesh>
-
-        <mesh position={[0, -(height / 2 + 0.015), 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, -(faceHeight / 2 + 0.015), 0]} rotation={[Math.PI / 2, 0, 0]}>
           <circleGeometry args={[radius + 0.015, 64]} />
           <meshStandardMaterial color="#1e3a5f" roughness={0.3} metalness={0.2} transparent opacity={0.5} />
         </mesh>
@@ -133,7 +130,7 @@ export default function ServicePrism({ services }) {
 
       <FloatingParticles count={60} />
 
-      <ContactShadows position={[0, -(height / 2 + 0.5), 0]} opacity={0.3} scale={14} blur={2.5} far={5} color="#1e3a5f" />
+      <ContactShadows position={[0, -1.5, 0]} opacity={0.3} scale={14} blur={2.5} far={5} color="#1e3a5f" />
 
       <Environment preset="city" />
       <fog attach="fog" args={[dark ? "#0F1115" : "#FFFFFF", 10, 30]} />
@@ -142,8 +139,8 @@ export default function ServicePrism({ services }) {
         <OrbitControls
           enablePan={false}
           enableZoom={false}
-          minPolarAngle={Math.PI / 5}
-          maxPolarAngle={Math.PI / 1.5}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 1.6}
           autoRotate={false}
           enableDamping
           dampingFactor={0.05}

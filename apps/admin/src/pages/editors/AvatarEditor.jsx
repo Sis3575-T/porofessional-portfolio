@@ -47,8 +47,12 @@ export default function AvatarEditor() {
       setProgress("AI is analyzing your face...");
       setProgressPercent(30);
 
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/v1/avatar/generate`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 

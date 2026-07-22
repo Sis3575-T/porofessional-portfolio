@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PortfolioProvider } from "./context/PortfolioContext";
+import { PortfolioProvider, usePortfolio } from "./context/PortfolioContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AvatarProvider } from "./context/AvatarContext";
 import { Avatar3DProvider } from "./context/Avatar3DContext";
@@ -49,20 +49,39 @@ function AnimatedPage({ children }) {
   );
 }
 
+const defaultVisibility = {
+  hero: true, about: true, skills: true, services: true,
+  experience: true, education: true, projects: true,
+  testimonials: true, contact: true, footer: true,
+};
+
 function HomePage() {
+  const { settings } = usePortfolio();
+  const visibility = (() => {
+    try {
+      if (settings?.sectionVisibility) {
+        const v = typeof settings.sectionVisibility === "string"
+          ? JSON.parse(settings.sectionVisibility)
+          : settings.sectionVisibility;
+        return { ...defaultVisibility, ...v };
+      }
+    } catch {}
+    return defaultVisibility;
+  })();
+
   return (
     <Suspense fallback={<SectionLoader />}>
       <AnimatedPage>
         <SEO />
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Services />
-        <Experience />
-        <Education />
-        <Testimonials />
-        <Contact />
+        {visibility.hero && <Hero />}
+        {visibility.about && <About />}
+        {visibility.skills && <Skills />}
+        {visibility.projects && <Projects />}
+        {visibility.services && <Services />}
+        {visibility.experience && <Experience />}
+        {visibility.education && <Education />}
+        {visibility.testimonials && <Testimonials />}
+        {visibility.contact && <Contact />}
       </AnimatedPage>
     </Suspense>
   );
@@ -88,6 +107,39 @@ function AppRoutes() {
   );
 }
 
+function MainLayout() {
+  const { settings } = usePortfolio();
+  const visibility = (() => {
+    try {
+      if (settings?.sectionVisibility) {
+        const v = typeof settings.sectionVisibility === "string"
+          ? JSON.parse(settings.sectionVisibility)
+          : settings.sectionVisibility;
+        return { ...defaultVisibility, ...v };
+      }
+    } catch {}
+    return defaultVisibility;
+  })();
+
+  return (
+    <div className="min-h-screen relative" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
+      <SkipLink />
+      <Sidebar />
+      <Navbar />
+      <div className="ml-0 md:ml-[100px] xl:ml-[105px] 2xl:ml-[110px] pt-[120px]">
+        <main id="main-content">
+          <AppRoutes />
+        </main>
+        {visibility.footer !== false && <Footer />}
+      </div>
+      <BackToTop />
+      <LoadingOverlay />
+      <PhotoManager />
+      <ScreenshotButton />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -96,21 +148,7 @@ export default function App() {
       <AvatarProvider>
       <Avatar3DProvider>
         <ErrorBoundary>
-          <div className="min-h-screen relative" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
-            <SkipLink />
-            <Sidebar />
-            <Navbar />
-            <div className="ml-0 md:ml-[100px] xl:ml-[105px] 2xl:ml-[110px] pt-[80px]">
-              <main id="main-content">
-                <AppRoutes />
-              </main>
-              <Footer />
-            </div>
-            <BackToTop />
-            <LoadingOverlay />
-            <PhotoManager />
-            <ScreenshotButton />
-          </div>
+          <MainLayout />
         </ErrorBoundary>
       </Avatar3DProvider>
       </AvatarProvider>

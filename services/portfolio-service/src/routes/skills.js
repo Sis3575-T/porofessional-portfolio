@@ -53,4 +53,20 @@ router.delete("/:id", authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
+router.put("/reorder/batch", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { orderedIds } = req.body;
+    if (!Array.isArray(orderedIds)) {
+      return res.status(400).json({ success: false, message: "orderedIds must be an array" });
+    }
+    const updates = orderedIds.map((id, index) =>
+      prisma.skill.update({ where: { id }, data: { order: index } })
+    );
+    await prisma.$transaction(updates);
+    res.json({ success: true, message: "Skills reordered" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to reorder skills" });
+  }
+});
+
 export default router;

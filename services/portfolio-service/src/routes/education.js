@@ -17,21 +17,43 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/all", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const education = await prisma.education.findMany({
+      orderBy: { order: "asc" },
+    });
+    res.json({ success: true, data: education });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch education" });
+  }
+});
+
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { institution, degree, field, description, logo, startDate, endDate, gpa, order, enabled } = req.body;
+    const {
+      institution, degree, field, description, logo,
+      startDate, endDate, isCurrent, gpa, location,
+      achievements, technologies, courses, certificateUrl,
+      order, enabled,
+    } = req.body;
     const edu = await prisma.education.create({
       data: {
         institution,
         degree,
-        field,
-        description,
-        logo,
+        field: field || "",
+        description: description || "",
+        logo: logo || null,
         startDate: new Date(startDate),
         endDate: endDate ? new Date(endDate) : null,
-        gpa,
-        order,
-        enabled,
+        isCurrent: isCurrent || false,
+        gpa: gpa || null,
+        location: location || null,
+        achievements: achievements || null,
+        technologies: technologies || null,
+        courses: courses || null,
+        certificateUrl: certificateUrl || null,
+        order: order || 0,
+        enabled: enabled !== undefined ? enabled : true,
       },
     });
     res.status(201).json({ success: true, data: edu });

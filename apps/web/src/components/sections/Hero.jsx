@@ -13,12 +13,14 @@ const stagger = {
   animate: { transition: { staggerChildren: 0.1 } },
 };
 
-const socialLinks = [
+const defaultSocialLinks = [
   { icon: Github,   href: "https://github.com",            label: "GitHub"   },
   { icon: Linkedin, href: "https://linkedin.com",          label: "LinkedIn" },
   { icon: Twitter,  href: "https://twitter.com",           label: "Twitter"  },
   { icon: Mail,     href: "mailto:sisaydev@example.com",   label: "Email"    },
 ];
+
+const iconMap = { github: Github, linkedin: Linkedin, twitter: Twitter, email: Mail, mail: Mail };
 
 export default function Hero() {
   const { hero, loading, settings } = usePortfolio();
@@ -27,7 +29,7 @@ export default function Hero() {
 
   if (loading) {
     return (
-      <section id="hero" className="h-screen flex items-center justify-center bg-white">
+      <section id="hero" className="h-screen flex items-center justify-center" style={{ background: "var(--section-hero)" }}>
         <div className="w-10 h-10 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
       </section>
     );
@@ -44,6 +46,26 @@ export default function Hero() {
     "I build modern, responsive and high-performance web applications with clean code and great user experience.";
 
   const heroImg = hero?.profileImage || "/hero-developer.png";
+
+  const socialLinks = (() => {
+    try {
+      const raw = settings?.socialLinks || hero?.socialLinks;
+      if (!raw) return defaultSocialLinks;
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      const arr = Array.isArray(parsed) ? parsed : Object.entries(parsed).map(([k, v]) => ({ platform: k, url: v }));
+      return arr
+        .filter((s) => s.url && s.enabled !== false)
+        .map((s) => {
+          const platform = (s.platform || "").toLowerCase();
+          const Icon = iconMap[platform] || Mail;
+          const href = platform === "email" || platform === "mail" ? `mailto:${s.url}` : s.url;
+          return { icon: Icon, href, label: platform.charAt(0).toUpperCase() + platform.slice(1) };
+        });
+    } catch {
+      return defaultSocialLinks;
+    }
+  })();
+
   const hero3dConfig = (() => {
     if (!settings?.hero3dConfig) return { mode: "office", autoRotate: true, autoRotateSpeed: 0.3, mouseInteraction: true };
     try {
@@ -60,7 +82,7 @@ export default function Hero() {
   })();
 
   return (
-    <section id="hero" className="relative bg-white overflow-hidden py-0" style={{ minHeight: "72vh" }}>
+    <section id="hero" className="relative overflow-hidden py-0" style={{ minHeight: "72vh", background: "var(--section-hero)" }}>
       <div className="section-bg section-hero-bg">
         <div className="section-bg-pattern section-hero-pattern" />
       </div>
@@ -80,7 +102,7 @@ export default function Hero() {
               <motion.div variants={fadeInUp} transition={{ duration: 0.45 }}>
                 <h1
                   className="text-[#111111] font-extrabold leading-[1.05] tracking-[-0.02em]"
-                  style={{ fontSize: "clamp(3rem, 5.5vw, 5rem)", maxWidth: 560 }}
+                  style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", maxWidth: 560 }}
                 >
                   <span>{firstName}</span>
                   <br />
@@ -92,7 +114,7 @@ export default function Hero() {
               <motion.div variants={fadeInUp} transition={{ duration: 0.45 }} className="mt-4">
                 <p
                   className="font-semibold leading-snug"
-                  style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)" }}
+                  style={{ fontSize: "clamp(0.85rem, 1.2vw, 1rem)" }}
                 >
                   {fullTitle.split("&").map((part, i, arr) => (
                     <span key={i}>
@@ -109,7 +131,7 @@ export default function Hero() {
               <motion.div variants={fadeInUp} transition={{ duration: 0.45 }} className="mt-5">
                 <p
                   className="text-gray-500 leading-relaxed"
-                  style={{ maxWidth: 520, fontSize: 17 }}
+                  style={{ maxWidth: 520, fontSize: 14 }}
                 >
                   {description}
                 </p>

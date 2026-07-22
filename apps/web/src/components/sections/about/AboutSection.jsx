@@ -20,7 +20,7 @@ const infoItems = [
   { key: "availability", icon: Clock, label: "Availability", color: "icon-phone", textColor: "text-accent-blue" },
 ];
 
-const statItems = [
+const defaultStatItems = [
   { icon: Code2, value: "20+", label: "Projects Completed", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
   { icon: Globe, value: "15+", label: "Happy Clients", iconClass: "icon-linkedin", accent: "text-accent-blue", border: "border-accent-blue" },
   { icon: Coffee, value: "1000+", label: "Hours of Coding", iconClass: "icon-email", accent: "text-accent-gray", border: "border-accent-gray" },
@@ -48,6 +48,21 @@ export default function AboutSection() {
     about?.biography ||
     "I'm a 3rd year Computer Science student at Bahir Dar University. Passionate about building scalable web apps and exploring AI technologies. I love turning ideas into real-world solutions.";
   const profileImage = about?.profileImage || "/about-profile.png";
+
+  const statItems = (() => {
+    try {
+      if (about?.statistics) {
+        const s = typeof about.statistics === "string" ? JSON.parse(about.statistics) : about.statistics;
+        return [
+          { icon: Code2, value: `${s.projects || s.projectsCount || 20}+`, label: "Projects Completed", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
+          { icon: Globe, value: `${s.clients || s.clientsCount || 15}+`, label: "Happy Clients", iconClass: "icon-linkedin", accent: "text-accent-blue", border: "border-accent-blue" },
+          { icon: Coffee, value: `${s.technologies || s.technologiesCount || 20}+`, label: "Technologies", iconClass: "icon-email", accent: "text-accent-gray", border: "border-accent-gray" },
+          { icon: Award, value: `${s.yearsExp || s.yearsOfExperience || 3}+`, label: "Years of Learning", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
+        ];
+      }
+    } catch {}
+    return defaultStatItems;
+  })();
 
   const getValue = (key) => {
     if (key === "name") return name;

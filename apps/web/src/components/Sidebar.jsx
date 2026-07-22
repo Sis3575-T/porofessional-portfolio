@@ -5,7 +5,6 @@ import {
   Sun, Moon,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-
 const navColors = {
   blue: { icon: "text-accent-blue", bg: "bg-accent-blue" },
   gray: { icon: "text-accent-gray", bg: "bg-accent-gray" },
@@ -48,25 +47,10 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="fixed left-[18px] top-[18px] z-50 select-none hidden md:flex flex-col items-center w-[70px] rounded-[22px] bg-white/80 backdrop-blur-xl border border-gray-200/60 overflow-hidden"
+      className="fixed left-0 top-[120px] z-50 select-none hidden md:flex flex-col items-center w-[100px] rounded-[22px] bg-white/80 backdrop-blur-xl border border-gray-200/60 overflow-hidden"
       style={{ height: "96vh", boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)" }}
     >
       <div className="flex flex-col h-full w-full py-4 gap-3 items-center">
-        {/* TOP: Logo */}
-        <motion.a
-          href="#hero"
-          onClick={(e) => { e.preventDefault(); handleClick("#hero"); }}
-          className="flex items-center justify-center w-[46px] h-[46px] rounded-[14px] bg-accent-blue shrink-0 shadow-sm cursor-pointer"
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          title="Home"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-            <circle cx="12" cy="12" r="4" fill="currentColor" opacity="0.9"/>
-            <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.6"/>
-          </svg>
-        </motion.a>
-
         {/* CENTER: Navigation Icons */}
         <nav className="flex-1 flex flex-col gap-2 items-center overflow-y-auto sidebar-scrollbar py-1 w-full">
           {navItems.map((item) => {

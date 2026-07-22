@@ -36,13 +36,20 @@ export function PortfolioProvider({ children }) {
 
       if (heroRes.status === "fulfilled") setHero(heroRes.value.data.data);
       if (aboutRes.status === "fulfilled") setAbout(aboutRes.value.data.data);
-      if (skillsRes.status === "fulfilled") setSkills(skillsRes.value.data.data);
-      if (servicesRes.status === "fulfilled") setServices(servicesRes.value.data.data);
-      if (expRes.status === "fulfilled") setExperiences(expRes.value.data.data);
-      if (eduRes.status === "fulfilled") setEducation(eduRes.value.data.data);
-      if (projRes.status === "fulfilled") setProjects(projRes.value.data.data);
-      if (testRes.status === "fulfilled") setTestimonials(testRes.value.data.data);
+      if (skillsRes.status === "fulfilled") setSkills(Array.isArray(skillsRes.value.data.data) ? skillsRes.value.data.data : []);
+      if (servicesRes.status === "fulfilled") setServices(Array.isArray(servicesRes.value.data.data) ? servicesRes.value.data.data : []);
+      if (expRes.status === "fulfilled") setExperiences(Array.isArray(expRes.value.data.data) ? expRes.value.data.data : []);
+      if (eduRes.status === "fulfilled") setEducation(Array.isArray(eduRes.value.data.data) ? eduRes.value.data.data : []);
+      if (projRes.status === "fulfilled") setProjects(Array.isArray(projRes.value.data.data) ? projRes.value.data.data : []);
+      if (testRes.status === "fulfilled") setTestimonials(Array.isArray(testRes.value.data.data) ? testRes.value.data.data : []);
       if (settingsRes.status === "fulfilled") setSettings(settingsRes.value.data.data);
+
+      const failedCount = results.filter((r) => r.status === "rejected").length;
+      if (failedCount === results.length) {
+        setError("Failed to load portfolio data");
+      } else if (failedCount > 0) {
+        console.warn(`${failedCount} API endpoints failed to load`);
+      }
     } catch (err) {
       setError("Failed to load portfolio data");
       console.error(err);

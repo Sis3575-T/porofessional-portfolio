@@ -39,13 +39,29 @@ const PLACEMENT_OPTIONS = [
   { value: 'both', label: 'Both' },
 ];
 
+const DEFAULT_SECTIONS = {
+  hero: true, about: true, skills: true, services: true,
+  experience: true, education: true, projects: true,
+  testimonials: true, contact: true, footer: true,
+};
+
+const SECTION_LABELS = {
+  hero: "Hero Section", about: "About Section", skills: "Skills Section",
+  services: "Services Section", experience: "Experience Section",
+  education: "Education Section", projects: "Projects Section",
+  testimonials: "Testimonials Section", contact: "Contact Section",
+  footer: "Footer",
+};
+
 export default function SettingsEditor() {
   const [form, setForm] = useState({
     siteTitle: '', siteDescription: '', siteUrl: '', contactEmail: '', contactPhone: '',
     address: '', metaKeywords: '', metaDescription: '', socialLinks: '',
+    availability: '', responseTime: '', workingHours: '',
   });
   const [hero3d, setHero3d] = useState(DEFAULT_3D);
   const [uiConfig, setUiConfig] = useState(DEFAULT_UI);
+  const [sectionVisibility, setSectionVisibility] = useState(DEFAULT_SECTIONS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -60,6 +76,7 @@ export default function SettingsEditor() {
             contactEmail: s.contactEmail || '', contactPhone: s.contactPhone || '', address: s.address || '',
             metaKeywords: s.metaKeywords || '', metaDescription: s.metaDescription || '',
             socialLinks: s.socialLinks ? JSON.stringify(JSON.parse(s.socialLinks), null, 2) : '{}',
+            availability: s.availability || '', responseTime: s.responseTime || '', workingHours: s.workingHours || '',
           });
           if (s.hero3dConfig) {
             try { setHero3d({ ...DEFAULT_3D, ...JSON.parse(s.hero3dConfig) }); }
@@ -67,6 +84,10 @@ export default function SettingsEditor() {
           }
           if (s.uiConfig) {
             try { setUiConfig({ ...DEFAULT_UI, ...JSON.parse(s.uiConfig) }); }
+            catch { /* use defaults */ }
+          }
+          if (s.sectionVisibility) {
+            try { setSectionVisibility({ ...DEFAULT_SECTIONS, ...JSON.parse(s.sectionVisibility) }); }
             catch { /* use defaults */ }
           }
         }
@@ -88,6 +109,7 @@ export default function SettingsEditor() {
         socialLinks: JSON.stringify(socialLinks),
         hero3dConfig: JSON.stringify(hero3d),
         uiConfig: JSON.stringify(uiConfig),
+        sectionVisibility: JSON.stringify(sectionVisibility),
       });
       toast.success('Settings updated');
     } catch (err) { toast.error('Failed to update'); }
@@ -137,8 +159,22 @@ export default function SettingsEditor() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Address</label>
-            <input value={form.address} onChange={(e) => setForm({...form, address: e.target.value})} className={inputClass} />
+            <label className={labelClass}>Address / Location</label>
+            <input value={form.address} onChange={(e) => setForm({...form, address: e.target.value})} className={inputClass} placeholder="Remote / Worldwide" />
+          </div>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div>
+              <label className={labelClass}>Availability</label>
+              <input value={form.availability} onChange={(e) => setForm({...form, availability: e.target.value})} className={inputClass} placeholder="Available for projects" />
+            </div>
+            <div>
+              <label className={labelClass}>Response Time</label>
+              <input value={form.responseTime} onChange={(e) => setForm({...form, responseTime: e.target.value})} className={inputClass} placeholder="Within 24 hours" />
+            </div>
+            <div>
+              <label className={labelClass}>Working Hours</label>
+              <input value={form.workingHours} onChange={(e) => setForm({...form, workingHours: e.target.value})} className={inputClass} placeholder="Mon - Fri, 9AM - 6PM" />
+            </div>
           </div>
         </div>
 
@@ -316,6 +352,24 @@ export default function SettingsEditor() {
               <p className="text-xs text-slate-500">Noise texture, stars, grid, and soft glow</p>
             </div>
           </label>
+        </div>
+
+        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-white">Section Visibility</h3>
+          <p className="text-xs text-slate-500">Toggle sections on/off on the public portfolio</p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {Object.entries(SECTION_LABELS).map(([key, label]) => (
+              <label key={key} className="flex items-center gap-3 cursor-pointer p-3 bg-slate-800/30 rounded-lg hover:bg-slate-800/50 transition">
+                <input
+                  type="checkbox"
+                  checked={sectionVisibility[key] !== false}
+                  onChange={(e) => setSectionVisibility({ ...sectionVisibility, [key]: e.target.checked })}
+                  className="accent-cyan-500 w-5 h-5 rounded"
+                />
+                <span className="text-sm text-slate-200">{label}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <button type="submit" disabled={saving} className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg font-semibold transition-all flex items-center gap-2 disabled:opacity-50">

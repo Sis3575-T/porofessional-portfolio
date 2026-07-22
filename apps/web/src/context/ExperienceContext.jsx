@@ -1,9 +1,9 @@
 import { createContext, useContext, useReducer, useCallback } from "react";
 
-const ServiceViewerContext = createContext(null);
+const ExperienceContext = createContext(null);
 
 const initialState = {
-  services: [],
+  experiences: [],
   activeIndex: -1,
   doorOpen: false,
   isAnimating: false,
@@ -12,8 +12,8 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case "SET_SERVICES":
-      return { ...state, services: action.services };
+    case "SET_EXPERIENCES":
+      return { ...state, experiences: action.experiences };
     case "OPEN_DOOR":
       return { ...state, activeIndex: action.index, doorOpen: true, isAnimating: true };
     case "CLOSE_DOOR":
@@ -22,42 +22,29 @@ function reducer(state, action) {
       return { ...state, isAnimating: false };
     case "SET_HOVERED":
       return { ...state, hoveredFace: action.index };
-    case "RESET":
-      return { ...initialState, services: state.services };
     default:
       return state;
   }
 }
 
-export function ServiceViewerProvider({ children }) {
+export function ExperienceProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const setServices = useCallback((services) => dispatch({ type: "SET_SERVICES", services }), []);
+  const setExperiences = useCallback((experiences) => dispatch({ type: "SET_EXPERIENCES", experiences }), []);
   const openDoor = useCallback((index) => dispatch({ type: "OPEN_DOOR", index }), []);
   const closeDoor = useCallback(() => dispatch({ type: "CLOSE_DOOR" }), []);
   const animationDone = useCallback(() => dispatch({ type: "ANIMATION_DONE" }), []);
   const setHovered = useCallback((index) => dispatch({ type: "SET_HOVERED", index }), []);
-  const reset = useCallback(() => dispatch({ type: "RESET" }), []);
 
   return (
-    <ServiceViewerContext.Provider
-      value={{
-        ...state,
-        setServices,
-        openDoor,
-        closeDoor,
-        animationDone,
-        setHovered,
-        reset,
-      }}
-    >
+    <ExperienceContext.Provider value={{ ...state, setExperiences, openDoor, closeDoor, animationDone, setHovered }}>
       {children}
-    </ServiceViewerContext.Provider>
+    </ExperienceContext.Provider>
   );
 }
 
-export function useServiceViewer() {
-  const ctx = useContext(ServiceViewerContext);
-  if (!ctx) throw new Error("useServiceViewer must be inside ServiceViewerProvider");
+export function useExperience() {
+  const ctx = useContext(ExperienceContext);
+  if (!ctx) throw new Error("useExperience must be inside ExperienceProvider");
   return ctx;
 }

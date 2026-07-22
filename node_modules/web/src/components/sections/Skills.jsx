@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
-import { AnimatedSection, AnimatedCard } from "../AnimatedSection";
 
 const categoryLabels = {
   FRONTEND: "Frontend",
@@ -15,302 +14,218 @@ const categoryLabels = {
 };
 
 const defaultSkills = [
-  { id: "skill-react", name: "React", category: "FRONTEND" },
-  { id: "skill-tailwind", name: "Tailwind CSS", category: "FRONTEND" },
-  { id: "skill-html", name: "HTML5", category: "FRONTEND" },
-  { id: "skill-css", name: "CSS3", category: "FRONTEND" },
-  { id: "skill-js", name: "JavaScript", category: "LANGUAGES" },
-  { id: "skill-ts", name: "TypeScript", category: "LANGUAGES" },
-  { id: "skill-node", name: "Node.js", category: "BACKEND" },
-  { id: "skill-express", name: "Express", category: "BACKEND" },
-  { id: "skill-php", name: "PHP", category: "BACKEND" },
-  { id: "skill-java", name: "Java", category: "BACKEND" },
-  { id: "skill-mongodb", name: "MongoDB", category: "DATABASE" },
-  { id: "skill-postgres", name: "PostgreSQL", category: "DATABASE" },
-  { id: "skill-mysql", name: "MySQL", category: "DATABASE" },
-  { id: "skill-docker", name: "Docker", category: "DEVOPS" },
-  { id: "skill-git", name: "Git", category: "TOOLS" },
-  { id: "skill-github", name: "GitHub", category: "TOOLS" },
-  { id: "skill-figma", name: "Figma", category: "TOOLS" },
-  { id: "skill-ai", name: "AI & Automation", category: "OTHER" },
-  { id: "skill-collab", name: "Team Collaboration", category: "SOFT_SKILLS" },
-  { id: "skill-problem", name: "Problem Solving", category: "SOFT_SKILLS" },
+  { id: "skill-react", name: "React", category: "FRONTEND", proficiency: 95 },
+  { id: "skill-tailwind", name: "Tailwind CSS", category: "FRONTEND", proficiency: 92 },
+  { id: "skill-next", name: "Next.js", category: "FRONTEND", proficiency: 90 },
+  { id: "skill-node", name: "Node.js", category: "BACKEND", proficiency: 88 },
+  { id: "skill-prisma", name: "Prisma", category: "BACKEND", proficiency: 87 },
+  { id: "skill-postgres", name: "PostgreSQL", category: "DATABASE", proficiency: 85 },
+  { id: "skill-mongodb", name: "MongoDB", category: "DATABASE", proficiency: 78 },
+  { id: "skill-docker", name: "Docker", category: "DEVOPS", proficiency: 80 },
+  { id: "skill-aws", name: "AWS", category: "DEVOPS", proficiency: 72 },
+  { id: "skill-ts", name: "TypeScript", category: "LANGUAGES", proficiency: 90 },
+  { id: "skill-python", name: "Python", category: "LANGUAGES", proficiency: 75 },
+  { id: "skill-git", name: "Git", category: "TOOLS", proficiency: 90 },
+  { id: "skill-problem", name: "Problem Solving", category: "SOFT_SKILLS", proficiency: 95 },
+  { id: "skill-comm", name: "Communication", category: "SOFT_SKILLS", proficiency: 90 },
 ];
 
-function SkillIcon({ name, accentColor = "#94a3b8" }) {
+const brandColors = {
+  react: "#61DAFB",
+  nextjs: "#FFFFFF",
+  html: "#E34F26",
+  css: "#1572B6",
+  javascript: "#F7DF1E",
+  typescript: "#3178C6",
+  nodejs: "#339933",
+  python: "#3776AB",
+  docker: "#2496ED",
+  aws: "#FF9900",
+  mongodb: "#47A248",
+  postgresql: "#4169E1",
+  git: "#F05032",
+  prisma: "#2D3748",
+  tailwind: "#06B6D4",
+  figma: "#F24E1E",
+  "problem solving": "#7C3AED",
+  communication: "#7C3AED",
+};
+
+function SkillIcon({ name, size = 32 }) {
   const key = name?.toLowerCase() || "";
-  const iconColor = accentColor;
+  const s = size;
+  const c = brandColors[key] || brandColors[Object.keys(brandColors).find(k => key.includes(k))] || "#6366F1";
 
-  if (key.includes("react")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <circle cx="20" cy="20" r="3.5" fill={iconColor} />
-        <ellipse cx="20" cy="20" rx="14" ry="5" stroke={iconColor} strokeWidth="1.2" fill="none" opacity="0.6" />
-        <ellipse cx="20" cy="20" rx="14" ry="5" stroke={iconColor} strokeWidth="1.2" fill="none" opacity="0.6" transform="rotate(60 20 20)" />
-        <ellipse cx="20" cy="20" rx="14" ry="5" stroke={iconColor} strokeWidth="1.2" fill="none" opacity="0.6" transform="rotate(120 20 20)" />
+  const icons = {
+    react: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M12 10.11a1.9 1.9 0 0 0-1.89 1.89 1.9 1.9 0 0 0 1.89 1.89 1.9 1.9 0 0 0 1.89-1.89 1.9 1.9 0 0 0-1.89-1.89z"/>
+        <path d="M12 17.9c4.57 0 8.28-1.92 8.28-4.29s-3.71-4.29-8.28-4.29-8.28 1.92-8.28 4.29 3.71 4.29 8.28 4.29zm0-.86c-4.1 0-7.42-1.53-7.42-3.43s3.32-3.43 7.42-3.43 7.42 1.53 7.42 3.43-3.32 3.43-7.42 3.43z"/>
+        <path d="M8.53 16.9c2.29 3.95 5.04 6.2 6.34 5.02s.02-5.79-2.27-9.74-5.04-6.2-6.34-5.02-.02 5.79 2.27 9.74zm.43-.75c-1.86-3.2-2.6-5.82-1.66-6.42s3.28.85 5.14 4.05 2.6 5.82 1.66 6.42-3.28-.85-5.14-4.05z"/>
+        <path d="M15.47 16.9c-1.86 3.2-3.95 5.04-5.14 4.05s-1.24-4.15.62-7.35 3.95-5.04 5.14-4.05 1.24 4.15-.62 7.35zm-.43-.75c1.28-2.2 1.6-4.1.62-4.66s-2.49.75-3.77 2.95-1.6 4.1-.62 4.66 2.49-.75 3.77-2.95z"/>
       </svg>
-    );
-  }
+    ),
+    nodejs: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M11.998 22.93c-.353 0-.706-.094-1.012-.282l-3.204-1.886c-.48-.267-.247-.362-.082-.418.632-.212.76-.26 1.441-.625.07-.041.162-.026.235.018l2.46 1.46c.089.052.212.052.286 0l9.575-5.53c.09-.052.142-.15.142-.26V7.582c0-.108-.053-.207-.142-.259l-9.575-5.53c-.09-.052-.198-.052-.286 0l-9.575 5.53c-.09.052-.142.15-.142.26v11.064c0 .108.053.207.142.26l2.625 1.515c1.421.71 2.298-.126 2.298-.967V8.398c0-.156.125-.282.282-.282h1.219c.156 0 .282.126.282.281v9.058c0 2.289-1.246 3.606-3.42 3.606-.667 0-1.19 0-2.655-.72l-3.023-1.743a1.987 1.987 0 0 1-1.012-1.721V7.571c0-.706.38-1.361 1.012-1.723L11 .3a2.04 2.04 0 0 1 2.026 0l9.575 5.53c.63.362 1.013 1.017 1.013 1.722v11.088c0 .705-.38 1.36-1.012 1.722l-9.575 5.53c-.306.177-.66.266-1.028.266z"/>
+        <path d="M14.873 18.192c-3.162 0-3.828-.625-3.828-3.414v-3.02c0-.156.126-.282.281-.282h1.273c.156 0 .282.126.282.282v2.731c0 1.535.17 1.95 2.006 1.95 1.22 0 1.684-.22 1.684-1.225 0-.494-.13-.702-1.832-1.138-1.994-.516-2.89-1.255-2.89-2.775 0-1.847 1.219-2.635 3.406-2.635 2.62 0 3.504.64 3.641 3.044 0 .09-.038.174-.106.234-.068.06-.16.094-.256.094h-1.285c-.156 0-.282-.126-.282-.282-.033-1.087-.195-1.478-1.717-1.478-1.213 0-1.502.363-1.502.959 0 .605.194.842 1.756 1.182 2.238.49 2.967 1.22 2.967 2.765 0 1.89-1.176 2.99-3.84 2.99z"/>
+      </svg>
+    ),
+    mongodb: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M17.193 9.555c-1.264-5.58-4.252-7.414-4.573-8.095-.28-.594-.392-.773-.612-1.147-.204.415-.348.647-.512 1.024-.498.946-3.064 3.72-4.52 7.815-1.334 3.748.646 6.522 1.364 7.364.61.713 1.943 1.569 2.646 2.028.13-.22.253-.449.346-.809.384-1.475.41-2.285.676-2.793.16-.307.322-.51.649-.296.33.216.435.533.456 1.046.017.426-.026.827-.055 1.09-.056.513-.153 1.303-.318 1.783-.143.417-.355.828-.642 1.15.94.412 2.308.903 2.958 1.107l.008.005c.234-.646.504-1.66.636-2.423.194-1.112.127-1.873.09-2.44-.049-.75-.042-1.108.228-1.337.212-.18.673-.105.941.135.428.384.588.853.764 1.648.125.563.187 1.07.21 1.413.046.663.025 1.329-.155 1.973-.068.242-.151.48-.251.71 1.19-.59 2.622-1.622 3.718-3.167 2.056-2.897 1.574-6.775.246-9.792z"/>
+      </svg>
+    ),
+    tailwind: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C7.666 17.818 9.027 19.2 12.001 19.2c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z"/>
+      </svg>
+    ),
+    typescript: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0zM5.25 10.936h3.063v9.844c0 .936.272 1.094 1.594 1.094V22.5H6.522v-.626c1.259 0 1.541-.42 1.541-1.094v-9.844H5.25zM12 22.124c-.624 0-.955-.34-.955-.34-.106-.106-.319-.213-.638-.213V21H15v-.574c-.106 0-.213.213-.106.213-.106.213-.319.319-.638.426-.106.106-.213.106-.213.213 0 0 .213-.106.426-.213.319-.213.638-.319.851-.532.213-.213.319-.638.426-.957.213-.638.213-1.383.213-2.767V12.5c0-.851-.213-1.49-.638-1.914-.426-.426-1.276-.638-2.34-.638-1.276 0-2.34.213-3.085.638l.213 1.276c.638-.426 1.276-.638 2.128-.638.745 0 1.276.213 1.49.426.213.213.319.532.319.957v.213h-2.234c-1.49 0-2.553.319-3.191.957-.638.638-.957 1.49-.957 2.66 0 1.064.319 1.915.957 2.34.638.426 1.49.638 2.66.638 1.064 0 1.915-.213 2.553-.638l-.213-.957c-.638.319-1.276.532-2.128.532-.745 0-1.276-.213-1.49-.426-.213-.213-.319-.532-.319-.957 0-.745.213-1.064.638-1.276.426-.213.957-.426 1.702-.426H15v.213c0 .106-.213.106-.213.213-.213.213-.319.532-.319.957v.426c0 .851-.213 1.49-.638 2.022-.426.426-1.276.638-2.34.638.213 0-.106 0-.213-.106.106.106.213.106.213.106.426.213.851.319 1.276.319.319 0 .532-.213.745-.319z"/>
+      </svg>
+    ),
+    git: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M23.546 10.93L13.067.452c-.604-.603-1.582-.603-2.188 0L8.708 2.627l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.715.72.715 1.875-.01 2.595-.715.72-1.873.72-2.595 0-.566-.57-.745-1.386-.542-2.087l-2.48-2.48v6.525c.884.293 1.5 1.1 1.5 2.04 0 1.21-.99 2.2-2.2 2.2s-2.2-.99-2.2-2.2c0-.94.616-1.747 1.5-2.04v-6.59c-.884-.293-1.5-1.1-1.5-2.04 0-.22.03-.44.09-.654L7.878 4.155l-7.42 7.422c-.603.606-.603 1.584 0 2.19l10.48 10.48c.603.603 1.582.603 2.188 0l10.422-10.42c.603-.606.603-1.585 0-2.19z"/>
+      </svg>
+    ),
+    docker: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.186m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.186.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.186.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.186.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H5.136a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z"/>
+      </svg>
+    ),
+    prisma: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M12.001 0l10.46 6.097v12.19L12.001 24 1.541 18.287V6.097L12.001 0zm-.004 2.686L4.32 7.07v9.14l7.677 4.384 7.678-4.384V7.07l-7.677-4.384z"/>
+      </svg>
+    ),
+    postgresql: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M17.128 0a6.832 6.832 0 00-6.156 4.079h-.022A6.798 6.798 0 005.03 3.36a6.832 6.832 0 00-4.537 6.385c0 2.71 1.868 5.017 4.401 5.676v.004l-.012.004c.262.52.67.975 1.178 1.318A6.832 6.832 0 006.432 24h.148a6.832 6.832 0 006.732-5.64h.004a6.793 6.793 0 005.58-6.796c0-2.601-1.73-4.837-4.136-5.59v-.004l.006-.004c.286-.496.696-.918 1.192-1.22A6.832 6.832 0 0023.04 0h-5.912zM12.036 2.4a4.416 4.416 0 014.388 4.4c0 2.432-1.976 4.408-4.408 4.408a4.416 4.416 0 01-4.388-4.408c0-2.432 1.976-4.4 4.408-4.4zm0 16.4a4.416 4.416 0 01-4.368-4.4c0-2.432 1.976-4.408 4.408-4.408a4.416 4.416 0 014.368 4.408c0 2.432-1.976 4.4-4.408 4.4z"/>
+      </svg>
+    ),
+    aws: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576.04.063.056.127.056.183 0 .08-.048.16-.152.24l-.503.335a.383.383 0 01-.208.072c-.08 0-.16-.04-.239-.112a2.47 2.47 0 01-.287-.375 6.18 6.18 0 01-.248-.471c-.622.734-1.405 1.101-2.347 1.101-.67 0-1.205-.191-1.596-.574-.391-.384-.59-.894-.59-1.533 0-.678.239-1.23.726-1.644.487-.415 1.133-.623 1.955-.623.272 0 .551.024.846.064.296.04.6.104.918.176v-.583c0-.607-.127-1.03-.375-1.277-.255-.248-.686-.367-1.3-.367-.28 0-.568.047-.863.143-.296.096-.575.223-.838.375a2.287 2.287 0 01-.36.136.488.488 0 01-.127.023c-.112 0-.168-.08-.168-.247v-.391c0-.128.016-.224.056-.28a.597.597 0 01.224-.167c.279-.144.614-.263 1.005-.36a4.84 4.84 0 011.246-.151c.95 0 1.644.216 2.091.647.44.43.662 1.085.662 1.963v2.586zm-3.24 1.214c.263 0 .534-.048.822-.144.287-.096.543-.271.758-.51.128-.152.224-.32.272-.512.047-.191.08-.423.08-.694v-.335a6.66 6.66 0 00-.735-.136 6.02 6.02 0 00-.75-.048c-.535 0-.926.104-1.19.32-.263.215-.39.518-.39.917 0 .375.095.655.295.846.191.2.47.296.838.296zm6.41.862c-.144 0-.24-.024-.304-.08-.064-.048-.12-.16-.176-.311L7.586 5.55a1.398 1.398 0 01-.16-.471c0-.128.064-.2.191-.2h.783c.151 0 .255.025.31.08.065.048.113.16.16.312l1.342 4.584 1.245-4.584c.04-.16.088-.264.151-.312a.549.549 0 01.32-.08h.638c.152 0 .256.025.32.08.063.048.12.16.151.312l1.261 4.648 1.381-4.648c.056-.16.112-.264.176-.312a.52.52 0 01.311-.08h.743c.127 0 .2.065.2.2 0 .04-.009.08-.017.128a1.137 1.137 0 01-.063.2l-1.923 5.194v.032c.056-.16.112-.264.176-.312.064-.056.16-.08.288-.08h.622c.128 0 .2.064.2.2 0 .048-.008.096-.024.144a1.36 1.36 0 01-.151.36l-1.77 4.747-.072.247-.024.056c.055-.16.103-.264.167-.32.064-.056.16-.08.288-.08h.79c.12 0 .2.064.2.2 0 .048-.008.096-.024.152-.016.048-.04.104-.064.16l-1.763 4.723c-.224.6-1.077 2.874-2.16 2.874h-.04l.048-.152z"/>
+      </svg>
+    ),
+    python: (
+      <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+        <path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.89.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.13.5-.23.41-.27.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/>
+      </svg>
+    ),
+  };
 
-  if (key.includes("html")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <path d="M13 12h14l-1.5 16-5.5 2-5.5-2L13 12z" fill={iconColor} opacity="0.18" />
-        <path d="M15 14l10 1-1 11-4 1.5-4-1.5-1-4" stroke={iconColor} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (key.includes("css")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <path d="M12 11h16l-1.4 16-6.6 3-6.6-3L12 11z" fill={iconColor} opacity="0.16" />
-        <path d="M14 14h12l-.8 10-5.2 2-5.2-2-.8-4" stroke={iconColor} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (key.includes("node")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M20 4l14 8v16l-14 8-14-8V12l14-8z" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}15`} />
-        <circle cx="20" cy="20" r="3" fill={iconColor} opacity="0.5" />
-        <path d="M20 7v26M6 12l28 16" stroke={iconColor} strokeWidth="0.8" opacity="0.3" />
-      </svg>
-    );
-  }
-
-  if (key.includes("typescript") || key === "ts") {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="4" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <text x="20" y="26" textAnchor="middle" fill={iconColor} fontSize="16" fontWeight="bold" fontFamily="monospace">TS</text>
-      </svg>
-    );
-  }
-
-  if (key.includes("javascript") || key === "js") {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="4" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <text x="20" y="26" textAnchor="middle" fill={iconColor} fontSize="16" fontWeight="bold" fontFamily="monospace">JS</text>
-      </svg>
-    );
-  }
-
-  if (key.includes("python")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M16 4h8v4h-8z" fill={iconColor} opacity="0.7" />
-        <path d="M16 32h8v4h-8z" fill={iconColor} opacity="0.7" />
-        <rect x="12" y="8" width="16" height="24" rx="3" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <circle cx="17" cy="13" r="1" fill={iconColor} />
-        <circle cx="23" cy="27" r="1" fill={iconColor} />
-      </svg>
-    );
-  }
-
-  if (key.includes("docker")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="4" y="18" width="32" height="14" rx="2" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <rect x="8" y="22" width="4" height="4" rx="0.5" fill={iconColor} opacity="0.5" />
-        <rect x="14" y="22" width="4" height="4" rx="0.5" fill={iconColor} opacity="0.5" />
-        <rect x="20" y="22" width="4" height="4" rx="0.5" fill={iconColor} opacity="0.5" />
-        <rect x="26" y="22" width="4" height="4" rx="0.5" fill={iconColor} opacity="0.5" />
-        <path d="M10 18V12h4v6" stroke={iconColor} strokeWidth="1.2" fill="none" />
-      </svg>
-    );
-  }
-
-  if (key.includes("mongo")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M20 4c-4 10-4 18 0 32 4-14 4-22 0-32z" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <circle cx="20" cy="8" r="1.5" fill={iconColor} />
-      </svg>
-    );
-  }
-
-  if (key.includes("postgres") || key.includes("sql")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <ellipse cx="20" cy="26" rx="14" ry="10" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}08`} />
-        <path d="M20 16v14" stroke={iconColor} strokeWidth="1.5" />
-        <path d="M14 20c4-2 8-2 12 0" stroke={iconColor} strokeWidth="1" opacity="0.5" />
-        <rect x="18" y="8" width="4" height="10" rx="1" stroke={iconColor} strokeWidth="1" fill={`${iconColor}10`} />
-      </svg>
-    );
-  }
-
-  if (key.includes("figma")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <path d="M16 12c0-2 2-3 4-3s4 1 4 3c0 1.5-1 2.5-2.5 3 1.5.5 2.5 1.5 2.5 3 0 2-2 3-4 3s-4-1-4-3c0-1.5 1-2.5 2.5-3-1.5-.5-2.5-1.5-2.5-3z" fill={iconColor} opacity="0.85" />
-      </svg>
-    );
-  }
-
-  if (key.includes("github")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <path d="M19.5 11c-4.5 0-8.2 3.7-8.2 8.3 0 3.7 2.4 6.8 5.7 7.9.4.1.6-.2.6-.4v-1.4c-2.3.5-2.8-1-2.8-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.2 1.8 0.8 2.2.6.1-.5.3-.8.5-1-1.8-.2-3.7-.9-3.7-4.1 0-.9.3-1.7.8-2.2-.1-.2-.3-.9.1-1.9 0 0 .7-.2 2.3.8.7-.2 1.4-.3 2.1-.3.7 0 1.4.1 2.1.3 1.6-1 2.3-.8 2.3-.8.4 1 .2 1.7.1 1.9.5.5.8 1.3.8 2.2 0 3.2-1.9 3.9-3.7 4.1.3.3.6.8.6 1.5v2.3c0 .2.2.5.6.4 3.3-1.1 5.7-4.2 5.7-7.9 0-4.6-3.7-8.3-8.2-8.3z" fill={iconColor} />
-      </svg>
-    );
-  }
-
-  if (key.includes("git")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <circle cx="12" cy="8" r="3" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <circle cx="28" cy="20" r="3" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <circle cx="12" cy="32" r="3" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <path d="M12 11v18M14 11l13 7" stroke={iconColor} strokeWidth="1.2" />
-      </svg>
-    );
-  }
-
-  if (key.includes("aws")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M20 4l14 8v16l-14 8-14-8V12l14-8z" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <path d="M14 22l4 4 8-8" stroke={iconColor} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (key.includes("next")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}08`} />
-        <text x="20" y="26" textAnchor="middle" fill={iconColor} fontSize="14" fontWeight="bold" fontFamily="monospace">N</text>
-      </svg>
-    );
-  }
-
-  if (key.includes("three")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <polygon points="20,6 34,30 6,30" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}10`} />
-        <polygon points="20,12 29,27 11,27" stroke={iconColor} strokeWidth="0.8" fill="none" opacity="0.4" />
-        <circle cx="20" cy="22" r="4" stroke={iconColor} strokeWidth="1" fill="none" />
-      </svg>
-    );
-  }
-
-  if (key.includes("tailwind")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M8 26c4-12 10-16 18-12-4 6-8 10-18 12z" fill={`${iconColor}20`} stroke={iconColor} strokeWidth="1" />
-        <path d="M14 28c4-8 10-10 16-6-4 4-8 6-16 6z" fill={`${iconColor}15`} stroke={iconColor} strokeWidth="0.8" />
-      </svg>
-    );
-  }
-
-  if (key.includes("graphql")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M20 6L6 20l14 14 14-14L20 6z" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}08`} />
-        <path d="M12 26l16-12M12 14l16 12M20 4v4M20 32v4" stroke={iconColor} strokeWidth="1" opacity="0.5" />
-      </svg>
-    );
-  }
-
-  if (key.includes("firebase")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M20 36L8 24l6-18 6 12 6-12 6 18-12 12z" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}08`} />
-        <path d="M14 24h12M17 18l3 6 3-6" stroke={iconColor} strokeWidth="1" opacity="0.6" />
-      </svg>
-    );
-  }
-
-  if (key.includes("redis")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M8 20l12-8 12 8-12 8-12-8z" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}08`} />
-        <path d="M14 20l6 4 6-4" stroke={iconColor} strokeWidth="1" opacity="0.5" />
-      </svg>
-    );
-  }
-
-  if (key.includes("express")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <path d="M6 20c4-8 10-8 14 0" stroke={iconColor} strokeWidth="1.5" fill="none" />
-        <path d="M20 20c4-8 10-8 14 0" stroke={iconColor} strokeWidth="1.5" fill="none" />
-        <path d="M28 20c-2 6-6 10-8 12" stroke={iconColor} strokeWidth="1.5" fill="none" />
-      </svg>
-    );
-  }
-
-  if (key.includes("tailwind")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <path d="M13 28c2.5-8 6.5-10.5 12-8-2.5 3-5 5-12 8z" fill={iconColor} opacity="0.75" />
-        <path d="M15.5 30c2.3-5.5 6.2-7 10.5-4.5-2.3 2.2-4.7 3.5-10.5 4.5z" fill={iconColor} opacity="0.45" />
-      </svg>
-    );
-  }
-
-  if (key.includes("ai") || key.includes("automation") || key.includes("machine")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <path d="M20 12l6 3v10l-6 3-6-3V15l6-3z" fill={iconColor} opacity="0.2" />
-        <path d="M20 15v10M14 17l12 6M14 23l12-6" stroke={iconColor} strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (key.includes("team") || key.includes("collaboration") || key.includes("problem") || key.includes("solving")) {
-    return (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-        <rect x="6" y="6" width="28" height="28" rx="6" stroke={iconColor} strokeWidth="1.5" fill={`${iconColor}12`} />
-        <circle cx="16" cy="18" r="3" fill={iconColor} opacity="0.8" />
-        <circle cx="24" cy="18" r="3" fill={iconColor} opacity="0.8" />
-        <path d="M12 28c1.5-3 4.2-4.5 8-4.5s6.5 1.5 8 4.5" stroke={iconColor} strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
-    );
-  }
+  if (key.includes("react")) return icons.react;
+  if (key.includes("next")) return icons.nodejs;
+  if (key.includes("html")) return (
+    <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+      <path d="M1.5 0h21l-1.91 21.563L11.997 24l-8.564-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.323-3.114L13.336 3.5H5.697l.23 2.718h8.597l-.3 3.387-4.365 1.173-4.37-1.173-.264-3.02H1.5l.5 5.563L5.07 24h13.86l.563-6.19L22.5 9.75h-8.969z"/>
+    </svg>
+  );
+  if (key.includes("css")) return (
+    <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+      <path d="M1.5 0h21l-1.91 21.563L11.997 24l-8.565-2.438L1.5 0zm17.09 4.413L5.41 4.41l.213 2.622 10.125.002-.255 2.716h-6.64l.24 2.573h6.182l-.366 3.523-2.91.804-2.955-.81-.188-2.11h-2.61l.29 3.855L12 24l8.559-2.435L22.5 4.414h-3.91z"/>
+    </svg>
+  );
+  if (key.includes("javascript") || key === "js") return (
+    <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+      <path d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.405-.6-.586-.78-.63-.705-1.469-1.029-2.399-1.029-1.11 0-1.99.552-2.445 1.303-.382.64-.498 1.43-.427 2.16.078.804.46 1.556 1.06 2.045 1.04.84 2.744 1.013 3.554 1.683.805.67 1.12 1.54 1.014 2.55-.104.98-.613 1.874-1.437 2.49-.824.616-1.956.878-3.064.736-1.314-.17-2.388-.8-3.095-1.824-.705-1.024-1.07-2.37-.94-3.77.132-1.408.836-2.67 1.93-3.478 1.095-.808 2.53-1.172 3.896-.996 1.365.175 2.57.74 3.416 1.673.847.933 1.305 2.154 1.365 3.414.06.126.09.252.09.378 0 .126-.03.252-.09.378-.06.126-.18.252-.36.378z"/>
+    </svg>
+  );
+  if (key.includes("typescript") || key === "ts") return icons.typescript;
+  if (key.includes("node")) return icons.nodejs;
+  if (key.includes("python")) return icons.python;
+  if (key.includes("docker")) return icons.docker;
+  if (key.includes("aws")) return icons.aws;
+  if (key.includes("mongo")) return icons.mongodb;
+  if (key.includes("postgres") || key.includes("sql")) return icons.postgresql;
+  if (key.includes("git")) return icons.git;
+  if (key.includes("prisma")) return icons.prisma;
+  if (key.includes("tailwind")) return icons.tailwind;
+  if (key.includes("figma")) return (
+    <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+      <path d="M8 24c2.208 0 4-1.792 4-4v-4H8c-2.208 0-4 1.792-4 4s1.792 4 4 4zM4 8c0-2.208 1.792-4 4-4h4v8H8C5.792 8 4 6.208 4 8zM4 16c0 2.208 1.792 4 4 4h4v-8H8c-2.208 0-4 1.792-4 4zM16 4h4c2.208 0 4 1.792 4 4s-1.792 4-4 4h-4V4zM20 16c2.208 0 4 1.792 4 4s-1.792 4-4 4-4-1.792-4-4 1.792-4 4-4zM12 0H8c-2.208 0-4 1.792-4 4h8V0zM12 12h-4v8c2.208 0 4-1.792 4-4v-4z"/>
+    </svg>
+  );
+  if (key.includes("team") || key.includes("collaboration") || key.includes("problem") || key.includes("communication")) return (
+    <svg viewBox="0 0 24 24" fill={c} width={s} height={s}>
+      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+    </svg>
+  );
 
   const initial = name?.charAt(0)?.toUpperCase() || "?";
+  return (
+    <svg viewBox="0 0 24 24" fill={c} width={s} height={s} opacity="0.6">
+      <text x="12" y="17" textAnchor="middle" fontSize="14" fontWeight="600" fontFamily="system-ui">{initial}</text>
+    </svg>
+  );
+}
+
+function SkillCard({ skill, index }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-20px" });
 
   return (
-    <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9 shrink-0">
-      <circle cx="20" cy="20" r="16" stroke={iconColor} strokeWidth="1.2" fill={`${iconColor}08`} />
-      <text x="20" y="26" textAnchor="middle" fill={iconColor} fontSize="17" fontWeight="bold" fontFamily="system-ui">
-        {initial}
-      </text>
-    </svg>
+    <motion.div
+      ref={ref}
+      className="skill-card"
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: Math.min(index * 0.04, 0.3) }}
+    >
+      <div className="skill-svg">
+        <SkillIcon name={skill.name} size={32} />
+      </div>
+      <span className="skill-card-name">{skill.name}</span>
+    </motion.div>
   );
 }
 
 export default function Skills() {
   const { skills, loading } = usePortfolio();
-  const [activeCategory, setActiveCategory] = useState("ALL");
-  const skillList = skills && skills.length > 0 ? skills : defaultSkills;
+  const skillList = useMemo(
+    () => (skills && skills.length > 0 ? skills : defaultSkills),
+    [skills]
+  );
 
-  const categories = ["ALL", ...new Set(skillList.map((s) => s.category))];
-  const filtered = activeCategory === "ALL" ? skillList : skillList.filter((s) => s.category === activeCategory);
+  const grouped = useMemo(() => {
+    const groups = {};
+    skillList.forEach((skill) => {
+      const cat = skill.category || "OTHER";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(skill);
+    });
+    return groups;
+  }, [skillList]);
+
+  const sectionRef = useRef(null);
+  const headerInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   if (loading) {
     return (
-      <section id="skills" className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-10 w-48 bg-gray-100 rounded mx-auto" />
-            <div className="flex gap-4 justify-center">
-              {[1,2,3,4].map(i => <div key={i} className="h-10 w-24 bg-gray-100 rounded-full" />)}
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[1,2,3,4,5,6].map(i => <div key={i} className="h-32 bg-gray-100 rounded-xl" />)}
-            </div>
+      <section id="skills" className="skills">
+        <div className="skills-container">
+          <div className="section-header" style={{ textAlign: "center" }}>
+            <div style={{ width: 120, height: 28, background: "var(--glass-bg)", borderRadius: 20, margin: "0 auto 1rem" }} />
+            <div style={{ width: 200, height: 36, background: "var(--glass-bg)", borderRadius: 8, margin: "0 auto" }} />
+          </div>
+          <div className="skill-groups">
+            {[1, 2, 3].map((g) => (
+              <div key={g}>
+                <div style={{ width: 80, height: 14, background: "var(--glass-bg)", borderRadius: 4, marginBottom: "1.25rem" }} />
+                <div className="skill-cards">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="skill-card" style={{ pointerEvents: "none" }}>
+                      <div style={{ width: 32, height: 32, background: "var(--glass-bg)", borderRadius: 8 }} />
+                      <div style={{ width: 50, height: 10, background: "var(--glass-bg)", borderRadius: 4 }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -318,79 +233,39 @@ export default function Skills() {
   }
 
   return (
-    <AnimatedSection id="skills" theme="skills" className="py-4 overflow-hidden" aria-label="Skills section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative">
-        <motion.p
-          className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Expertise
-        </motion.p>
-        <motion.h2
-          className="text-center text-gray-900 text-4xl font-bold"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          My <span className="text-accent-blue">Skills</span>
-        </motion.h2>
+    <section id="skills" className="skills">
+      <div className="skills-container" ref={sectionRef}>
         <motion.div
-          className="w-16 h-1 bg-accent-blue rounded-full mx-auto mt-4 mb-4"
-          initial={{ width: 0 }}
-          whileInView={{ width: 64 }}
-          viewport={{ once: true }}
-        />
-        <motion.p
-          className="text-center text-gray-400 mb-10 max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
+          className="section-header"
+          style={{ textAlign: "center" }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          Technologies and tools I work with
-        </motion.p>
-
-        <motion.div
-          className="flex flex-wrap justify-center gap-3 mb-12"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                activeCategory === cat
-                  ? "bg-accent-blue text-white shadow-lg shadow-blue-100"
-                  : "bg-white/80 text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              {cat === "ALL" ? "All" : categoryLabels[cat] || cat}
-            </button>
-          ))}
+          <span className="section-tag">What I Work With</span>
+          <h2 className="section-title">My Skills</h2>
+          <div className="section-line" />
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered.map((skill, i) => {
-            const accentColor = skill.category === "FRONTEND" ? "#111111" : skill.category === "BACKEND" ? "#2563EB" : skill.category === "DATABASE" ? "#4B5563" : skill.category === "DEVOPS" ? "#111111" : skill.category === "TOOLS" ? "#2563EB" : skill.category === "LANGUAGES" ? "#4B5563" : skill.category === "SOFT_SKILLS" ? "#111111" : "#4B5563";
-            const cardClass = "bg-white border-gray-200";
-            return (
-              <AnimatedCard key={skill.id} className={`group relative bg-white ${cardClass} rounded-2xl p-4 shadow-[0_16px_40px_rgba(15,23,42,0.05)] hover:-translate-y-1`} index={i}>
-                <div className="flex items-center gap-3">
-                  <SkillIcon name={skill.name} accentColor={accentColor} />
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm truncate group-hover:text-gray-900 transition-colors">{skill.name}</h3>
-                    <span className="text-xs text-gray-400">{categoryLabels[skill.category] || skill.category}</span>
-                  </div>
-                </div>
-              </AnimatedCard>
-            );
-          })}
+        <div className="skill-groups">
+          {Object.entries(grouped).map(([category, catSkills], gi) => (
+            <motion.div
+              key={category}
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: gi * 0.08, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <div className="skill-group-label">{categoryLabels[category] || category}</div>
+              <div className="skill-cards">
+                {catSkills.map((skill, i) => (
+                  <SkillCard key={skill.id} skill={skill} index={i} />
+                ))}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }

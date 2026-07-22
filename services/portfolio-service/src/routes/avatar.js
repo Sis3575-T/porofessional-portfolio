@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
-import { authenticateToken, requireAdmin } from "../middleware/auth.js";
+import { authenticateToken, requireAdmin } from "shared";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";

@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { requestLogger, errorHandler, rateLimiter } from "shared";
 import heroRoutes from "./routes/hero.js";
@@ -18,6 +20,8 @@ import avatarRoutes from "./routes/avatar.js";
 
 dotenv.config();
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
@@ -26,6 +30,8 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(requestLogger);
 app.use(rateLimiter());
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/v1/hero", heroRoutes);
 app.use("/api/v1/about", aboutRoutes);

@@ -62,7 +62,14 @@ export async function fetchSavedAvatar() {
     const res = await fetch(`${API_URL}/api/v1/avatar`);
     if (!res.ok) return null;
     const data = await res.json();
-    return data.data || null;
+    const avatar = data.data || null;
+    if (avatar && avatar.modelUrl && avatar.modelUrl.startsWith("/")) {
+      avatar.modelUrl = `${API_URL}${avatar.modelUrl}`;
+    }
+    if (avatar && avatar.photoUrl && avatar.photoUrl.startsWith("/")) {
+      avatar.photoUrl = `${API_URL}${avatar.photoUrl}`;
+    }
+    return avatar;
   } catch {
     return null;
   }

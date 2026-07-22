@@ -137,37 +137,49 @@ model Service {
 }
 
 model Experience {
-  id          String    @id @default(cuid())
-  company     String
-  position    String
-  description String    @db.Text
-  logo        String?
-  startDate   DateTime
-  endDate     DateTime?
-  isCurrent   Boolean   @default(false)
-  technologies String?  @db.Text // JSON array as string
-  order       Int       @default(0)
-  enabled     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  company         String
+  position        String
+  description     String    @db.Text
+  logo            String?
+  startDate       DateTime
+  endDate         DateTime?
+  isCurrent       Boolean   @default(false)
+  employmentType  String?
+  location        String?
+  companyUrl      String?
+  technologies    String?   @db.Text
+  responsibilities String?  @db.Text
+  achievements    String?   @db.Text
+  galleryImages   String?   @db.Text
+  order           Int       @default(0)
+  enabled         Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@map("experiences")
 }
 
 model Education {
-  id          String    @id @default(cuid())
-  institution String
-  degree      String
-  field       String
-  description String    @db.Text
-  logo        String?
-  startDate   DateTime
-  endDate     DateTime
-  gpa         String?
-  order       Int       @default(0)
-  enabled     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  institution    String
+  degree         String
+  field          String
+  description    String    @db.Text
+  logo           String?
+  startDate      DateTime
+  endDate        DateTime?
+  isCurrent      Boolean   @default(false)
+  gpa            String?
+  location       String?
+  achievements   String?   @db.Text // JSON array
+  technologies   String?   @db.Text // JSON array
+  courses        String?   @db.Text // JSON array
+  certificateUrl String?
+  order          Int       @default(0)
+  enabled        Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@map("education")
 }
@@ -249,12 +261,16 @@ model Setting {
   contactEmail    String?
   contactPhone    String?
   address         String?
+  availability    String?
+  responseTime    String?
+  workingHours    String?
   metaKeywords    String?
   metaDescription String?
   ogImage         String?
   googleAnalytics String?
   hero3dConfig    String?   @db.Text // JSON: mode, rotationSpeed, floatSpeed, etc.
   uiConfig        String?   @db.Text // JSON: customCursor, backgroundEffects, etc.
+  sectionVisibility String?  @db.Text // JSON: {hero, about, skills, services, experience, education, projects, testimonials, contact, footer}
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

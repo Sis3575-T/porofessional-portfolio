@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, LogIn } from 'lucide-react';
 
 export default function Login({ setIsAuthenticated }) {
-  const [email, setEmail] = useState('admin@portfolio.dev');
-  const [password, setPassword] = useState('AdminPassword123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();

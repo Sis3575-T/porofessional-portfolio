@@ -64,18 +64,11 @@ export default function Projects() {
   }
 
   return (
-    <section id="projects" className="py-4 relative overflow-hidden bg-white">
+    <section id="projects" className="py-4 relative overflow-hidden" style={{ background: "var(--section-projects)" }}>
       <div className="max-w-5xl mx-auto px-4 sm:px-8 relative z-10">
-        <p className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3">
-          Portfolio
-        </p>
-        <h2 className="text-center text-gray-900 text-4xl font-bold">
-          Featured <span className="text-accent-blue">Projects</span>
+        <h2 className="text-center text-gray-900 text-4xl font-bold mb-10">
+          Projects
         </h2>
-        <div className="w-16 h-1 bg-accent-blue rounded-full mx-auto mt-4 mb-4" />
-        <p className="text-center text-gray-500 mb-10 max-w-2xl mx-auto">
-          A showcase of my recent work
-        </p>
 
         <div className="grid sm:grid-cols-2 gap-4">
           {projectList.map((project) => (
@@ -165,7 +158,10 @@ export default function Projects() {
               <p className="text-gray-500 text-sm leading-relaxed mb-5">{selected.description}</p>
               {selected.technologies && (
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {(Array.isArray(selected.technologies) ? selected.technologies : JSON.parse(selected.technologies)).map((tech) => (
+                  {(Array.isArray(selected.technologies)
+                    ? selected.technologies
+                    : (() => { try { const p = JSON.parse(selected.technologies); return Array.isArray(p) ? p : []; } catch { return []; } })()
+                  ).map((tech) => (
                     <span key={tech} className="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full border border-gray-200">
                       {tech}
                     </span>

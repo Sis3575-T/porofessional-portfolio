@@ -20,21 +20,22 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.some((o) => origin.startsWith(o.replace(/\/$/, "")))) {
-      cb(null, true);
-      return;
+    if (!origin) { cb(null, true); return; }
+    if (allowedOrigins.some((o) => origin.startsWith(o.replace(/\/$/, "")))) {
+      cb(null, true); return;
     }
-    if (/^https?:\/\/(localhost|127\.0\.0\.1|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/.test(origin)) {
-      cb(null, true);
-      return;
+    if (/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+      cb(null, true); return;
     }
-    cb(null, true);
+    cb(new Error("Not allowed by CORS"));
   },
   credentials: true,
 }));
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+app.options("*", cors({ origin: true, credentials: true }));
 
 const AUTH_SERVICE = process.env.AUTH_SERVICE_URL || "http://localhost:5001";
 const PORTFOLIO_SERVICE = process.env.PORTFOLIO_SERVICE_URL || "http://localhost:5002";
@@ -44,6 +45,8 @@ const DASHBOARD_SERVICE = process.env.DASHBOARD_SERVICE_URL || "http://localhost
 function proxyRequest(targetBase) {
   return (req, res) => {
     const targetUrl = new URL(req.originalUrl, targetBase);
+    const isMultipart = req.headers["content-type"]?.startsWith("multipart/");
+
     const options = {
       hostname: targetUrl.hostname,
       port: targetUrl.port,
@@ -55,27 +58,25 @@ function proxyRequest(targetBase) {
     delete options.headers["host"];
 
     const proxyReq = http.request(options, (proxyRes) => {
-      let body = "";
-      proxyRes.on("data", (chunk) => { body += chunk; });
-      proxyRes.on("end", () => {
-        try {
-          const data = JSON.parse(body);
-          res.status(proxyRes.statusCode).json(data);
-        } catch {
-          res.status(proxyRes.statusCode).send(body);
-        }
-      });
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
     });
 
     proxyReq.on("error", (err) => {
       console.error(`[Gateway] Proxy error to ${targetBase}:`, err.message);
-      res.status(502).json({ success: false, message: "Service unavailable" });
+      if (!res.headersSent) {
+        res.status(502).json({ success: false, message: "Service unavailable" });
+      }
     });
 
-    if (["POST", "PUT", "PATCH"].includes(req.method)) {
+    if (isMultipart) {
+      req.pipe(proxyReq);
+    } else if (["POST", "PUT", "PATCH"].includes(req.method)) {
       proxyReq.write(JSON.stringify(req.body));
+      proxyReq.end();
+    } else {
+      proxyReq.end();
     }
-    proxyReq.end();
   };
 }
 
@@ -96,7 +97,26 @@ app.use("/api/v1/media", proxyRequest(MEDIA_SERVICE));
 app.use("/api/v1/dashboard", proxyRequest(DASHBOARD_SERVICE));
 app.use("/api/v1/activities", proxyRequest(DASHBOARD_SERVICE));
 
-app.use("/uploads", proxyRequest(MEDIA_SERVICE));
+app.use("/uploads", (req, res) => {
+  const targetBase = req.url.startsWith("/avatar") ? PORTFOLIO_SERVICE : MEDIA_SERVICE;
+  const targetUrl = `${targetBase}/uploads${req.url}`;
+  http.get(targetUrl, (proxyRes) => {
+    if (proxyRes.statusCode === 404 && targetBase === MEDIA_SERVICE) {
+      const fallbackUrl = `${PORTFOLIO_SERVICE}/uploads${req.url}`;
+      http.get(fallbackUrl, (fallbackRes) => {
+        res.writeHead(fallbackRes.statusCode, fallbackRes.headers);
+        fallbackRes.pipe(res);
+      }).on("error", () => {
+        res.status(404).json({ success: false, message: "File not found" });
+      });
+    } else {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    }
+  }).on("error", () => {
+    res.status(404).json({ success: false, message: "File not found" });
+  });
+});
 
 app.get("/health", (req, res) => {
   res.json({

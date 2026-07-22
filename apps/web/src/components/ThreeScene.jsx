@@ -83,7 +83,7 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
           minPolarAngle={Math.PI / 8}
           maxPolarAngle={Math.PI / 2.2}
           autoRotate={false}
-          target={[0.3, 0.8, 0]}
+          target={[0, 0.85, -0.15]}
         />
       </Canvas>
     );

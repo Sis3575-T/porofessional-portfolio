@@ -150,7 +150,12 @@ async function main() {
       description: "Studied computer science with focus on web development and software engineering.",
       startDate: new Date("2018-09-01"),
       endDate: new Date("2022-06-01"),
+      isCurrent: false,
       gpa: "3.8",
+      location: "Addis Ababa, Ethiopia",
+      achievements: JSON.stringify(["Graduated with Distinction", "Dean's List", "Best Final Year Project"]),
+      technologies: JSON.stringify(["Python", "Java", "SQL", "JavaScript"]),
+      courses: JSON.stringify(["Data Structures", "Operating Systems", "Computer Networks", "Software Engineering"]),
     },
   ];
 
@@ -261,6 +266,11 @@ async function main() {
         github: "https://github.com/sisay",
         linkedin: "https://linkedin.com/in/sisay",
         twitter: "https://twitter.com/sisay",
+      }),
+      sectionVisibility: JSON.stringify({
+        hero: true, about: true, skills: true, services: true,
+        experience: true, education: true, projects: true,
+        testimonials: true, contact: true, footer: true,
       }),
     },
   });
