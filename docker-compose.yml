@@ -1,83 +1,19 @@
 services:
-  gateway:
+  backend:
     build:
       context: .
-      dockerfile: services/api/Dockerfile
-    container_name: portfolio_gateway
+      dockerfile: services/backend/Dockerfile
+    container_name: portfolio_backend
     restart: unless-stopped
     ports:
       - '5000:5000'
     environment:
-      GATEWAY_PORT: 5000
-      AUTH_SERVICE_URL: http://auth-service:5001
-      PORTFOLIO_SERVICE_URL: http://portfolio-service:5002
-      MEDIA_SERVICE_URL: http://media-service:5003
-      DASHBOARD_SERVICE_URL: http://dashboard-service:5004
-      NODE_ENV: development
-      FRONTEND_URL: http://localhost:5175
-    depends_on:
-      - auth-service
-      - portfolio-service
-      - media-service
-      - dashboard-service
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: services/auth-service/Dockerfile
-    container_name: portfolio_auth
-    restart: unless-stopped
-    expose:
-      - '5001'
-    environment:
-      AUTH_SERVICE_PORT: 5001
-      DATABASE_URL: postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslqmqr-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-      JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
-      JWT_EXPIRY: 7d
-      NODE_ENV: development
-
-  portfolio-service:
-    build:
-      context: .
-      dockerfile: services/portfolio-service/Dockerfile
-    container_name: portfolio_content
-    restart: unless-stopped
-    expose:
-      - '5002'
-    environment:
-      PORTFOLIO_SERVICE_PORT: 5002
+      PORT: 5000
       DATABASE_URL: postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslqmqr-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       JWT_EXPIRY: 7d
       ADMIN_EMAIL: sisay3575@gmail.com
-      NODE_ENV: development
-
-  media-service:
-    build:
-      context: .
-      dockerfile: services/media-service/Dockerfile
-    container_name: portfolio_media
-    restart: unless-stopped
-    expose:
-      - '5003'
-    environment:
-      MEDIA_SERVICE_PORT: 5003
-      JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
-      NODE_ENV: development
-
-  dashboard-service:
-    build:
-      context: .
-      dockerfile: services/dashboard-service/Dockerfile
-    container_name: portfolio_dashboard
-    restart: unless-stopped
-    expose:
-      - '5004'
-    environment:
-      DASHBOARD_SERVICE_PORT: 5004
-      DATABASE_URL: postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslqmqr-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-      JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
-      JWT_EXPIRY: 7d
+      FRONTEND_URL: http://localhost:5175
       NODE_ENV: development
 
   web:
@@ -91,7 +27,7 @@ services:
     environment:
       VITE_API_URL: http://localhost:5000
     depends_on:
-      - gateway
+      - backend
 
   admin:
     build:
@@ -104,6 +40,6 @@ services:
     environment:
       VITE_API_URL: http://localhost:5000
     depends_on:
-      - gateway
+      - backend
 
 volumes: {}

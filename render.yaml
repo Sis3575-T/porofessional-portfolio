@@ -1,45 +1,13 @@
 services:
   - type: web
-    name: portfolio-gateway
+    name: portfolio-backend
     runtime: node
     plan: free
-    buildCommand: npm install && cd services/shared && npm install && cd ../api && npm install
-    startCommand: node services/api/src/server.js
+    buildCommand: npm install && cd services/shared && npm install && cd ../backend && npm install && npx prisma generate --schema=../../prisma/schema.prisma
+    startCommand: cd services/backend && node src/server.js
     envVars:
-      - key: GATEWAY_PORT
+      - key: PORT
         value: 5000
-      - key: AUTH_SERVICE_URL
-        fromService:
-          name: portfolio-auth
-          type: web
-          property: host
-      - key: PORTFOLIO_SERVICE_URL
-        fromService:
-          name: portfolio-content
-          type: web
-          property: host
-      - key: MEDIA_SERVICE_URL
-        fromService:
-          name: portfolio-media
-          type: web
-          property: host
-      - key: DASHBOARD_SERVICE_URL
-        fromService:
-          name: portfolio-dashboard
-          type: web
-          property: host
-      - key: NODE_ENV
-        value: production
-
-  - type: web
-    name: portfolio-auth
-    runtime: node
-    plan: free
-    buildCommand: npm install && cd services/shared && npm install && cd ../auth-service && npm install && npx prisma generate --schema=prisma/schema.prisma
-    startCommand: node services/auth-service/src/server.js
-    envVars:
-      - key: AUTH_SERVICE_PORT
-        value: 5001
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
@@ -48,58 +16,6 @@ services:
         value: 7d
       - key: ADMIN_EMAIL
         value: sisay3575@gmail.com
-      - key: NODE_ENV
-        value: production
-
-  - type: web
-    name: portfolio-content
-    runtime: node
-    plan: free
-    buildCommand: npm install && cd services/shared && npm install && cd ../portfolio-service && npm install && npx prisma generate --schema=prisma/schema.prisma
-    startCommand: node services/portfolio-service/src/server.js
-    envVars:
-      - key: PORTFOLIO_SERVICE_PORT
-        value: 5002
-      - key: DATABASE_URL
-        sync: false
-      - key: JWT_SECRET
-        generateValue: true
-      - key: JWT_EXPIRY
-        value: 7d
-      - key: ADMIN_EMAIL
-        value: sisay3575@gmail.com
-      - key: NODE_ENV
-        value: production
-
-  - type: web
-    name: portfolio-media
-    runtime: node
-    plan: free
-    buildCommand: npm install && cd services/shared && npm install && cd ../media-service && npm install
-    startCommand: node services/media-service/src/server.js
-    envVars:
-      - key: MEDIA_SERVICE_PORT
-        value: 5003
-      - key: JWT_SECRET
-        generateValue: true
-      - key: NODE_ENV
-        value: production
-
-  - type: web
-    name: portfolio-dashboard
-    runtime: node
-    plan: free
-    buildCommand: npm install && cd services/shared && npm install && cd ../dashboard-service && npm install && npx prisma generate --schema=prisma/schema.prisma
-    startCommand: node services/dashboard-service/src/server.js
-    envVars:
-      - key: DASHBOARD_SERVICE_PORT
-        value: 5004
-      - key: DATABASE_URL
-        sync: false
-      - key: JWT_SECRET
-        generateValue: true
-      - key: JWT_EXPIRY
-        value: 7d
       - key: NODE_ENV
         value: production
 
@@ -112,7 +28,7 @@ services:
     envVars:
       - key: VITE_API_URL
         fromService:
-          name: portfolio-gateway
+          name: portfolio-backend
           type: web
           property: host
       - key: NODE_ENV
@@ -127,7 +43,7 @@ services:
     envVars:
       - key: VITE_API_URL
         fromService:
-          name: portfolio-gateway
+          name: portfolio-backend
           type: web
           property: host
       - key: NODE_ENV

@@ -8,17 +8,11 @@
   ],
   "scripts": {
     "dev": "docker compose up --build",
-    "dev:all": "concurrently -n gw,auth,portfolio,media,dash,web,admin -c cyan,yellow,green,magenta,blue,red,white \"node --watch services/api/src/server.js\" \"node --watch services/auth-service/src/server.js\" \"node --watch services/portfolio-service/src/server.js\" \"node --watch services/media-service/src/server.js\" \"node --watch services/dashboard-service/src/server.js\" \"cd apps/web && npm run dev\" \"cd apps/admin && npm run dev\"",
-    "dev:services": "concurrently -n gw,auth,portfolio,media,dash -c cyan,yellow,green,magenta,blue \"node --watch services/api/src/server.js\" \"node --watch services/auth-service/src/server.js\" \"node --watch services/portfolio-service/src/server.js\" \"node --watch services/media-service/src/server.js\" \"node --watch services/dashboard-service/src/server.js\"",
+    "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch services/backend/src/server.js\" \"cd apps/web && npm run dev\" \"cd apps/admin && npm run dev\"",
+    "dev:backend": "node --watch services/backend/src/server.js",
     "dev:web": "npm --workspace apps/web run dev",
     "dev:admin": "npm --workspace apps/admin run dev",
-    "dev:gateway": "npm --workspace services/api run dev",
-    "dev:auth": "npm --workspace services/auth-service run dev",
-    "dev:portfolio": "npm --workspace services/portfolio-service run dev",
-    "dev:media": "npm --workspace services/media-service run dev",
-    "dev:dashboard": "npm --workspace services/dashboard-service run dev",
-    "test": "npm --workspace services/api run test",
-    "start": "node services/api/src/server.js"
+    "start": "node services/backend/src/server.js"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"

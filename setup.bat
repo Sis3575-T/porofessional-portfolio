@@ -29,7 +29,7 @@ echo.
 echo === Setup Complete! ===
 echo.
 echo Run these in separate terminals:
-echo   Terminal 1: npm run dev:api
+echo   Terminal 1: npm run dev:backend
 echo   Terminal 2: npm run dev:web
 echo   Terminal 3: npm run dev:admin
 echo.
