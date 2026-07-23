@@ -17,7 +17,8 @@
     "dev:portfolio": "npm --workspace services/portfolio-service run dev",
     "dev:media": "npm --workspace services/media-service run dev",
     "dev:dashboard": "npm --workspace services/dashboard-service run dev",
-    "test": "npm --workspace services/api run test"
+    "test": "npm --workspace services/api run test",
+    "start": "node services/api/src/server.js"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
