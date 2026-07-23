@@ -39,19 +39,19 @@ export default function TestimonialsEditor() {
     catch { toast.error('Failed to delete'); }
   };
 
-  if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
+  if (loading) return <div className="animate-pulse text-slate-400">Loading...</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-white">Testimonials</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Testimonials</h2>
         <button onClick={() => { setShowForm(!showForm); setEditing(null); }}
           className="btn-primary text-sm flex items-center gap-2"><Plus size={16} /> Add Testimonial</button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="max-w-2xl mb-8 p-6 bg-slate-900/50 border border-slate-800 rounded-xl space-y-4">
-          <h3 className="font-semibold text-white">{editing ? 'Edit' : 'New'} Testimonial</h3>
+        <form onSubmit={handleSubmit} className="max-w-2xl mb-8 p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
+          <h3 className="font-semibold text-slate-900">{editing ? 'Edit' : 'New'} Testimonial</h3>
           <div className="grid sm:grid-cols-2 gap-4">
             <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full" placeholder="Name" required />
             <input value={form.position} onChange={(e) => setForm({...form, position: e.target.value})} className="w-full" placeholder="Position" />
@@ -65,37 +65,37 @@ export default function TestimonialsEditor() {
             <label className="block text-sm text-slate-400 mb-1">Avatar</label>
             <div className="flex gap-2">
               <input value={form.avatar} onChange={(e) => setForm({...form, avatar: e.target.value})} className="w-full" placeholder="https://..." />
-              <button type="button" onClick={() => setPickerField('avatar')} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition shrink-0">
+              <button type="button" onClick={() => setPickerField('avatar')} className="px-3 py-2 bg-slate-200 hover:bg-slate-200 text-slate-600 rounded-lg transition shrink-0">
                 <ImageIcon size={16} />
               </button>
             </div>
             {form.avatar && (
-              <div className="mt-2 w-14 h-14 rounded-full overflow-hidden border border-slate-700">
+              <div className="mt-2 w-14 h-14 rounded-full overflow-hidden border border-slate-200">
                 <img src={form.avatar} alt="" className="w-full h-full object-cover" />
               </div>
             )}
           </div>
           <div className="flex gap-3">
             <button type="submit" className="btn-primary text-sm flex items-center gap-2"><Save size={16} /> {editing ? 'Update' : 'Create'}</button>
-            <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 border border-slate-600 text-slate-300 rounded-lg text-sm">Cancel</button>
+            <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm">Cancel</button>
           </div>
         </form>
       )}
 
       <div className="space-y-4">
         {items.map(item => (
-          <div key={item.id} className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 group">
+          <div key={item.id} className="bg-slate-50 border border-slate-200 rounded-xl p-5 group">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-3">
-                  <h4 className="font-medium text-white">{item.name}</h4>
+                  <h4 className="font-medium text-slate-900">{item.name}</h4>
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} size={12} className={i < item.rating ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'} />
                     ))}
                   </div>
                 </div>
-                <p className="text-sm text-slate-500">{item.position} at {item.company}</p>
+                <p className="text-sm text-slate-400">{item.position} at {item.company}</p>
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
                 <button onClick={() => handleEdit(item)} className="p-1 text-slate-400 hover:text-cyan-400"><Pencil size={14} /></button>
@@ -105,7 +105,7 @@ export default function TestimonialsEditor() {
           </div>
         ))}
       </div>
-      {items.length === 0 && <p className="text-slate-500">No testimonials added yet</p>}
+      {items.length === 0 && <p className="text-slate-400">No testimonials added yet</p>}
 
       <ImagePicker
         open={!!pickerField}

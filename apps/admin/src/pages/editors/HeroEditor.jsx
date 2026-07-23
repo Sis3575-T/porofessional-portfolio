@@ -4,8 +4,8 @@ import { heroAPI } from '../../services/api';
 import { Save, Loader2, Image as ImageIcon, X, Plus, Trash2 } from 'lucide-react';
 import ImagePicker from '../../components/ImagePicker';
 
-const inputClass = "w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm";
-const labelClass = "block text-sm text-slate-400 mb-1.5";
+const inputClass = "w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm";
+const labelClass = "block text-sm text-slate-500 mb-1.5";
 
 const defaultSocial = { platform: 'github', url: '', enabled: true };
 const defaultStat = { label: '', value: 0, enabled: true };
@@ -61,6 +61,7 @@ export default function HeroEditor() {
       try { JSON.parse(buttonConfig); } catch { toast.error('Invalid JSON in Button Config'); setSaving(false); return; }
       await heroAPI.update({ ...form, socialLinks, stats, buttonConfig });
       toast.success('Hero section updated successfully');
+      window.dispatchEvent(new Event('profile-updated'));
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update');
     } finally { setSaving(false); }
@@ -71,7 +72,7 @@ export default function HeroEditor() {
     setForm((prev) => ({ ...prev, [pickerField]: url }));
   };
 
-  if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
+  if (loading) return <div className="animate-pulse text-slate-400">Loading...</div>;
 
   const ImageField = ({ field, label }) => (
     <div>
@@ -86,7 +87,7 @@ export default function HeroEditor() {
         <button
           type="button"
           onClick={() => pickImage(field)}
-          className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition flex items-center gap-1.5 shrink-0"
+          className="px-3 py-2 bg-slate-200 hover:bg-slate-200 text-slate-600 rounded-lg transition flex items-center gap-1.5 shrink-0"
           title="Browse media library"
         >
           <ImageIcon size={16} />
@@ -104,7 +105,7 @@ export default function HeroEditor() {
         )}
       </div>
       {form[field] && (
-        <div className="mt-2 relative group w-28 h-20 rounded-lg overflow-hidden border border-slate-700">
+        <div className="mt-2 relative group w-28 h-20 rounded-lg overflow-hidden border border-slate-200">
           <img
             src={form[field]}
             alt={label}
@@ -118,10 +119,10 @@ export default function HeroEditor() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-8">Hero Section</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-8">Hero Section</h2>
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Content</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Content</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className={labelClass}>Greeting</label>
@@ -152,15 +153,15 @@ export default function HeroEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Images</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Images</h3>
           <ImageField field="profileImage" label="Profile Image" />
           <ImageField field="backgroundImage" label="Background Image" />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Button Configuration</h3>
-          <p className="text-xs text-slate-500">JSON config for button styling (borderRadius, shadowIntensity, hoverEffect)</p>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Button Configuration</h3>
+          <p className="text-xs text-slate-400">JSON config for button styling (borderRadius, shadowIntensity, hoverEffect)</p>
           <textarea
             value={form.buttonConfig}
             onChange={(e) => setForm({...form, buttonConfig: e.target.value})}
@@ -169,9 +170,9 @@ export default function HeroEditor() {
           />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Social Links (JSON)</h3>
-          <p className="text-xs text-slate-500">Array of {`{ platform, url, enabled }`}</p>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Social Links (JSON)</h3>
+          <p className="text-xs text-slate-400">Array of {`{ platform, url, enabled }`}</p>
           <textarea
             value={form.socialLinks}
             onChange={(e) => setForm({...form, socialLinks: e.target.value})}
@@ -180,9 +181,9 @@ export default function HeroEditor() {
           />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Stats (JSON)</h3>
-          <p className="text-xs text-slate-500">Array of {`{ label, value, enabled }`}</p>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Stats (JSON)</h3>
+          <p className="text-xs text-slate-400">Array of {`{ label, value, enabled }`}</p>
           <textarea
             value={form.stats}
             onChange={(e) => setForm({...form, stats: e.target.value})}

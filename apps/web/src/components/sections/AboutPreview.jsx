@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { User, MapPin, Mail, Clock } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { useProfile } from "../../context/ProfileContext";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -16,6 +17,7 @@ const statItems = [
 
 export default function AboutPreview() {
   const { about, loading } = usePortfolio();
+  const { name: profileName, email: profileEmail, initials } = useProfile();
 
   if (loading) {
     return (
@@ -27,9 +29,9 @@ export default function AboutPreview() {
     );
   }
 
-  const name = about?.name || "Sisay Temesgen";
-  const location = about?.location || "Bahir Dar, Ethiopia";
-  const email = about?.email || "sisaydev@example.com";
+  const name = about?.name || profileName || "Developer";
+  const location = about?.location || "Remote";
+  const email = about?.email || profileEmail || "";
   const availability = about?.availability || "Open for opportunities";
   const profileImage = about?.profileImage || "/about-profile.png";
 
@@ -67,7 +69,7 @@ export default function AboutPreview() {
                   />
                 ) : (
                   <div className="w-full aspect-[3/4] flex items-center justify-center bg-gray-100">
-                    <span className="text-6xl font-bold text-gray-300">ST</span>
+                    <span className="text-6xl font-bold text-gray-300">{initials}</span>
                   </div>
                 )}
               </div>

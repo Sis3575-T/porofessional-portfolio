@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, ChevronLeft, ChevronRight, Eye, Calendar } from "lucide-react";
 import { projectsAPI } from "../services/api";
+import { useAnalytics } from "../hooks/useAnalytics";
 
 const categoryLabels = {
   FRONTEND: "Frontend",
@@ -15,6 +16,7 @@ const categoryLabels = {
 
 export default function ProjectDetails() {
   const { slug } = useParams();
+  const { trackEvent } = useAnalytics();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,6 +27,7 @@ export default function ProjectDetails() {
         setLoading(true);
         const res = await projectsAPI.getBySlug(slug);
         setProject(res.data.data);
+        trackEvent("project_view", { projectSlug: slug });
       } catch (err) {
         setError("Project not found");
       } finally {

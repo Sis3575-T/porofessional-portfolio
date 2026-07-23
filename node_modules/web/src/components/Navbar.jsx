@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Download, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useProfile } from "../context/ProfileContext";
+import { useAnalytics } from "../hooks/useAnalytics";
 import Logo from "./Logo";
 
 const navItems = [
@@ -16,6 +18,8 @@ const navItems = [
 
 export default function Navbar() {
   const { dark, toggle } = useTheme();
+  const { siteTitle } = useProfile();
+  const { trackEvent } = useAnalytics();
   const [activeSection, setActiveSection] = useState("hero");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -79,6 +83,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3 ml-auto">
             <a
               href="/resume.pdf"
+              onClick={() => trackEvent("resume_download")}
               className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 shadow-sm"
               aria-label="Download CV"
             >
@@ -126,7 +131,7 @@ export default function Navbar() {
               <div className="flex items-center justify-between px-5 pt-6 pb-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
                   <Logo />
-                  <span className="text-lg font-bold text-gray-900">SISAY DEV</span>
+                  <span className="text-lg font-bold text-gray-900">{siteTitle || "Portfolio"}</span>
                 </div>
                 <button
                   onClick={() => setMobileOpen(false)}

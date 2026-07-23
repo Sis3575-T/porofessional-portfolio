@@ -38,13 +38,13 @@ function ImageUpload({ value, onChange, label, aspect = "w-16 h-16" }) {
 
   return (
     <div>
-      <label className="block text-xs text-slate-400 mb-1">{label}</label>
+      <label className="block text-xs text-slate-500 mb-1">{label}</label>
       <div className="flex items-center gap-3">
         <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
         {value ? (
           <div className="relative">
-            <img src={value} alt="" className={`${aspect} object-cover rounded-lg border border-slate-700`} />
-            <button onClick={() => onChange('')} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center">
+            <img src={value} alt="" className={`${aspect} object-cover rounded-lg border border-slate-200`} />
+            <button onClick={() => onChange('')} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-slate-900 flex items-center justify-center">
               <X size={10} />
             </button>
           </div>
@@ -52,7 +52,7 @@ function ImageUpload({ value, onChange, label, aspect = "w-16 h-16" }) {
           <button
             onClick={() => ref.current?.click()}
             disabled={uploading}
-            className={`${aspect} rounded-lg border border-dashed border-slate-600 flex items-center justify-center text-slate-500 hover:text-slate-300 hover:border-slate-500 transition`}
+            className={`${aspect} rounded-lg border border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:text-slate-400 hover:border-slate-500 transition`}
           >
             {uploading ? '...' : <Upload size={16} />}
           </button>
@@ -191,14 +191,14 @@ export default function ServicesEditor() {
     return [];
   };
 
-  if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
+  if (loading) return <div className="animate-pulse text-slate-400">Loading...</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-white">Services</h2>
-          <p className="text-sm text-slate-400 mt-1">{services.length} services — prism has {Math.max(3, services.length)} faces</p>
+          <h2 className="text-2xl font-bold text-slate-900">Services</h2>
+          <p className="text-sm text-slate-500 mt-1">{services.length} services — prism has {Math.max(3, services.length)} faces</p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-gray-100 transition">
@@ -207,35 +207,35 @@ export default function ServicesEditor() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="max-w-3xl mb-8 p-6 bg-slate-900/50 border border-slate-800 rounded-xl space-y-5">
+        <form onSubmit={handleSubmit} className="max-w-3xl mb-8 p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-white">{editing ? 'Edit Service' : 'New Service'}</h3>
-            <button type="button" onClick={resetForm} className="text-slate-400 hover:text-white"><X size={18} /></button>
+            <h3 className="font-semibold text-slate-900">{editing ? 'Edit Service' : 'New Service'}</h3>
+            <button type="button" onClick={resetForm} className="text-slate-500 hover:text-slate-900"><X size={18} /></button>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Title *</label>
+              <label className="block text-xs text-slate-500 mb-1">Title *</label>
               <input value={form.title} onChange={e => setForm({...form, title: e.target.value})}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" required />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" required />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Short Description (shown on prism face)</label>
+              <label className="block text-xs text-slate-500 mb-1">Short Description (shown on prism face)</label>
               <input value={form.shortDescription} onChange={e => setForm({...form, shortDescription: e.target.value})}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Short Description (search/preview)</label>
+              <label className="block text-xs text-slate-500 mb-1">Short Description (search/preview)</label>
               <input value={form.description} onChange={e => setForm({...form, description: e.target.value})}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Full Description (shown in detail page)</label>
+              <label className="block text-xs text-slate-500 mb-1">Full Description (shown in detail page)</label>
               <textarea value={form.fullDescription} onChange={e => setForm({...form, fullDescription: e.target.value})} rows={5}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             {/* Images */}
@@ -245,83 +245,83 @@ export default function ServicesEditor() {
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Gallery Images (one URL per line)</label>
+              <label className="block text-xs text-slate-500 mb-1">Gallery Images (one URL per line)</label>
               <textarea value={form.galleryImages} onChange={e => setForm({...form, galleryImages: e.target.value})} rows={3}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white"
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white"
                 placeholder="https://example.com/img1.jpg&#10;https://example.com/img2.jpg" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Technologies (one per line)</label>
+              <label className="block text-xs text-slate-500 mb-1">Technologies (one per line)</label>
               <textarea value={form.technologies} onChange={e => setForm({...form, technologies: e.target.value})} rows={3}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Features (one per line)</label>
+              <label className="block text-xs text-slate-500 mb-1">Features (one per line)</label>
               <textarea value={form.features} onChange={e => setForm({...form, features: e.target.value})} rows={3}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Tools (one per line)</label>
+              <label className="block text-xs text-slate-500 mb-1">Tools (one per line)</label>
               <textarea value={form.tools} onChange={e => setForm({...form, tools: e.target.value})} rows={2}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs text-slate-400 mb-1">Development Process</label>
+              <label className="block text-xs text-slate-500 mb-1">Development Process</label>
               <textarea value={form.process} onChange={e => setForm({...form, process: e.target.value})} rows={3}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             {/* Links */}
             <div className="col-span-2 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Live Demo URL</label>
+                <label className="block text-xs text-slate-500 mb-1">Live Demo URL</label>
                 <input value={form.liveUrl} onChange={e => setForm({...form, liveUrl: e.target.value})}
-                  className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">GitHub URL</label>
+                <label className="block text-xs text-slate-500 mb-1">GitHub URL</label>
                 <input value={form.githubUrl} onChange={e => setForm({...form, githubUrl: e.target.value})}
-                  className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Docs URL</label>
+                <label className="block text-xs text-slate-500 mb-1">Docs URL</label>
                 <input value={form.docsUrl} onChange={e => setForm({...form, docsUrl: e.target.value})}
-                  className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Case Study URL</label>
+                <label className="block text-xs text-slate-500 mb-1">Case Study URL</label>
                 <input value={form.caseStudyUrl} onChange={e => setForm({...form, caseStudyUrl: e.target.value})}
-                  className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
               </div>
             </div>
 
             {/* Button settings */}
             <div className="col-span-2 grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Button Text</label>
+                <label className="block text-xs text-slate-500 mb-1">Button Text</label>
                 <input value={form.buttonText} onChange={e => setForm({...form, buttonText: e.target.value})}
-                  className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" />
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Button Color</label>
+                <label className="block text-xs text-slate-500 mb-1">Button Color</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={form.buttonColor} onChange={e => setForm({...form, buttonColor: e.target.value})}
                     className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
                   <input value={form.buttonColor} onChange={e => setForm({...form, buttonColor: e.target.value})}
-                    className="flex-1 bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white" />
+                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-white" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Accent Color</label>
+                <label className="block text-xs text-slate-500 mb-1">Accent Color</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={form.accentColor} onChange={e => setForm({...form, accentColor: e.target.value})}
                     className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
                   <input value={form.accentColor} onChange={e => setForm({...form, accentColor: e.target.value})}
-                    className="flex-1 bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white" />
+                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-white" />
                 </div>
               </div>
             </div>
@@ -331,7 +331,7 @@ export default function ServicesEditor() {
             <button type="submit" className="flex items-center gap-2 px-5 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-gray-100 transition">
               <Save size={16} /> {editing ? 'Update' : 'Create'}
             </button>
-            <button type="button" onClick={resetForm} className="px-4 py-2 border border-slate-600 text-slate-300 rounded-xl text-sm hover:bg-slate-800 transition">Cancel</button>
+            <button type="button" onClick={resetForm} className="px-4 py-2 border border-slate-300 text-slate-400 rounded-xl text-sm hover:bg-slate-100 transition">Cancel</button>
           </div>
         </form>
       )}
@@ -340,39 +340,39 @@ export default function ServicesEditor() {
       <div className="space-y-2">
         {services.map((s, idx) => (
           <div key={s.id} draggable onDragStart={() => handleDragStart(idx)} onDragOver={e => handleDragOver(e, idx)} onDragEnd={handleDragEnd}
-            className={`bg-slate-900/50 border rounded-xl p-3 group transition-all ${dragIdx === idx ? 'border-white/30 opacity-60' : 'border-slate-800'}`}>
+            className={`bg-slate-50 border rounded-xl p-3 group transition-all ${dragIdx === idx ? 'border-white/30 opacity-60' : 'border-slate-200'}`}>
             <div className="flex items-center gap-3">
-              <div className="cursor-grab text-slate-600 hover:text-slate-400"><GripVertical size={16} /></div>
+              <div className="cursor-grab text-slate-400 hover:text-slate-500"><GripVertical size={16} /></div>
 
               {s.icon ? (
-                <img src={s.icon} alt="" className="w-8 h-8 rounded-lg object-cover border border-slate-700" />
+                <img src={s.icon} alt="" className="w-8 h-8 rounded-lg object-cover border border-slate-200" />
               ) : (
-                <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-500">{idx + 1}</div>
+                <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs text-slate-400">{idx + 1}</div>
               )}
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-white text-sm">{s.title}</h4>
-                <p className="text-xs text-slate-500 truncate">{s.shortDescription || s.description}</p>
+                <h4 className="font-medium text-slate-900 text-sm">{s.title}</h4>
+                <p className="text-xs text-slate-400 truncate">{s.shortDescription || s.description}</p>
               </div>
 
               <div className="flex items-center gap-0.5">
-                <button onClick={() => handleMove(idx, -1)} disabled={idx === 0} className="p-1 text-slate-600 hover:text-white disabled:opacity-20"><ChevronUp size={12} /></button>
-                <button onClick={() => handleMove(idx, 1)} disabled={idx === services.length - 1} className="p-1 text-slate-600 hover:text-white disabled:opacity-20"><ChevronDown size={12} /></button>
+                <button onClick={() => handleMove(idx, -1)} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-900 disabled:opacity-20"><ChevronUp size={12} /></button>
+                <button onClick={() => handleMove(idx, 1)} disabled={idx === services.length - 1} className="p-1 text-slate-400 hover:text-slate-900 disabled:opacity-20"><ChevronDown size={12} /></button>
               </div>
 
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-                <button onClick={() => handleToggle(s)} className={`p-1.5 rounded-lg ${s.enabled ? 'text-white hover:bg-white/10' : 'text-slate-600 hover:bg-slate-800'}`}>
+                <button onClick={() => handleToggle(s)} className={`p-1.5 rounded-lg ${s.enabled ? 'text-slate-900 hover:bg-white/10' : 'text-slate-400 hover:bg-slate-100'}`}>
                   {s.enabled ? <Eye size={13} /> : <EyeOff size={13} />}
                 </button>
-                <button onClick={() => handleEdit(s)} className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg"><Pencil size={13} /></button>
-                <button onClick={() => handleDelete(s.id)} className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg"><Trash2 size={13} /></button>
+                <button onClick={() => handleEdit(s)} className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-white/10 rounded-lg"><Pencil size={13} /></button>
+                <button onClick={() => handleDelete(s.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg"><Trash2 size={13} /></button>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {services.length === 0 && <p className="text-slate-500 text-sm text-center py-8">No services yet.</p>}
+      {services.length === 0 && <p className="text-slate-400 text-sm text-center py-8">No services yet.</p>}
     </div>
   );
 }

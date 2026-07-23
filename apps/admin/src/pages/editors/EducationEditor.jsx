@@ -139,7 +139,7 @@ export default function EducationEditor() {
   };
 
   if (loading) {
-    return <div className="animate-pulse text-slate-500">Loading education...</div>;
+    return <div className="animate-pulse text-slate-400">Loading education...</div>;
   }
 
   return (
@@ -147,8 +147,8 @@ export default function EducationEditor() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-white">Education</h2>
-          <p className="text-sm text-slate-400 mt-1">{items.length} education entries</p>
+          <h2 className="text-2xl font-bold text-slate-900">Education</h2>
+          <p className="text-sm text-slate-500 mt-1">{items.length} education entries</p>
         </div>
         <button
           onClick={() => { setShowForm(!showForm); setEditing(null); setForm({ ...emptyForm }); }}
@@ -160,11 +160,11 @@ export default function EducationEditor() {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-8 p-6 bg-slate-900/50 border border-slate-800 rounded-xl space-y-5">
+        <form onSubmit={handleSubmit} className="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-white">{editing ? 'Edit' : 'New'} Education</h3>
+            <h3 className="font-semibold text-slate-900">{editing ? 'Edit' : 'New'} Education</h3>
             <button type="button" onClick={() => { setShowForm(false); setEditing(null); }}
-              className="p-1 text-slate-400 hover:text-white transition">
+              className="p-1 text-slate-500 hover:text-slate-900 transition">
               <X size={18} />
             </button>
           </div>
@@ -172,56 +172,56 @@ export default function EducationEditor() {
           {/* Row 1: Institution + Degree */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Institution *</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Institution *</label>
               <input value={form.institution} onChange={(e) => setForm({ ...form, institution: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
                 placeholder="University name" required />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Degree *</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Degree *</label>
               <input value={form.degree} onChange={(e) => setForm({ ...form, degree: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
                 placeholder="BSc, MSc, Certificate..." required />
             </div>
           </div>
 
           {/* Row 2: Field */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Field of Study</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Field of Study</label>
             <input value={form.field} onChange={(e) => setForm({ ...form, field: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
               placeholder="Computer Science, Software Engineering..." />
           </div>
 
           {/* Row 3: Description */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Description</label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 resize-none"
               placeholder="Describe your academic experience..." />
           </div>
 
           {/* Row 4: Dates + Current */}
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Start Date *</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Start Date *</label>
               <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-500"
                 required />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">End Date</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">End Date</label>
               <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })}
                 disabled={form.isCurrent}
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 disabled:opacity-40" />
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-500 disabled:opacity-40" />
             </div>
             <div className="flex items-end pb-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.isCurrent}
                   onChange={(e) => setForm({ ...form, isCurrent: e.target.checked, endDate: '' })}
-                  className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500" />
-                <span className="text-sm text-slate-300">Currently studying here</span>
+                  className="w-4 h-4 rounded border-slate-200 bg-slate-100 text-blue-500 focus:ring-blue-500" />
+                <span className="text-sm text-slate-600">Currently studying here</span>
               </label>
             </div>
           </div>
@@ -229,62 +229,62 @@ export default function EducationEditor() {
           {/* Row 5: GPA + Location */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">GPA (optional)</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">GPA (optional)</label>
               <input value={form.gpa} onChange={(e) => setForm({ ...form, gpa: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
                 placeholder="3.7/4.0" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Location</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Location</label>
               <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
                 placeholder="City, Country" />
             </div>
           </div>
 
           {/* Row 6: Logo URL */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Logo URL</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Logo URL</label>
             <input value={form.logo} onChange={(e) => setForm({ ...form, logo: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
               placeholder="https://example.com/logo.png" />
           </div>
 
           {/* Row 7: Achievements (comma separated) */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
               <span className="flex items-center gap-1.5"><Award size={12} /> Achievements (comma separated)</span>
             </label>
             <input value={form.achievements} onChange={(e) => setForm({ ...form, achievements: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
               placeholder="Dean's List, Best Project, Graduated with Distinction" />
           </div>
 
           {/* Row 8: Technologies (comma separated) */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Technologies (comma separated)</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Technologies (comma separated)</label>
             <input value={form.technologies} onChange={(e) => setForm({ ...form, technologies: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
               placeholder="React, Node.js, Python, SQL" />
           </div>
 
           {/* Row 9: Courses (comma separated) */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
               <span className="flex items-center gap-1.5"><BookOpen size={12} /> Relevant Courses (comma separated)</span>
             </label>
             <input value={form.courses} onChange={(e) => setForm({ ...form, courses: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
               placeholder="Data Structures, Operating Systems, Networks" />
           </div>
 
           {/* Row 10: Certificate URL */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
               <span className="flex items-center gap-1.5"><ExternalLink size={12} /> Certificate URL (optional)</span>
             </label>
             <input value={form.certificateUrl} onChange={(e) => setForm({ ...form, certificateUrl: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
               placeholder="https://example.com/certificate.pdf" />
           </div>
 
@@ -296,7 +296,7 @@ export default function EducationEditor() {
             </button>
             <button type="button"
               onClick={() => { setShowForm(false); setEditing(null); setForm({ ...emptyForm }); }}
-              className="px-4 py-2 border border-slate-600 text-slate-300 rounded-lg text-sm hover:bg-slate-800 transition">
+              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-100 transition">
               Cancel
             </button>
           </div>
@@ -307,22 +307,22 @@ export default function EducationEditor() {
       <div className="space-y-3">
         {items.map((item, idx) => (
           <div key={item.id}
-            className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden group">
+            className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden group">
             {/* Item Header */}
             <div className="flex items-center gap-3 p-4">
               <div className="flex flex-col gap-0.5">
                 <button onClick={() => handleMove(item.id, 'up')} disabled={idx === 0}
-                  className="p-0.5 text-slate-500 hover:text-white disabled:opacity-20 transition">
+                  className="p-0.5 text-slate-400 hover:text-slate-900 disabled:opacity-20 transition">
                   <ChevronUp size={14} />
                 </button>
                 <button onClick={() => handleMove(item.id, 'down')} disabled={idx === items.length - 1}
-                  className="p-0.5 text-slate-500 hover:text-white disabled:opacity-20 transition">
+                  className="p-0.5 text-slate-400 hover:text-slate-900 disabled:opacity-20 transition">
                   <ChevronDown size={14} />
                 </button>
               </div>
 
               {item.logo ? (
-                <img src={item.logo} alt="" className="w-10 h-10 rounded-lg object-cover border border-slate-700" />
+                <img src={item.logo} alt="" className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
               ) : (
                 <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                   <GraduationCap size={18} className="text-blue-400" />
@@ -330,9 +330,9 @@ export default function EducationEditor() {
               )}
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-white text-sm truncate">{item.degree}</h4>
+                <h4 className="font-medium text-slate-900 text-sm truncate">{item.degree}</h4>
                 <p className="text-xs text-blue-400 truncate">{item.institution}</p>
-                <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+                <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
                   {item.startDate && (
                     <span>{formatDate(item.startDate)} – {item.isCurrent ? 'Present' : formatDate(item.endDate)}</span>
                   )}
@@ -342,20 +342,20 @@ export default function EducationEditor() {
 
               <div className="flex items-center gap-1.5">
                 <button onClick={() => handleToggle(item.id, item.enabled)}
-                  className={`p-1.5 rounded-lg transition ${item.enabled ? 'text-green-400 hover:bg-green-500/10' : 'text-slate-500 hover:bg-slate-800'}`}
+                  className={`p-1.5 rounded-lg transition ${item.enabled ? 'text-green-400 hover:bg-green-500/10' : 'text-slate-400 hover:bg-slate-100'}`}
                   title={item.enabled ? 'Visible' : 'Hidden'}>
                   {item.enabled ? <Eye size={14} /> : <EyeOff size={14} />}
                 </button>
                 <button onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                  className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                  className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition">
                   <ChevronDown size={14} className={`transition-transform ${expandedId === item.id ? 'rotate-180' : ''}`} />
                 </button>
                 <button onClick={() => handleEdit(item)}
-                  className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition opacity-0 group-hover:opacity-100">
+                  className="p-1.5 text-slate-500 hover:text-cyan-400 hover:bg-slate-100 rounded-lg transition opacity-0 group-hover:opacity-100">
                   <Pencil size={14} />
                 </button>
                 <button onClick={() => handleDelete(item.id)}
-                  className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition opacity-0 group-hover:opacity-100">
+                  className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-slate-100 rounded-lg transition opacity-0 group-hover:opacity-100">
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -363,14 +363,14 @@ export default function EducationEditor() {
 
             {/* Expanded Details */}
             {expandedId === item.id && (
-              <div className="px-4 pb-4 pt-0 border-t border-slate-800">
-                <div className="pt-3 space-y-2 text-xs text-slate-400">
-                  {item.field && <p><span className="text-slate-500">Field:</span> {item.field}</p>}
-                  {item.gpa && <p><span className="text-slate-500">GPA:</span> {item.gpa}</p>}
-                  {item.description && <p className="text-slate-300 leading-relaxed">{item.description}</p>}
+              <div className="px-4 pb-4 pt-0 border-t border-slate-200">
+                <div className="pt-3 space-y-2 text-xs text-slate-500">
+                  {item.field && <p><span className="text-slate-400">Field:</span> {item.field}</p>}
+                  {item.gpa && <p><span className="text-slate-400">GPA:</span> {item.gpa}</p>}
+                  {item.description && <p className="text-slate-600 leading-relaxed">{item.description}</p>}
                   {item.achievements && (
                     <div>
-                      <span className="text-slate-500">Achievements:</span>
+                      <span className="text-slate-400">Achievements:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {(Array.isArray(item.achievements) ? item.achievements : [item.achievements]).map((a, i) => (
                           <span key={i} className="px-2 py-0.5 bg-green-500/10 text-green-400 rounded text-xs">{a}</span>
@@ -380,7 +380,7 @@ export default function EducationEditor() {
                   )}
                   {item.technologies && (
                     <div>
-                      <span className="text-slate-500">Technologies:</span>
+                      <span className="text-slate-400">Technologies:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {(Array.isArray(item.technologies) ? item.technologies : [item.technologies]).map((t, i) => (
                           <span key={i} className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded text-xs">{t}</span>
@@ -390,17 +390,17 @@ export default function EducationEditor() {
                   )}
                   {item.courses && (
                     <div>
-                      <span className="text-slate-500">Courses:</span>
+                      <span className="text-slate-400">Courses:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {(Array.isArray(item.courses) ? item.courses : [item.courses]).map((c, i) => (
-                          <span key={i} className="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-xs">{c}</span>
+                          <span key={i} className="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs">{c}</span>
                         ))}
                       </div>
                     </div>
                   )}
                   {item.certificateUrl && (
                     <p>
-                      <span className="text-slate-500">Certificate:</span>{' '}
+                      <span className="text-slate-400">Certificate:</span>{' '}
                       <a href={item.certificateUrl} target="_blank" rel="noopener noreferrer"
                         className="text-blue-400 hover:underline">{item.certificateUrl}</a>
                     </p>
@@ -413,7 +413,7 @@ export default function EducationEditor() {
       </div>
 
       {items.length === 0 && (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-slate-400">
           <GraduationCap size={40} className="mx-auto mb-3 opacity-30" />
           <p>No education entries yet. Add your first education record.</p>
         </div>

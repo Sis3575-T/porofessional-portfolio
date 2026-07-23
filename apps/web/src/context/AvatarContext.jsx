@@ -5,10 +5,10 @@ const AvatarContext = createContext(null);
 const initialState = {
   textureUrl: null,
   textureBlob: null,
-  position: [1.15, 0.7, 0.2],
+  position: [0, 0.7, 0.5],
   rotation: [0, 0, 0],
   scale: [1, 1, 1],
-  visible: true,
+  visible: false,
   locked: false,
   mirrored: false,
   processing: false,
@@ -22,15 +22,7 @@ function avatarReducer(state, action) {
     case "SET_PROCESSING":
       return { ...state, processing: true, progress: action.progress, progressPercent: action.percent, error: null };
     case "SET_TEXTURE":
-      return {
-        ...state,
-        processing: false,
-        textureUrl: action.url,
-        textureBlob: action.blob,
-        progress: "",
-        progressPercent: 0,
-        error: null,
-      };
+      return { ...state, processing: false, textureUrl: action.url, textureBlob: action.blob, progress: "", progressPercent: 0, error: null };
     case "SET_ERROR":
       return { ...state, processing: false, error: action.error, progress: "", progressPercent: 0 };
     case "SET_POSITION":
@@ -46,9 +38,9 @@ function avatarReducer(state, action) {
     case "TOGGLE_MIRROR":
       return { ...state, mirrored: !state.mirrored };
     case "SNAP_TO_CHAIR":
-      return { ...state, position: [1.15, 0.7, 0.2], rotation: [0, -Math.PI / 2, 0], scale: [1, 1, 1] };
+      return { ...state, position: [0, 0.7, 0.5], rotation: [0, 0, 0], scale: [1, 1, 1] };
     case "RESET_POSITION":
-      return { ...state, position: [1.15, 0.7, 0.2], rotation: [0, 0, 0], scale: [1, 1, 1] };
+      return { ...state, position: [0, 0.7, 0.5], rotation: [0, 0, 0], scale: [1, 1, 1] };
     case "DELETE":
       if (state.textureUrl) URL.revokeObjectURL(state.textureUrl);
       return { ...initialState };
@@ -77,18 +69,8 @@ export function AvatarProvider({ children }) {
     <AvatarContext.Provider
       value={{
         ...state,
-        setProcessing,
-        setTexture,
-        setError,
-        setPosition,
-        setRotation,
-        setScale,
-        toggleVisible,
-        toggleLock,
-        toggleMirror,
-        snapToChair,
-        resetPosition,
-        deleteAvatar,
+        setProcessing, setTexture, setError, setPosition, setRotation, setScale,
+        toggleVisible, toggleLock, toggleMirror, snapToChair, resetPosition, deleteAvatar,
       }}
     >
       {children}

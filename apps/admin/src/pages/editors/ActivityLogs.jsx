@@ -29,12 +29,12 @@ export default function ActivityLogs() {
 
   useEffect(() => { fetch(); }, []);
 
-  if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
+  if (loading) return <div className="animate-pulse text-slate-400">Loading...</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-white">Activity Logs</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Activity Logs</h2>
         <button onClick={fetch} className="p-2 text-slate-400 hover:text-cyan-400 transition">
           <RefreshCw size={18} />
         </button>
@@ -42,27 +42,27 @@ export default function ActivityLogs() {
 
       {activities.length === 0 ? (
         <div className="text-center py-16">
-          <Activity size={48} className="mx-auto mb-4 text-slate-600" />
-          <p className="text-slate-500">No activity recorded yet</p>
+          <Activity size={48} className="mx-auto mb-4 text-slate-400" />
+          <p className="text-slate-400">No activity recorded yet</p>
         </div>
       ) : (
         <div className="space-y-3">
           {activities.map((a) => (
-            <div key={a.id} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${actionColors[a.action] || "text-slate-400 bg-slate-800"}`}>
+            <div key={a.id} className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-4">
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${actionColors[a.action] || "text-slate-400 bg-slate-100"}`}>
                 {a.action}
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white">
+                <p className="text-sm text-slate-900">
                   {a.action === "LOGIN" ? "User logged in" :
                    a.action === "LOGOUT" ? "User logged out" :
                    `${a.action}d ${a.entity?.toLowerCase()}`}
                 </p>
                 {a.user?.email && (
-                  <p className="text-xs text-slate-500">{a.user.email}</p>
+                  <p className="text-xs text-slate-400">{a.user.email}</p>
                 )}
               </div>
-              <span className="text-xs text-slate-500 shrink-0">
+              <span className="text-xs text-slate-400 shrink-0">
                 {new Date(a.createdAt).toLocaleString()}
               </span>
             </div>

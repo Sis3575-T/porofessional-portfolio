@@ -342,3 +342,54 @@ model Avatar3D {
 
   @@map("avatar3d")
 }
+
+// ============== Analytics ==============
+model Visitor {
+  id                 String   @id @default(cuid())
+  visitorId          String   @unique
+  firstVisitAt       DateTime @default(now())
+  lastVisitAt        DateTime @default(now())
+  totalVisits        Int      @default(1)
+  totalTimeSpent     Int      @default(0)
+  country            String?
+  region             String?
+  city               String?
+  timezone           String?
+  browser            String?
+  os                 String?
+  deviceType         String?
+  language           String?
+  referrer           String?
+  pagesVisited       String   @default("[]")
+  projectsViewed     String   @default("[]")
+  skillsViewed       Boolean  @default(false)
+  servicesViewed     Boolean  @default(false)
+  experienceViewed   Boolean  @default(false)
+  educationViewed    Boolean  @default(false)
+  contactViewed      Boolean  @default(false)
+  resumeDownloads    Int      @default(0)
+  contactSubmissions Int      @default(0)
+  visits             Visit[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([visitorId])
+  @@map("visitors")
+}
+
+model Visit {
+  id          String   @id @default(cuid())
+  visitorId   String
+  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitNumber Int
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  duration    Int      @default(0)
+  pagesViewed String   @default("[]")
+  actions     String   @default("[]")
+  referrer    String?
+  createdAt   DateTime @default(now())
+
+  @@index([visitorId])
+  @@map("visits")
+}

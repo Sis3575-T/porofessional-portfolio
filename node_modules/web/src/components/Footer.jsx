@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Github, Linkedin, Mail, ArrowUp } from "lucide-react";
 import { usePortfolio } from "../context/PortfolioContext";
+import { useProfile } from "../context/ProfileContext";
 
 const navLinks = [
   { label: "Home", href: "#hero" },
@@ -15,6 +16,7 @@ const navLinks = [
 
 export default function Footer() {
   const { settings } = usePortfolio();
+  const { name, email } = useProfile();
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
@@ -37,7 +39,7 @@ export default function Footer() {
         >
           {/* Brand */}
           <div className="ft-brand">
-            <h3 className="ft-name">SISAY TEMESGEN</h3>
+            <h3 className="ft-name">{name?.toUpperCase() || "PORTFOLIO"}</h3>
             <p className="ft-subtitle">Full Stack Developer | AI Enthusiast</p>
             <p className="ft-desc">
               Creating responsive, scalable, and user-focused digital solutions
@@ -83,16 +85,16 @@ export default function Footer() {
                   <Linkedin size={18} />
                 </a>
               )}
-              {settings?.contactEmail && (
+              {email && (
                 <a
-                  href={`mailto:${settings.contactEmail}`}
+                  href={`mailto:${email}`}
                   className="ft-social"
                   aria-label="Email"
                 >
                   <Mail size={18} />
                 </a>
               )}
-              {!socialLinks.github && !socialLinks.linkedin && !settings?.contactEmail && (
+              {!socialLinks.github && !socialLinks.linkedin && !email && (
                 <>
                   <a href="#" className="ft-social" aria-label="GitHub">
                     <Github size={18} />
@@ -112,9 +114,9 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="ft-bottom">
           <p className="ft-copyright">
-            &copy; {new Date().getFullYear()} Sisay Temesgen. All rights reserved.
+            &copy; {new Date().getFullYear()} {name || "Portfolio"}. All rights reserved.
           </p>
-          <p className="ft-credit">Designed &amp; Developed by Sisay</p>
+          <p className="ft-credit">Designed &amp; Developed by {name?.split(" ")[0] || "Developer"}</p>
         </div>
       </div>
 

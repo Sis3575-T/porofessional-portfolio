@@ -1,22 +1,4 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: portfolio_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: portfolio
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - '5432:5432'
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   gateway:
     build:
       context: .
@@ -49,13 +31,10 @@ services:
       - '5001'
     environment:
       AUTH_SERVICE_PORT: 5001
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio
+      DATABASE_URL: postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslqmqr-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       JWT_EXPIRY: 7d
       NODE_ENV: development
-    depends_on:
-      db:
-        condition: service_healthy
 
   portfolio-service:
     build:
@@ -67,14 +46,11 @@ services:
       - '5002'
     environment:
       PORTFOLIO_SERVICE_PORT: 5002
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio
+      DATABASE_URL: postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslqmqr-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       JWT_EXPIRY: 7d
       ADMIN_EMAIL: sisay3575@gmail.com
       NODE_ENV: development
-    depends_on:
-      db:
-        condition: service_healthy
 
   media-service:
     build:
@@ -88,9 +64,6 @@ services:
       MEDIA_SERVICE_PORT: 5003
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       NODE_ENV: development
-    depends_on:
-      db:
-        condition: service_healthy
 
   dashboard-service:
     build:
@@ -102,13 +75,10 @@ services:
       - '5004'
     environment:
       DASHBOARD_SERVICE_PORT: 5004
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio
+      DATABASE_URL: postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslqmqr-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       JWT_SECRET: portfolio-pro-super-secret-jwt-key-2024
       JWT_EXPIRY: 7d
       NODE_ENV: development
-    depends_on:
-      db:
-        condition: service_healthy
 
   web:
     build:
@@ -136,5 +106,4 @@ services:
     depends_on:
       - gateway
 
-volumes:
-  pgdata:
+volumes: {}

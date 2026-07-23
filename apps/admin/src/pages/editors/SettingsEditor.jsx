@@ -112,24 +112,25 @@ export default function SettingsEditor() {
         sectionVisibility: JSON.stringify(sectionVisibility),
       });
       toast.success('Settings updated');
+      window.dispatchEvent(new Event('profile-updated'));
     } catch (err) { toast.error('Failed to update'); }
     finally { setSaving(false); }
   };
 
   const reset3d = () => setHero3d(DEFAULT_3D);
 
-  if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
+  if (loading) return <div className="animate-pulse text-slate-400">Loading...</div>;
 
-  const inputClass = "w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm";
-  const labelClass = "block text-sm text-slate-400 mb-1.5";
-  const selectClass = "w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 text-sm";
+  const inputClass = "w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm";
+  const labelClass = "block text-sm text-slate-500 mb-1.5";
+  const selectClass = "w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-cyan-500 text-sm";
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-8">Site Settings</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-8">Site Settings</h2>
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">General</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">General</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className={labelClass}>Site Title</label>
@@ -146,8 +147,8 @@ export default function SettingsEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Contact Info</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Contact Info</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className={labelClass}>Contact Email</label>
@@ -178,8 +179,8 @@ export default function SettingsEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">SEO</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">SEO</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className={labelClass}>Meta Keywords</label>
@@ -196,10 +197,10 @@ export default function SettingsEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-white">3D Hero Configuration</h3>
-            <button type="button" onClick={reset3d} className="text-sm text-slate-400 hover:text-cyan-400 transition flex items-center gap-1">
+            <h3 className="text-lg font-semibold text-slate-900">3D Hero Configuration</h3>
+            <button type="button" onClick={reset3d} className="text-sm text-slate-500 hover:text-cyan-400 transition flex items-center gap-1">
               <RefreshCw size={14} /> Reset Defaults
             </button>
           </div>
@@ -222,35 +223,35 @@ export default function SettingsEditor() {
               <input type="range" min="0" max="1" step="0.1" value={hero3d.autoRotateSpeed}
                 onChange={(e) => setHero3d({...hero3d, autoRotateSpeed: parseFloat(e.target.value)})}
                 className="w-full accent-cyan-500" />
-              <span className="text-xs text-slate-500">{hero3d.autoRotateSpeed.toFixed(1)}x</span>
+              <span className="text-xs text-slate-400">{hero3d.autoRotateSpeed.toFixed(1)}x</span>
             </div>
             <div>
               <label className={labelClass}>Rotation Speed</label>
               <input type="range" min="0" max="1" step="0.1" value={hero3d.rotationSpeed}
                 onChange={(e) => setHero3d({...hero3d, rotationSpeed: parseFloat(e.target.value)})}
                 className="w-full accent-cyan-500" />
-              <span className="text-xs text-slate-500">{hero3d.rotationSpeed.toFixed(1)}x</span>
+              <span className="text-xs text-slate-400">{hero3d.rotationSpeed.toFixed(1)}x</span>
             </div>
             <div>
               <label className={labelClass}>Float Speed</label>
               <input type="range" min="0" max="1.5" step="0.1" value={hero3d.floatSpeed}
                 onChange={(e) => setHero3d({...hero3d, floatSpeed: parseFloat(e.target.value)})}
                 className="w-full accent-cyan-500" />
-              <span className="text-xs text-slate-500">{hero3d.floatSpeed.toFixed(1)}x</span>
+              <span className="text-xs text-slate-400">{hero3d.floatSpeed.toFixed(1)}x</span>
             </div>
             <div>
               <label className={labelClass}>Float Intensity</label>
               <input type="range" min="0" max="1" step="0.1" value={hero3d.floatIntensity}
                 onChange={(e) => setHero3d({...hero3d, floatIntensity: parseFloat(e.target.value)})}
                 className="w-full accent-cyan-500" />
-              <span className="text-xs text-slate-500">{hero3d.floatIntensity.toFixed(1)}</span>
+              <span className="text-xs text-slate-400">{hero3d.floatIntensity.toFixed(1)}</span>
             </div>
             <div>
               <label className={labelClass}>Particle Density</label>
               <input type="range" min="0" max="150" step="10" value={hero3d.particleDensity}
                 onChange={(e) => setHero3d({...hero3d, particleDensity: parseInt(e.target.value)})}
                 className="w-full accent-cyan-500" />
-              <span className="text-xs text-slate-500">{hero3d.particleDensity}</span>
+              <span className="text-xs text-slate-400">{hero3d.particleDensity}</span>
             </div>
             <div>
               <label className={labelClass}>Shadow Quality</label>
@@ -265,65 +266,65 @@ export default function SettingsEditor() {
               <input type="range" min="2" max="10" step="1" value={hero3d.iconCount}
                 onChange={(e) => setHero3d({...hero3d, iconCount: parseInt(e.target.value)})}
                 className="w-full accent-cyan-500" />
-              <span className="text-xs text-slate-500">{hero3d.iconCount}</span>
+              <span className="text-xs text-slate-400">{hero3d.iconCount}</span>
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-4">
-            <h4 className="text-sm font-medium text-slate-300 mb-4">Lighting</h4>
+          <div className="border-t border-slate-200 pt-4">
+            <h4 className="text-sm font-medium text-slate-600 mb-4">Lighting</h4>
             <div className="grid sm:grid-cols-3 gap-6">
               <div>
                 <label className={labelClass}>Ambient Intensity</label>
                 <input type="range" min="0" max="0.5" step="0.05" value={hero3d.ambientIntensity}
                   onChange={(e) => setHero3d({...hero3d, ambientIntensity: parseFloat(e.target.value)})}
                   className="w-full accent-cyan-500" />
-                <span className="text-xs text-slate-500">{hero3d.ambientIntensity.toFixed(2)}</span>
+                <span className="text-xs text-slate-400">{hero3d.ambientIntensity.toFixed(2)}</span>
               </div>
               <div>
                 <label className={labelClass}>Directional Intensity</label>
                 <input type="range" min="0" max="1" step="0.1" value={hero3d.directionalIntensity}
                   onChange={(e) => setHero3d({...hero3d, directionalIntensity: parseFloat(e.target.value)})}
                   className="w-full accent-cyan-500" />
-                <span className="text-xs text-slate-500">{hero3d.directionalIntensity.toFixed(1)}</span>
+                <span className="text-xs text-slate-400">{hero3d.directionalIntensity.toFixed(1)}</span>
               </div>
               <div>
                 <label className={labelClass}>Accent Intensity</label>
                 <input type="range" min="0" max="0.5" step="0.05" value={hero3d.accentIntensity}
                   onChange={(e) => setHero3d({...hero3d, accentIntensity: parseFloat(e.target.value)})}
                   className="w-full accent-cyan-500" />
-                <span className="text-xs text-slate-500">{hero3d.accentIntensity.toFixed(2)}</span>
+                <span className="text-xs text-slate-400">{hero3d.accentIntensity.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-4">
-            <h4 className="text-sm font-medium text-slate-300 mb-4">Character Animation</h4>
+          <div className="border-t border-slate-200 pt-4">
+            <h4 className="text-sm font-medium text-slate-600 mb-4">Character Animation</h4>
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
                 <label className={labelClass}>Typing Speed</label>
                 <input type="range" min="0.5" max="4" step="0.5" value={hero3d.typingSpeed}
                   onChange={(e) => setHero3d({...hero3d, typingSpeed: parseFloat(e.target.value)})}
                   className="w-full accent-cyan-500" />
-                <span className="text-xs text-slate-500">{hero3d.typingSpeed.toFixed(1)}x</span>
+                <span className="text-xs text-slate-400">{hero3d.typingSpeed.toFixed(1)}x</span>
               </div>
               <div>
                 <label className={labelClass}>Breathing Speed</label>
                 <input type="range" min="0.3" max="2" step="0.1" value={hero3d.breathingSpeed}
                   onChange={(e) => setHero3d({...hero3d, breathingSpeed: parseFloat(e.target.value)})}
                   className="w-full accent-cyan-500" />
-                <span className="text-xs text-slate-500">{hero3d.breathingSpeed.toFixed(1)}x</span>
+                <span className="text-xs text-slate-400">{hero3d.breathingSpeed.toFixed(1)}x</span>
               </div>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-6">
-            <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
               <input type="checkbox" checked={hero3d.autoRotate}
                 onChange={(e) => setHero3d({...hero3d, autoRotate: e.target.checked})}
                 className="accent-cyan-500 w-4 h-4" />
               Auto Rotate
             </label>
-            <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
               <input type="checkbox" checked={hero3d.mouseInteraction}
                 onChange={(e) => setHero3d({...hero3d, mouseInteraction: e.target.checked})}
                 className="accent-cyan-500 w-4 h-4" />
@@ -332,15 +333,15 @@ export default function SettingsEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">UI Features</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">UI Features</h3>
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" checked={uiConfig.customCursorEnabled}
               onChange={(e) => setUiConfig({...uiConfig, customCursorEnabled: e.target.checked})}
               className="accent-cyan-500 w-5 h-5 rounded" />
             <div>
               <p className="text-sm font-medium text-slate-200">Custom Cursor</p>
-              <p className="text-xs text-slate-500">Animated follower circle with magnetic hover effect</p>
+              <p className="text-xs text-slate-400">Animated follower circle with magnetic hover effect</p>
             </div>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
@@ -349,26 +350,34 @@ export default function SettingsEditor() {
               className="accent-cyan-500 w-5 h-5 rounded" />
             <div>
               <p className="text-sm font-medium text-slate-200">Background Effects</p>
-              <p className="text-xs text-slate-500">Noise texture, stars, grid, and soft glow</p>
+              <p className="text-xs text-slate-400">Noise texture, stars, grid, and soft glow</p>
             </div>
           </label>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white">Section Visibility</h3>
-          <p className="text-xs text-slate-500">Toggle sections on/off on the public portfolio</p>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Section Visibility</h3>
+          <p className="text-sm text-slate-500">Toggle sections on/off on the public portfolio</p>
           <div className="grid sm:grid-cols-2 gap-3">
-            {Object.entries(SECTION_LABELS).map(([key, label]) => (
-              <label key={key} className="flex items-center gap-3 cursor-pointer p-3 bg-slate-800/30 rounded-lg hover:bg-slate-800/50 transition">
-                <input
-                  type="checkbox"
-                  checked={sectionVisibility[key] !== false}
-                  onChange={(e) => setSectionVisibility({ ...sectionVisibility, [key]: e.target.checked })}
-                  className="accent-cyan-500 w-5 h-5 rounded"
-                />
-                <span className="text-sm text-slate-200">{label}</span>
-              </label>
-            ))}
+            {Object.entries(SECTION_LABELS).map(([key, label]) => {
+              const isEnabled = sectionVisibility[key] !== false;
+              return (
+                <label key={key} className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border transition-all ${isEnabled ? "bg-white border-cyan-200 shadow-sm" : "bg-slate-100 border-slate-200 opacity-60"}`}>
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={isEnabled}
+                      onChange={(e) => setSectionVisibility({ ...sectionVisibility, [key]: e.target.checked })}
+                      className="sr-only"
+                    />
+                    <div className={`w-11 h-6 rounded-full transition-colors ${isEnabled ? "bg-cyan-500" : "bg-slate-300"}`}>
+                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${isEnabled ? "translate-x-5" : ""}`} />
+                    </div>
+                  </div>
+                  <span className={`text-sm font-medium ${isEnabled ? "text-slate-900" : "text-slate-500"}`}>{label}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
 

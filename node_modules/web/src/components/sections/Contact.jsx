@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { contactAPI } from "../../services/api";
+import { useAnalytics } from "../../hooks/useAnalytics";
 import {
   Send, Mail, MapPin, Phone, Clock, Loader2, CheckCircle,
   Github, Linkedin, Twitter, User, Tag, MessageSquare,
@@ -75,6 +76,7 @@ function SocialIcon({ href, icon: Icon, label, delay }) {
 
 export default function Contact() {
   const { settings } = usePortfolio();
+  const { trackEvent } = useAnalytics();
   const [form, setForm] = useState({
     name: "", email: "", subject: "", message: "", service: "",
   });
@@ -127,6 +129,7 @@ export default function Contact() {
       setSuccess(true);
       setForm({ name: "", email: "", subject: "", message: "", service: "" });
       setErrors({});
+      trackEvent("contact_submit", { name: form.name, subject: form.subject });
     } catch (err) {
       setErrors({ submit: err.response?.data?.message || "Failed to send message" });
     } finally {

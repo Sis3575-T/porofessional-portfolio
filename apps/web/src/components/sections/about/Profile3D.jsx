@@ -69,11 +69,13 @@ function AvatarPlaceholder({ initials }) {
 }
 
 function getInitials(name) {
-  if (!name) return "ST";
-  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "ST";
+  if (!name) return "??";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-export default function Profile3D({ profileImage, glbModel, isLowEnd: _isLowEnd = false }) {
+export default function Profile3D({ profileImage, glbModel, name, isLowEnd: _isLowEnd = false }) {
   const cardRef = useRef(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [imgError, setImgError] = useState(false);
@@ -133,7 +135,7 @@ export default function Profile3D({ profileImage, glbModel, isLowEnd: _isLowEnd 
                 <p className="text-gray-400 text-sm">3D Model Loader</p>
               </div>
             ) : (
-              <AvatarPlaceholder initials={getInitials("Sisay Temesgen")} />
+              <AvatarPlaceholder initials={getInitials(name)} />
             )}
 
             <div className="absolute bottom-4 left-4 right-4 z-20">

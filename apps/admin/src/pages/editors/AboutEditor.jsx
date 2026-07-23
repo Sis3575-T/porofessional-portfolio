@@ -4,9 +4,9 @@ import { aboutAPI } from '../../services/api';
 import { Save, Loader2, Plus, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import ImagePicker from '../../components/ImagePicker';
 
-const inputClass = "w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm";
-const labelClass = "block text-sm text-slate-400 mb-1.5";
-const textareaClass = "w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm resize-y";
+const inputClass = "w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm";
+const labelClass = "block text-sm text-slate-500 mb-1.5";
+const textareaClass = "w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm resize-y";
 
 export default function AboutEditor() {
   const [form, setForm] = useState({
@@ -83,6 +83,7 @@ export default function AboutEditor() {
       }
       await aboutAPI.update(payload);
       toast.success('About section updated');
+      window.dispatchEvent(new Event('profile-updated'));
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update');
     } finally { setSaving(false); }
@@ -94,11 +95,11 @@ export default function AboutEditor() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-8">About Section</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-8">About Section</h2>
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Header</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Header</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className={labelClass}>Subtitle</label>
@@ -115,8 +116,8 @@ export default function AboutEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Biography</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Biography</h3>
           <div>
             <label className={labelClass}>Full Biography</label>
             <textarea value={form.biography} onChange={(e) => set('biography', e.target.value)} rows={6} className={textareaClass} />
@@ -127,14 +128,14 @@ export default function AboutEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Media</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Media</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className={labelClass}>Profile Image</label>
               <div className="flex gap-2">
                 <input value={form.profileImage || ''} onChange={(e) => set('profileImage', e.target.value)} className={inputClass} placeholder="https://..." />
-                <button type="button" onClick={() => setPickerField('profileImage')} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition shrink-0">
+                <button type="button" onClick={() => setPickerField('profileImage')} className="px-3 py-2 bg-slate-200 hover:bg-slate-600 text-slate-600 rounded-lg transition shrink-0">
                   <ImageIcon size={16} />
                 </button>
                 {form.profileImage && (
@@ -144,7 +145,7 @@ export default function AboutEditor() {
                 )}
               </div>
               {form.profileImage && (
-                <div className="mt-2 w-24 h-20 rounded-lg overflow-hidden border border-slate-700">
+                <div className="mt-2 w-24 h-20 rounded-lg overflow-hidden border border-slate-200">
                   <img src={form.profileImage} alt="" className="w-full h-full object-cover" />
                 </div>
               )}
@@ -156,8 +157,8 @@ export default function AboutEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Personal Information</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Personal Information</h3>
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <label className={labelClass}>Location</label>
@@ -209,28 +210,28 @@ export default function AboutEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Statistics (JSON)</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Statistics (JSON)</h3>
           <textarea value={form.statistics} onChange={(e) => set('statistics', e.target.value)} rows={4} className={`${textareaClass} font-mono text-xs`} />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Feature Cards (JSON)</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Feature Cards (JSON)</h3>
           <textarea value={form.featureCards} onChange={(e) => set('featureCards', e.target.value)} rows={6} className={`${textareaClass} font-mono text-xs`} />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Background (JSON)</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Background (JSON)</h3>
           <textarea value={form.background} onChange={(e) => set('background', e.target.value)} rows={3} className={`${textareaClass} font-mono text-xs`} />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Decoration (JSON)</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Decoration (JSON)</h3>
           <textarea value={form.decoration} onChange={(e) => set('decoration', e.target.value)} rows={3} className={`${textareaClass} font-mono text-xs`} />
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Animation Settings (JSON)</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Animation Settings (JSON)</h3>
           <textarea value={form.animationSettings} onChange={(e) => set('animationSettings', e.target.value)} rows={3} className={`${textareaClass} font-mono text-xs`} />
         </div>
 

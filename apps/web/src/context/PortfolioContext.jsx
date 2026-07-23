@@ -1,24 +1,44 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { heroAPI, aboutAPI, skillsAPI, servicesAPI, experienceAPI, educationAPI, projectsAPI, testimonialsAPI, settingsAPI, contactAPI } from "../services/api";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { heroAPI, aboutAPI, skillsAPI, servicesAPI, experienceAPI, educationAPI, projectsAPI, testimonialsAPI, settingsAPI } from "../services/api";
 
 export const PortfolioContext = createContext();
 
+const CACHE_KEY = "portfolio_cache";
+const CACHE_TTL = 5 * 60 * 1000;
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (Date.now() - cached.ts > CACHE_TTL) return null;
+    return cached.data;
+  } catch { return null; }
+}
+
+function saveCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+  } catch {}
+}
+
 export function PortfolioProvider({ children }) {
-  const [hero, setHero] = useState(null);
-  const [about, setAbout] = useState(null);
-  const [skills, setSkills] = useState([]);
-  const [services, setServices] = useState([]);
-  const [experiences, setExperiences] = useState([]);
-  const [education, setEducation] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
-  const [settings, setSettings] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cached = loadCache();
+
+  const [hero, setHero] = useState(cached?.hero ?? null);
+  const [about, setAbout] = useState(cached?.about ?? null);
+  const [skills, setSkills] = useState(cached?.skills ?? []);
+  const [services, setServices] = useState(cached?.services ?? []);
+  const [experiences, setExperiences] = useState(cached?.experiences ?? []);
+  const [education, setEducation] = useState(cached?.education ?? []);
+  const [projects, setProjects] = useState(cached?.projects ?? []);
+  const [testimonials, setTestimonials] = useState(cached?.testimonials ?? []);
+  const [settings, setSettings] = useState(cached?.settings ?? null);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(null);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
       const results = await Promise.allSettled([
         heroAPI.get(),
@@ -34,15 +54,18 @@ export function PortfolioProvider({ children }) {
 
       const [heroRes, aboutRes, skillsRes, servicesRes, expRes, eduRes, projRes, testRes, settingsRes] = results;
 
-      if (heroRes.status === "fulfilled") setHero(heroRes.value.data.data);
-      if (aboutRes.status === "fulfilled") setAbout(aboutRes.value.data.data);
-      if (skillsRes.status === "fulfilled") setSkills(Array.isArray(skillsRes.value.data.data) ? skillsRes.value.data.data : []);
-      if (servicesRes.status === "fulfilled") setServices(Array.isArray(servicesRes.value.data.data) ? servicesRes.value.data.data : []);
-      if (expRes.status === "fulfilled") setExperiences(Array.isArray(expRes.value.data.data) ? expRes.value.data.data : []);
-      if (eduRes.status === "fulfilled") setEducation(Array.isArray(eduRes.value.data.data) ? eduRes.value.data.data : []);
-      if (projRes.status === "fulfilled") setProjects(Array.isArray(projRes.value.data.data) ? projRes.value.data.data : []);
-      if (testRes.status === "fulfilled") setTestimonials(Array.isArray(testRes.value.data.data) ? testRes.value.data.data : []);
-      if (settingsRes.status === "fulfilled") setSettings(settingsRes.value.data.data);
+      const data = {};
+      if (heroRes.status === "fulfilled") { const v = heroRes.value.data.data; setHero(v); data.hero = v; }
+      if (aboutRes.status === "fulfilled") { const v = aboutRes.value.data.data; setAbout(v); data.about = v; }
+      if (skillsRes.status === "fulfilled") { const v = Array.isArray(skillsRes.value.data.data) ? skillsRes.value.data.data : []; setSkills(v); data.skills = v; }
+      if (servicesRes.status === "fulfilled") { const v = Array.isArray(servicesRes.value.data.data) ? servicesRes.value.data.data : []; setServices(v); data.services = v; }
+      if (expRes.status === "fulfilled") { const v = Array.isArray(expRes.value.data.data) ? expRes.value.data.data : []; setExperiences(v); data.experiences = v; }
+      if (eduRes.status === "fulfilled") { const v = Array.isArray(eduRes.value.data.data) ? eduRes.value.data.data : []; setEducation(v); data.education = v; }
+      if (projRes.status === "fulfilled") { const v = Array.isArray(projRes.value.data.data) ? projRes.value.data.data : []; setProjects(v); data.projects = v; }
+      if (testRes.status === "fulfilled") { const v = Array.isArray(testRes.value.data.data) ? testRes.value.data.data : []; setTestimonials(v); data.testimonials = v; }
+      if (settingsRes.status === "fulfilled") { const v = settingsRes.value.data.data; setSettings(v); data.settings = v; }
+
+      saveCache(data);
 
       const failedCount = results.filter((r) => r.status === "rejected").length;
       if (failedCount === results.length) {
@@ -56,9 +79,11 @@ export function PortfolioProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   return (
     <PortfolioContext.Provider

@@ -28,16 +28,16 @@ export default function Login({ setIsAuthenticated }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-cyan-400">
             Admin Dashboard
           </h1>
-          <p className="text-slate-400 mt-2">Sign in to manage your portfolio</p>
+          <p className="text-slate-500 mt-2">Sign in to manage your portfolio</p>
         </div>
         <div className="card">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm">
                 {error}
@@ -50,7 +50,8 @@ export default function Login({ setIsAuthenticated }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full"
-                placeholder="admin@portfolio.dev"
+                placeholder="Enter email"
+                autoComplete="new-email"
                 required
               />
             </div>
@@ -62,6 +63,7 @@ export default function Login({ setIsAuthenticated }) {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full"
                 placeholder="Enter your password"
+                autoComplete="new-password"
                 required
               />
             </div>

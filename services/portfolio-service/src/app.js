@@ -17,6 +17,7 @@ import testimonialsRoutes from "./routes/testimonials.js";
 import settingsRoutes from "./routes/settings.js";
 import contactRoutes from "./routes/contact.js";
 import avatarRoutes from "./routes/avatar.js";
+import analyticsRoutes from "./routes/analytics.js";
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use("/api/v1/testimonials", testimonialsRoutes);
 app.use("/api/v1/settings", settingsRoutes);
 app.use("/api/v1/contact", contactRoutes);
 app.use("/api/v1/avatar", avatarRoutes);
+app.use("/api/v1/analytics", analyticsRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "portfolio-service", timestamp: new Date().toISOString() });

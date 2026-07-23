@@ -21,29 +21,27 @@ export default function FloatingPhoto({ imageUrl }) {
     return () => { cancelled = true; };
   }, [imageUrl]);
 
+  if (!imageUrl || !texture) return null;
+
   const aspect = 3 / 4;
-  const width = 0.35;
+  const width = 0.25;
   const height = width / aspect;
 
   return (
-    <group position={[-1.4, 1.8, -2.45]}>
-      <mesh position={[0, 0, -0.002]}>
-        <planeGeometry args={[width + 0.04, height + 0.04]} />
-        <meshStandardMaterial color="#2a2a2a" roughness={0.5} metalness={0.1} />
+    <group position={[-3.46, 1.6, 0]}>
+      <mesh position={[0, 0, 0.01]}>
+        <boxGeometry args={[width + 0.04, height + 0.04, 0.015]} />
+        <meshStandardMaterial color="#2a2a2a" roughness={0.4} metalness={0.3} />
       </mesh>
-      <mesh position={[0, 0, 0]}>
+      <mesh position={[0, 0, 0.02]}>
         <planeGeometry args={[width, height]} />
-        {texture ? (
-          <meshStandardMaterial
-            map={texture}
-            transparent
-            roughness={0.3}
-            metalness={0.05}
-            side={THREE.DoubleSide}
-          />
-        ) : (
-          <meshBasicMaterial color="#333" transparent opacity={0.5} side={THREE.DoubleSide} />
-        )}
+        <meshStandardMaterial
+          map={texture}
+          transparent
+          roughness={0.3}
+          metalness={0.05}
+          side={THREE.DoubleSide}
+        />
       </mesh>
     </group>
   );

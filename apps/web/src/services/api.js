@@ -102,3 +102,8 @@ export const authAPI = {
   me: () => api.get("/auth/me"),
   logout: () => api.post("/auth/logout"),
 };
+
+export const analyticsAPI = {
+  track: (data) => api.post("/analytics/track", data),
+  endSession: (data) => api.post("/analytics/session/end", data),
+};

@@ -1,8 +1,10 @@
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Send, Github, Linkedin, Twitter, Mail } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
-import ThreeScene from "../ThreeScene";
+import { useProfile } from "../../context/ProfileContext";
+
+const ThreeScene = lazy(() => import("../ThreeScene"));
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -17,13 +19,14 @@ const defaultSocialLinks = [
   { icon: Github,   href: "https://github.com",            label: "GitHub"   },
   { icon: Linkedin, href: "https://linkedin.com",          label: "LinkedIn" },
   { icon: Twitter,  href: "https://twitter.com",           label: "Twitter"  },
-  { icon: Mail,     href: "mailto:sisaydev@example.com",   label: "Email"    },
+  { icon: Mail,     href: "mailto:",   label: "Email"    },
 ];
 
 const iconMap = { github: Github, linkedin: Linkedin, twitter: Twitter, email: Mail, mail: Mail };
 
 export default function Hero() {
   const { hero, loading, settings } = usePortfolio();
+  const { name: profileName, email: profileEmail } = useProfile();
 
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -35,10 +38,10 @@ export default function Hero() {
     );
   }
 
-  const fullName   = hero?.name  || "Sisay Temesgen";
+  const fullName   = hero?.name  || profileName || "Developer";
   const parts      = fullName.trim().split(" ");
-  const firstName  = parts[0]           || "Sisay";
-  const lastName   = parts.slice(1).join(" ") || "Temesgen";
+  const firstName  = parts[0]           || "";
+  const lastName   = parts.slice(1).join(" ") || "";
 
   const fullTitle  = hero?.title || "Full Stack Developer & AI Enthusiast";
 

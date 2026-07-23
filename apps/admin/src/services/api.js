@@ -123,3 +123,10 @@ export const mediaAPI = {
   getAll: () => api.get("/media"),
   delete: (filename) => api.delete(`/media/${filename}`),
 };
+
+export const analyticsAPI = {
+  getStats: () => api.get("/analytics/stats"),
+  getVisitors: (params) => api.get("/analytics/visitors", { params }),
+  getVisitor: (visitorId) => api.get(`/analytics/visitors/${visitorId}`),
+  deleteVisitor: (visitorId) => api.delete(`/analytics/visitors/${visitorId}`),
+};

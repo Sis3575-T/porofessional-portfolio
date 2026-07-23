@@ -2,9 +2,10 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PortfolioProvider, usePortfolio } from "./context/PortfolioContext";
+import { ProfileProvider } from "./context/ProfileContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AvatarProvider } from "./context/AvatarContext";
-import { Avatar3DProvider } from "./context/Avatar3DContext";
+import { useAnalytics } from "./hooks/useAnalytics";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -109,6 +110,7 @@ function AppRoutes() {
 
 function MainLayout() {
   const { settings } = usePortfolio();
+  useAnalytics();
   const visibility = (() => {
     try {
       if (settings?.sectionVisibility) {
@@ -145,13 +147,13 @@ export default function App() {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider>
       <PortfolioProvider>
+      <ProfileProvider>
       <AvatarProvider>
-      <Avatar3DProvider>
         <ErrorBoundary>
           <MainLayout />
         </ErrorBoundary>
-      </Avatar3DProvider>
       </AvatarProvider>
+      </ProfileProvider>
       </PortfolioProvider>
       </ThemeProvider>
     </Router>

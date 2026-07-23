@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { usePortfolio } from "../../../context/PortfolioContext";
+import { useProfile } from "../../../context/ProfileContext";
 import { AnimatedSection } from "../../AnimatedSection";
 import { User, MapPin, Mail, Clock, Code2, Globe, Coffee, Award } from "lucide-react";
 
@@ -29,6 +30,7 @@ const defaultStatItems = [
 
 export default function AboutSection() {
   const { about, loading } = usePortfolio();
+  const { name: profileName, email: profileEmail, initials } = useProfile();
 
   if (loading) {
     return (
@@ -40,9 +42,9 @@ export default function AboutSection() {
     );
   }
 
-  const name = about?.name || "Sisay Temesgen";
-  const location = about?.location || "Bahir Dar, Ethiopia";
-  const email = about?.email || "sisaydev@example.com";
+  const name = about?.name || profileName || "Developer";
+  const location = about?.location || "Remote";
+  const email = about?.email || profileEmail || "";
   const availability = about?.availability || "Open for opportunities";
   const biography =
     about?.biography ||
@@ -146,13 +148,13 @@ export default function AboutSection() {
                 {profileImage ? (
                   <img
                     src={profileImage}
-                    alt="Sisay Temesgen - Full Stack Developer"
+                    alt={`${name} - Full Stack Developer`}
                     className="w-full h-full object-cover object-top"
                     loading="lazy"
                   />
                 ) : (
                   <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-gray-100">
-                    <span className="text-5xl font-bold text-gray-300">ST</span>
+                    <span className="text-5xl font-bold text-gray-300">{initials}</span>
                   </div>
                 )}
               </div>
