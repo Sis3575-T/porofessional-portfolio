@@ -61,6 +61,8 @@ app.use(requestLogger);
 app.use(rateLimiter());
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "../../media-service/uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "../../portfolio-service/uploads")));
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/hero", heroRoutes);
@@ -79,6 +81,19 @@ app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/media", mediaRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/activities", activitiesRoutes);
+
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Portfolio API is running",
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      api: "/api/v1/*",
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.get("/health", (req, res) => {
   res.json({
