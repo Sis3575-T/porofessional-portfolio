@@ -1,8 +1,10 @@
 services:
   - type: web
     name: portfolio-gateway
-    runtime: docker
-    dockerfilePath: services/api/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd services/shared && npm install && cd ../api && npm install
+    startCommand: node services/api/src/server.js
     envVars:
       - key: GATEWAY_PORT
         value: 5000
@@ -28,13 +30,13 @@ services:
           property: host
       - key: NODE_ENV
         value: production
-    ports:
-      port: 5000
 
   - type: web
     name: portfolio-auth
-    runtime: docker
-    dockerfilePath: services/auth-service/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd services/shared && npm install && cd ../auth-service && npm install && npx prisma generate --schema=prisma/schema.prisma
+    startCommand: node services/auth-service/src/server.js
     envVars:
       - key: AUTH_SERVICE_PORT
         value: 5001
@@ -44,13 +46,17 @@ services:
         generateValue: true
       - key: JWT_EXPIRY
         value: 7d
+      - key: ADMIN_EMAIL
+        value: sisay3575@gmail.com
       - key: NODE_ENV
         value: production
 
   - type: web
     name: portfolio-content
-    runtime: docker
-    dockerfilePath: services/portfolio-service/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd services/shared && npm install && cd ../portfolio-service && npm install && npx prisma generate --schema=prisma/schema.prisma
+    startCommand: node services/portfolio-service/src/server.js
     envVars:
       - key: PORTFOLIO_SERVICE_PORT
         value: 5002
@@ -67,8 +73,10 @@ services:
 
   - type: web
     name: portfolio-media
-    runtime: docker
-    dockerfilePath: services/media-service/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd services/shared && npm install && cd ../media-service && npm install
+    startCommand: node services/media-service/src/server.js
     envVars:
       - key: MEDIA_SERVICE_PORT
         value: 5003
@@ -79,8 +87,10 @@ services:
 
   - type: web
     name: portfolio-dashboard
-    runtime: docker
-    dockerfilePath: services/dashboard-service/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd services/shared && npm install && cd ../dashboard-service && npm install && npx prisma generate --schema=prisma/schema.prisma
+    startCommand: node services/dashboard-service/src/server.js
     envVars:
       - key: DASHBOARD_SERVICE_PORT
         value: 5004
@@ -95,26 +105,30 @@ services:
 
   - type: web
     name: portfolio-web
-    runtime: docker
-    dockerfilePath: apps/web/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: cd apps/web && npm install && npm run build
+    startCommand: cd apps/web && npx serve -s dist -l 5175
     envVars:
       - key: VITE_API_URL
         fromService:
           name: portfolio-gateway
           type: web
           property: host
-    ports:
-      port: 5175
+      - key: NODE_ENV
+        value: production
 
   - type: web
     name: portfolio-admin
-    runtime: docker
-    dockerfilePath: apps/admin/Dockerfile
+    runtime: node
+    plan: free
+    buildCommand: cd apps/admin && npm install && npm run build
+    startCommand: cd apps/admin && npx serve -s dist -l 5174
     envVars:
       - key: VITE_API_URL
         fromService:
           name: portfolio-gateway
           type: web
           property: host
-    ports:
-      port: 5174
+      - key: NODE_ENV
+        value: production
