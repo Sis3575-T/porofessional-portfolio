@@ -24,7 +24,7 @@ services:
     runtime: node
     plan: free
     buildCommand: cd apps/web && npm install && npm run build
-    startCommand: cd apps/web && npx serve -s dist -l 5175
+    startCommand: cd apps/web && npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
         fromService:
@@ -39,7 +39,7 @@ services:
     runtime: node
     plan: free
     buildCommand: cd apps/admin && npm install && npm run build
-    startCommand: cd apps/admin && npx serve -s dist -l 5174
+    startCommand: cd apps/admin && npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
         fromService:
