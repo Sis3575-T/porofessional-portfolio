@@ -16,6 +16,10 @@ services:
         value: 7d
       - key: ADMIN_EMAIL
         value: sisay3575@gmail.com
+      - key: FRONTEND_URL
+        value: https://porofessional-portfolio-web-ri59.vercel.app
+      - key: ADMIN_URL
+        value: https://porofessional-portfolio-admin-ri59.vercel.app
       - key: NODE_ENV
         value: production
 

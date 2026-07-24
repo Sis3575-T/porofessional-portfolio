@@ -38,10 +38,13 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  "https://porofessional-portfolio-admin-ri59.vercel.app",
+  "https://porofessional-portfolio-web-ri59.vercel.app",
   process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
 ].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, cb) => {
     if (!origin) { cb(null, true); return; }
     if (allowedOrigins.some((o) => origin.startsWith(o.replace(/\/$/, "")))) {
@@ -53,7 +56,10 @@ app.use(cors({
     cb(new Error("Not allowed by CORS"));
   },
   credentials: true,
-}));
+};
+
+app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
