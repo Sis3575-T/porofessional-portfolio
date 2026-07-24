@@ -14,6 +14,15 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const hero = await prisma.hero.findFirst();
+    res.json({ success: true, data: hero });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch hero" });
+  }
+});
+
 router.put("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { greeting, name, title, description, primaryCTA, secondaryCTA, profileImage, backgroundImage } = req.body;

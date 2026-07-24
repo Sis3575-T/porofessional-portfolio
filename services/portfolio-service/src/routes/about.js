@@ -14,6 +14,15 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const about = await prisma.about.findFirst();
+    res.json({ success: true, data: about });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch about" });
+  }
+});
+
 router.put("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { biography, summary, profileImage, yearsOfExperience, downloadCVUrl, location, email, phone, nationality, languages, subtitle, heading, name, degree, availability, freelance, glbModel, statistics, featureCards, techIcons, background, decoration, animationSettings, visibility, order, enabled } = req.body;

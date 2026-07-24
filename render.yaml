@@ -20,6 +20,12 @@ services:
         value: https://porofessional-portfolio-web-ri59.vercel.app
       - key: ADMIN_URL
         value: https://porofessional-portfolio-admin-ri59.vercel.app
+      - key: CLOUDINARY_CLOUD_NAME
+        value: portfolio
+      - key: CLOUDINARY_API_KEY
+        value: "476678795163495"
+      - key: CLOUDINARY_API_SECRET
+        value: tJ7vjnboe1XocYAJjTJ73sufDMM
       - key: NODE_ENV
         value: production
 

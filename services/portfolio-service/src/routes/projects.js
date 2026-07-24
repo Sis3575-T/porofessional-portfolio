@@ -22,6 +22,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      orderBy: { order: "asc" },
+    });
+    res.json({ success: true, data: projects });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch projects" });
+  }
+});
+
 router.get("/:slug", async (req, res) => {
   try {
     const project = await prisma.project.findUnique({ where: { slug: req.params.slug } });

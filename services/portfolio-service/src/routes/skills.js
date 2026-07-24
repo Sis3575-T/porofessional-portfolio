@@ -17,6 +17,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const skills = await prisma.skill.findMany({
+      orderBy: { order: "asc" },
+    });
+    res.json({ success: true, data: skills });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch skills" });
+  }
+});
+
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, icon, category, proficiency, description, order, enabled } = req.body;

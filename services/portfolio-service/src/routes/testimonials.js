@@ -17,6 +17,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const testimonials = await prisma.testimonial.findMany({
+      orderBy: { order: "asc" },
+    });
+    res.json({ success: true, data: testimonials });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch testimonials" });
+  }
+});
+
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const testimonial = await prisma.testimonial.create({ data: req.body });

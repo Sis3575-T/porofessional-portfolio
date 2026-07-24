@@ -35,17 +35,17 @@ export const authAPI = {
 };
 
 export const heroAPI = {
-  get: () => api.get("/hero"),
+  get: () => api.get("/hero/admin"),
   update: (data) => api.put("/hero", data),
 };
 
 export const aboutAPI = {
-  get: () => api.get("/about"),
+  get: () => api.get("/about/admin"),
   update: (data) => api.put("/about", data),
 };
 
 export const skillsAPI = {
-  getAll: () => api.get("/skills"),
+  getAll: () => api.get("/skills/admin"),
   create: (data) => api.post("/skills", data),
   update: (id, data) => api.put(`/skills/${id}`, data),
   delete: (id) => api.delete(`/skills/${id}`),
@@ -76,7 +76,7 @@ export const educationAPI = {
 };
 
 export const projectsAPI = {
-  getAll: (params) => api.get("/projects", { params }),
+  getAll: (params) => api.get("/projects/admin", { params }),
   getById: (id) => api.get(`/projects/${id}`),
   create: (data) => api.post("/projects", data),
   update: (id, data) => api.put(`/projects/${id}`, data),
@@ -84,7 +84,7 @@ export const projectsAPI = {
 };
 
 export const testimonialsAPI = {
-  getAll: () => api.get("/testimonials"),
+  getAll: () => api.get("/testimonials/admin"),
   create: (data) => api.post("/testimonials", data),
   update: (id, data) => api.put(`/testimonials/${id}`, data),
   delete: (id) => api.delete(`/testimonials/${id}`),
