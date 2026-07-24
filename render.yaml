@@ -27,10 +27,7 @@ services:
     startCommand: cd apps/web && npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: portfolio-backend
-          type: web
-          property: host
+        value: https://portfolio-s-pn8u.onrender.com
       - key: NODE_ENV
         value: production
 
@@ -42,9 +39,6 @@ services:
     startCommand: cd apps/admin && npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: portfolio-backend
-          type: web
-          property: host
+        value: https://portfolio-s-pn8u.onrender.com
       - key: NODE_ENV
         value: production
