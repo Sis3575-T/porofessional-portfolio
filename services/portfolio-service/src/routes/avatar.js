@@ -2,29 +2,19 @@ import express from "express";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
 import { authenticateToken, requireAdmin } from "shared";
-import path from "path";
-import { fileURLToPath } from "url";
-import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 const router = express.Router();
 const prisma = new PrismaClient();
 
-const uploadsDir = path.join(__dirname, "../../uploads/avatar");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  },
-});
-
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ["image/png", "image/jpeg", "image/webp"];
@@ -36,20 +26,17 @@ const upload = multer({
   },
 });
 
-// GET /api/v1/avatar - Get saved avatar (public)
 router.get("/", async (req, res) => {
   try {
     const avatar = await prisma.avatar3D.findFirst({
       orderBy: { createdAt: "desc" },
     });
-
     res.json({ success: true, data: avatar });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch avatar" });
   }
 });
 
-// POST /api/v1/avatar/generate - Generate 3D avatar from photo (admin)
 router.post(
   "/generate",
   authenticateToken,
@@ -61,14 +48,17 @@ router.post(
         return res.status(400).json({ success: false, message: "No photo uploaded" });
       }
 
-      const photoUrl = `/uploads/avatar/${req.file.filename}`;
+      const b64 = req.file.buffer.toString("base64");
+      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+      const result = await cloudinary.uploader.upload(dataURI, {
+        folder: "portfolio/avatar",
+        resource_type: "image",
+      });
 
-      // In production, this would call Ready Player Me, Meshy AI, or similar
-      // For now, we store the photo and return a placeholder model URL
+      const photoUrl = result.secure_url;
       const avatarId = `avatar-${Date.now()}`;
-      const modelUrl = photoUrl; // In production: URL to generated GLB file
+      const modelUrl = photoUrl;
 
-      // Delete previous avatar
       await prisma.avatar3D.deleteMany();
 
       const avatar = await prisma.avatar3D.create({
@@ -97,7 +87,6 @@ router.post(
   }
 );
 
-// POST /api/v1/avatar - Save avatar data (admin)
 router.post(
   "/",
   authenticateToken,
@@ -105,13 +94,10 @@ router.post(
   async (req, res) => {
     try {
       const { avatarId, modelUrl, photoUrl } = req.body;
-
       await prisma.avatar3D.deleteMany();
-
       const avatar = await prisma.avatar3D.create({
         data: { avatarId, modelUrl, photoUrl },
       });
-
       res.json({ success: true, message: "Avatar saved", data: avatar });
     } catch (error) {
       res.status(500).json({ success: false, message: "Failed to save avatar" });
@@ -119,13 +105,21 @@ router.post(
   }
 );
 
-// DELETE /api/v1/avatar - Delete avatar (admin)
 router.delete(
   "/",
   authenticateToken,
   requireAdmin,
   async (req, res) => {
     try {
+      const avatar = await prisma.avatar3D.findFirst({
+        orderBy: { createdAt: "desc" },
+      });
+      if (avatar?.photoUrl) {
+        const parts = avatar.photoUrl.split("/");
+        const publicIdWithFolder = parts.slice(-2).join("/");
+        const publicId = publicIdWithFolder.replace(/\.[^.]+$/, "");
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
+      }
       await prisma.avatar3D.deleteMany();
       res.json({ success: true, message: "Avatar deleted" });
     } catch (error) {

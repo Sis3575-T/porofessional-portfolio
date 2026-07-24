@@ -66,9 +66,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(requestLogger);
 app.use(rateLimiter());
 
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-app.use("/uploads", express.static(path.join(__dirname, "../../media-service/uploads")));
-app.use("/uploads", express.static(path.join(__dirname, "../../portfolio-service/uploads")));
+
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/hero", heroRoutes);
