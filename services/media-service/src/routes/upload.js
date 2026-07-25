@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { cloudinary } from "../config/cloudinary.js";
+import { cloudinary, configureCloudinary } from "../config/cloudinary.js";
 import { authenticateToken } from "shared";
 
 const upload = multer({
@@ -20,8 +20,14 @@ const router = express.Router();
 
 router.post("/", authenticateToken, upload.single("image"), async (req, res) => {
   try {
+    configureCloudinary();
+
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    if (!process.env.CLOUDINARY_CLOUD_NAME) {
+      return res.status(500).json({ success: false, message: "Cloudinary not configured" });
     }
 
     const b64 = req.file.buffer.toString("base64");
@@ -42,7 +48,7 @@ router.post("/", authenticateToken, upload.single("image"), async (req, res) => 
       },
     });
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("Upload error:", error.message, error.http_code || "");
     res.status(500).json({ success: false, message: error.message || "Failed to upload file" });
   }
 });

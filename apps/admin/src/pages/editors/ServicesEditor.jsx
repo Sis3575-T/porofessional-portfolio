@@ -27,7 +27,7 @@ function ImageUpload({ value, onChange, label, aspect = "w-16 h-16" }) {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('image', file);
       const res = await fetch(`${API_URL}/api/v1/upload`, { method: 'POST', body: formData });
       const data = await res.json();
       if (data.data?.url) { onChange(data.data.url); toast.success('Uploaded'); }

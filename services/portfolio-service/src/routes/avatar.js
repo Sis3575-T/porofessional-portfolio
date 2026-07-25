@@ -4,11 +4,15 @@ import { PrismaClient } from "@prisma/client";
 import { authenticateToken, requireAdmin } from "shared";
 import { v2 as cloudinary } from "cloudinary";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+function configureCloudinary() {
+  if (!cloudinary.config().cloud_name) {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+  }
+}
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -47,6 +51,8 @@ router.post(
       if (!req.file) {
         return res.status(400).json({ success: false, message: "No photo uploaded" });
       }
+
+      configureCloudinary();
 
       const b64 = req.file.buffer.toString("base64");
       const dataURI = `data:${req.file.mimetype};base64,${b64}`;
@@ -115,6 +121,7 @@ router.delete(
         orderBy: { createdAt: "desc" },
       });
       if (avatar?.photoUrl) {
+        configureCloudinary();
         const parts = avatar.photoUrl.split("/");
         const publicIdWithFolder = parts.slice(-2).join("/");
         const publicId = publicIdWithFolder.replace(/\.[^.]+$/, "");

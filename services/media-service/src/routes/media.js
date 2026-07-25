@@ -2,16 +2,21 @@ import express from "express";
 import { v2 as cloudinary } from "cloudinary";
 import { authenticateToken } from "shared";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+function configureCloudinary() {
+  if (!cloudinary.config().cloud_name) {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+  }
+}
 
 const router = express.Router();
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
+    configureCloudinary();
     const result = await cloudinary.api.resources({
       type: "upload",
       prefix: "portfolio/",
@@ -36,6 +41,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.delete("/:filename", authenticateToken, async (req, res) => {
   try {
+    configureCloudinary();
     const { filename } = req.params;
 
     const result = await cloudinary.api.resources({
