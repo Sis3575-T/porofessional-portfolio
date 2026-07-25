@@ -39,10 +39,6 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
-  "https://porofessional-portfolio-admin-ri59.vercel.app",
-  "https://porofessional-portfolio-web-ri59.vercel.app",
-  "https://porofessional-portfolio-admin.vercel.app",
-  "https://porofessional-portfolio-web.vercel.app",
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
@@ -54,6 +50,9 @@ const corsOptions = {
       cb(null, true); return;
     }
     if (/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+      cb(null, true); return;
+    }
+    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
       cb(null, true); return;
     }
     cb(new Error("Not allowed by CORS"));
