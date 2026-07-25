@@ -3,7 +3,7 @@ import { Upload, Trash2, User, Loader2, CheckCircle, AlertCircle, RefreshCw } fr
 import { generateAvatarFromPhoto, saveAvatar, deleteAvatar as deleteAvatarAPI } from "../../services/api";
 import toast from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "");
 
 export default function AvatarEditor() {
   const [avatar, setAvatar] = useState(null);

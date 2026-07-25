@@ -7,7 +7,7 @@ import {
   ExternalLink, Github,
 } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
 
 const EMPTY_FORM = {
   title: '', shortDescription: '', description: '', fullDescription: '',
