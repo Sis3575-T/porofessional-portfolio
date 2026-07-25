@@ -11,7 +11,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
-        sync: false
+        value: portfolio-pro-super-secret-jwt-key-2024
       - key: JWT_EXPIRY
         value: 7d
       - key: ADMIN_EMAIL
@@ -37,7 +37,7 @@ services:
     startCommand: cd apps/web && npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
-        value: https://porofessional-portfolio.onrender.com
+        value: https://portfolio-ss.onrender.com
       - key: NODE_ENV
         value: production
 
@@ -49,6 +49,6 @@ services:
     startCommand: cd apps/admin && npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
-        value: https://porofessional-portfolio.onrender.com
+        value: https://portfolio-ss.onrender.com
       - key: NODE_ENV
         value: production
