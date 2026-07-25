@@ -22,7 +22,7 @@ function ThumbnailUpload({ value, onChange }) {
       const res = await api.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      const url = `${API_URL}${res.data.data.url}`;
+      const url = res.data.data.url;
       onChange(url);
       toast.success('Image uploaded');
     } catch {

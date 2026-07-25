@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import api from "../../services/api";
+import api, { API_URL } from "../../services/api";
 import { Upload, Trash2, Copy, Image } from "lucide-react";
 
 export default function MediaManager() {
@@ -42,8 +42,14 @@ export default function MediaManager() {
     }
   };
 
+  const getFullUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `${API_URL}${url}`;
+  };
+
   const copyUrl = (url) => {
-    navigator.clipboard.writeText(`http://localhost:5000${url}`);
+    navigator.clipboard.writeText(getFullUrl(url));
     toast.success("URL copied");
   };
 
@@ -72,7 +78,7 @@ export default function MediaManager() {
             <div key={asset.id} className="group bg-white border border-slate-200 rounded-xl overflow-hidden">
               <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                 {asset.url ? (
-                  <img src={`http://localhost:5000${asset.url}`} alt={asset.filename} className="w-full h-full object-cover" />
+                  <img src={getFullUrl(asset.url)} alt={asset.filename} className="w-full h-full object-cover" />
                 ) : (
                   <Image size={32} className="text-slate-400" />
                 )}

@@ -47,8 +47,14 @@ export default function ImagePicker({ open, onSelect, onClose }) {
     }
   };
 
+  const getFullUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `${API_URL}${url}`;
+  };
+
   const handleSelect = (asset) => {
-    const url = `${API_URL}${asset.url}`;
+    const url = getFullUrl(asset.url);
     setSelected(asset.id);
     setTimeout(() => {
       onSelect(url);
@@ -122,7 +128,7 @@ export default function ImagePicker({ open, onSelect, onClose }) {
                         }`}
                       >
                         <img
-                          src={`${API_URL}${asset.url}`}
+                          src={getFullUrl(asset.url)}
                           alt={asset.filename}
                           className="w-full h-full object-cover"
                           loading="lazy"

@@ -30,7 +30,7 @@ function ImageUpload({ value, onChange, label, aspect = "w-16 h-16" }) {
       formData.append('file', file);
       const res = await fetch(`${API_URL}/api/v1/upload`, { method: 'POST', body: formData });
       const data = await res.json();
-      if (data.url) { onChange(data.url); toast.success('Uploaded'); }
+      if (data.data?.url) { onChange(data.data.url); toast.success('Uploaded'); }
       else { toast.error('Upload failed'); }
     } catch { toast.error('Upload failed'); }
     finally { setUploading(false); }
