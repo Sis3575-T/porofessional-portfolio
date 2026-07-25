@@ -21,7 +21,7 @@ services:
       - key: ADMIN_URL
         value: https://porofessional-portfolio-admin.vercel.app
       - key: CLOUDINARY_CLOUD_NAME
-        value: portfolio
+        value: dto10sv4y
       - key: CLOUDINARY_API_KEY
         value: "476678795163495"
       - key: CLOUDINARY_API_SECRET
