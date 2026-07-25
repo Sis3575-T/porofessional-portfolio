@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Briefcase } from "lucide-react";
+import { resolveUrl } from "../../../utils/resolveUrl";
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -32,7 +33,7 @@ export default function Timeline({ experiences }) {
           >
             <div className="absolute left-0 top-1 w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center group-hover:border-gray-300 transition-colors z-10 shadow-sm">
               {exp.logo ? (
-                <img src={exp.logo} alt="" className="w-6 h-6 rounded-full object-cover" />
+                <img src={resolveUrl(exp.logo)} alt="" className="w-6 h-6 rounded-full object-cover" />
               ) : (
                 <Briefcase size={16} className="text-gray-500" />
               )}

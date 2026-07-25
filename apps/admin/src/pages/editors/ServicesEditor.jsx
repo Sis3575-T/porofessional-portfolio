@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { servicesAPI } from '../../services/api';
+import { resolveUrl } from '../../utils/resolveUrl';
 import {
   Plus, Save, Trash2, Pencil, GripVertical,
   Upload, Eye, EyeOff, X, ChevronUp, ChevronDown,
@@ -43,7 +44,7 @@ function ImageUpload({ value, onChange, label, aspect = "w-16 h-16" }) {
         <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
         {value ? (
           <div className="relative">
-            <img src={value} alt="" className={`${aspect} object-cover rounded-lg border border-slate-200`} />
+            <img src={resolveUrl(value)} alt="" className={`${aspect} object-cover rounded-lg border border-slate-200`} />
             <button onClick={() => onChange('')} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-slate-900 flex items-center justify-center">
               <X size={10} />
             </button>
@@ -345,7 +346,7 @@ export default function ServicesEditor() {
               <div className="cursor-grab text-slate-400 hover:text-slate-500"><GripVertical size={16} /></div>
 
               {s.icon ? (
-                <img src={s.icon} alt="" className="w-8 h-8 rounded-lg object-cover border border-slate-200" />
+                <img src={resolveUrl(s.icon)} alt="" className="w-8 h-8 rounded-lg object-cover border border-slate-200" />
               ) : (
                 <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs text-slate-400">{idx + 1}</div>
               )}

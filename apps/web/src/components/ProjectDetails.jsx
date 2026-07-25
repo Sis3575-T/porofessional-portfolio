@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, ChevronLeft, ChevronRight, Eye, Calendar } from "lucide-react";
 import { projectsAPI } from "../services/api";
+import { resolveUrl } from "../utils/resolveUrl";
 import { useAnalytics } from "../hooks/useAnalytics";
 
 const categoryLabels = {
@@ -74,7 +75,7 @@ export default function ProjectDetails() {
         <div className="bg-white border border-gray-200 rounded-[28px] overflow-hidden mb-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
           <div className="h-64 sm:h-80 bg-gray-100 flex items-center justify-center">
             {project.thumbnail ? (
-              <img src={project.thumbnail} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
+              <img src={resolveUrl(project.thumbnail)} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
             ) : (
               <div className="text-center">
                 <div className="text-6xl mb-2">🚀</div>

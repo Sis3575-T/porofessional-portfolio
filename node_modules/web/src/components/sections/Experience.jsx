@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { resolveUrl } from "../../utils/resolveUrl";
 import { X, ExternalLink, Building2, MapPin, Calendar, Briefcase, Award, ChevronLeft, ChevronRight } from "lucide-react";
 
 const defaultExperiences = [
@@ -86,7 +87,7 @@ function DetailModal({ experience, onClose }) {
           <div className="flex justify-between items-start mb-5">
             <div className="flex items-center gap-3">
               {experience.logo ? (
-                <img src={experience.logo} alt={experience.company} className="w-12 h-12 rounded-xl object-cover" style={{ border: "1px solid var(--border)" }} />
+                <img src={resolveUrl(experience.logo)} alt={experience.company} className="w-12 h-12 rounded-xl object-cover" style={{ border: "1px solid var(--border)" }} />
               ) : (
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
                   <Building2 size={22} style={{ color: "var(--accent)" }} />
@@ -220,7 +221,7 @@ function ExperienceCard({ experience, index, onOpen }) {
       <div className="p-6 flex flex-col h-full">
         <div className="flex items-start gap-4 mb-4">
           {experience.logo ? (
-            <img src={experience.logo} alt={experience.company} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" style={{ border: "1px solid var(--border)" }} />
+            <img src={resolveUrl(experience.logo)} alt={experience.company} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" style={{ border: "1px solid var(--border)" }} />
           ) : (
             <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
               <Building2 size={20} style={{ color: "var(--accent)" }} />

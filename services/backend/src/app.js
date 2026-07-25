@@ -4,8 +4,9 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { PrismaClient } from "@prisma/client";
 
-import { requestLogger, errorHandler, rateLimiter } from "shared";
+import { requestLogger, errorHandler, rateLimiter, authenticateToken, requireAdmin } from "shared";
 
 import authRoutes from "../../auth-service/src/routes/auth.js";
 import heroRoutes from "../../portfolio-service/src/routes/hero.js";
@@ -105,8 +106,121 @@ app.get("/health", (req, res) => {
   res.json({
     status: "ok",
     service: "portfolio-backend",
+    cloudinary: {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? "set" : "missing",
+      api_key: process.env.CLOUDINARY_API_KEY ? "set" : "missing",
+      api_secret: process.env.CLOUDINARY_API_SECRET ? "set" : "missing",
+    },
     timestamp: new Date().toISOString(),
   });
+});
+
+const prisma = new PrismaClient();
+const LOCALHOST_RE = /^https?:\/\/localhost:\d+/;
+
+app.post("/api/v1/admin/cleanup-urls", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const results = {};
+
+    const hero = await prisma.hero.findMany();
+    for (const h of hero) {
+      const changes = {};
+      if (h.profileImage && LOCALHOST_RE.test(h.profileImage)) { changes.profileImage = null; }
+      if (h.backgroundImage && LOCALHOST_RE.test(h.backgroundImage)) { changes.backgroundImage = null; }
+      if (Object.keys(changes).length) {
+        await prisma.hero.update({ where: { id: h.id }, data: changes });
+        results.hero = (results.hero || 0) + 1;
+      }
+    }
+
+    const about = await prisma.about.findMany();
+    for (const a of about) {
+      if (a.profileImage && LOCALHOST_RE.test(a.profileImage)) {
+        await prisma.about.update({ where: { id: a.id }, data: { profileImage: null } });
+        results.about = (results.about || 0) + 1;
+      }
+    }
+
+    const services = await prisma.service.findMany();
+    for (const s of services) {
+      const changes = {};
+      if (s.icon && LOCALHOST_RE.test(s.icon)) { changes.icon = null; }
+      if (s.iconUrl && LOCALHOST_RE.test(s.iconUrl)) { changes.iconUrl = null; }
+      if (s.heroImage && LOCALHOST_RE.test(s.heroImage)) { changes.heroImage = null; }
+      if (s.galleryImages && LOCALHOST_RE.test(s.galleryImages)) { changes.galleryImages = null; }
+      if (Object.keys(changes).length) {
+        await prisma.service.update({ where: { id: s.id }, data: changes });
+        results.services = (results.services || 0) + 1;
+      }
+    }
+
+    const experiences = await prisma.experience.findMany();
+    for (const e of experiences) {
+      const changes = {};
+      if (e.logo && LOCALHOST_RE.test(e.logo)) { changes.logo = null; }
+      if (e.galleryImages && LOCALHOST_RE.test(e.galleryImages)) { changes.galleryImages = null; }
+      if (Object.keys(changes).length) {
+        await prisma.experience.update({ where: { id: e.id }, data: changes });
+        results.experiences = (results.experiences || 0) + 1;
+      }
+    }
+
+    const education = await prisma.education.findMany();
+    for (const ed of education) {
+      if (ed.logo && LOCALHOST_RE.test(ed.logo)) {
+        await prisma.education.update({ where: { id: ed.id }, data: { logo: null } });
+        results.education = (results.education || 0) + 1;
+      }
+    }
+
+    const projects = await prisma.project.findMany();
+    for (const p of projects) {
+      const changes = {};
+      if (p.thumbnail && LOCALHOST_RE.test(p.thumbnail)) { changes.thumbnail = null; }
+      if (p.images && LOCALHOST_RE.test(p.images)) { changes.images = null; }
+      if (Object.keys(changes).length) {
+        await prisma.project.update({ where: { id: p.id }, data: changes });
+        results.projects = (results.projects || 0) + 1;
+      }
+    }
+
+    const testimonials = await prisma.testimonial.findMany();
+    for (const t of testimonials) {
+      if (t.avatar && LOCALHOST_RE.test(t.avatar)) {
+        await prisma.testimonial.update({ where: { id: t.id }, data: { avatar: null } });
+        results.testimonials = (results.testimonials || 0) + 1;
+      }
+    }
+
+    const settings = await prisma.setting.findMany();
+    for (const s of settings) {
+      const changes = {};
+      if (s.favicon && LOCALHOST_RE.test(s.favicon)) { changes.favicon = null; }
+      if (s.logo && LOCALHOST_RE.test(s.logo)) { changes.logo = null; }
+      if (s.logo_dark && LOCALHOST_RE.test(s.logo_dark)) { changes.logo_dark = null; }
+      if (s.ogImage && LOCALHOST_RE.test(s.ogImage)) { changes.ogImage = null; }
+      if (Object.keys(changes).length) {
+        await prisma.setting.update({ where: { id: s.id }, data: changes });
+        results.settings = (results.settings || 0) + 1;
+      }
+    }
+
+    const avatars = await prisma.avatar3D.findMany();
+    for (const a of avatars) {
+      const changes = {};
+      if (a.photoUrl && LOCALHOST_RE.test(a.photoUrl)) { changes.photoUrl = null; }
+      if (a.modelUrl && LOCALHOST_RE.test(a.modelUrl)) { changes.modelUrl = null; }
+      if (Object.keys(changes).length) {
+        await prisma.avatar3D.update({ where: { id: a.id }, data: changes });
+        results.avatars = (results.avatars || 0) + 1;
+      }
+    }
+
+    res.json({ success: true, message: "Localhost URLs cleaned up", cleaned: results });
+  } catch (error) {
+    console.error("Cleanup error:", error);
+    res.status(500).json({ success: false, message: "Cleanup failed" });
+  }
 });
 
 app.use((req, res) => {

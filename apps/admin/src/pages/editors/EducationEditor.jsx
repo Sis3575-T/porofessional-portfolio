@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { educationAPI } from '../../services/api';
+import { resolveUrl } from '../../utils/resolveUrl';
 import {
   Plus, Save, Trash2, Pencil, X, Upload, GripVertical,
   Eye, EyeOff, ChevronDown, ChevronUp, Award, BookOpen,
@@ -322,7 +323,7 @@ export default function EducationEditor() {
               </div>
 
               {item.logo ? (
-                <img src={item.logo} alt="" className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                <img src={resolveUrl(item.logo)} alt="" className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
               ) : (
                 <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                   <GraduationCap size={18} className="text-blue-400" />

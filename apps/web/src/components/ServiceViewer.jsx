@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ExternalLink, Github, MessageSquare, ArrowRight, Check } from "lucide-react";
 import { useServiceViewer } from "../context/ServiceViewerContext";
 import { useTheme } from "../context/ThemeContext";
+import { resolveUrl } from "../utils/resolveUrl";
 
 function Lightbox({ src, onClose }) {
   return (
@@ -156,7 +157,7 @@ export default function ServiceViewer() {
                 variants={fadeUp}
               >
                 <img
-                  src={service.heroImage}
+                  src={resolveUrl(service.heroImage)}
                   alt={service.title}
                   className="w-full h-auto object-cover"
                 />
@@ -249,7 +250,7 @@ export default function ServiceViewer() {
                       onClick={() => setLightbox(img)}
                       whileHover={{ scale: 1.02 }}
                     >
-                      <img src={img} alt="" className="w-full h-40 object-cover" />
+                      <img src={resolveUrl(img)} alt="" className="w-full h-40 object-cover" />
                     </motion.div>
                   ))}
                 </div>

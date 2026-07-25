@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef, useCallback, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { ServiceViewerProvider, useServiceViewer } from "../../context/ServiceViewerContext";
+import { resolveUrl } from "../../utils/resolveUrl";
 import ServicePrism from "../three/ServicePrism";
 import { X, ExternalLink, Github, MessageSquare } from "lucide-react";
 
@@ -84,7 +85,7 @@ function ServiceCard({ service, onClose }) {
           </div>
 
           {service.heroImage && (
-            <img src={service.heroImage} alt={service.title} className="w-full h-40 object-cover rounded-xl mb-4" style={{ border: "1px solid var(--border)" }} />
+            <img src={resolveUrl(service.heroImage)} alt={service.title} className="w-full h-40 object-cover rounded-xl mb-4" style={{ border: "1px solid var(--border)" }} />
           )}
 
           <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--text-secondary)" }}>{service.fullDescription || service.description}</p>

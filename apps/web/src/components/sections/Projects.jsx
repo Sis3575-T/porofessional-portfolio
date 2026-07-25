@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Github, X } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { resolveUrl } from "../../utils/resolveUrl";
 
 const defaultProjects = [
   {
@@ -81,7 +82,7 @@ export default function Projects() {
               <div className="h-56 bg-gray-100 overflow-hidden">
                 {project.thumbnail ? (
                   <img
-                    src={project.thumbnail}
+                    src={resolveUrl(project.thumbnail)}
                     alt={project.title}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

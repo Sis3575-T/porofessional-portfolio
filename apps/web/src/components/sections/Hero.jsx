@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Send, Github, Linkedin, Twitter, Mail } from "lucide-react";
+import { resolveUrl } from "../../utils/resolveUrl";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { useProfile } from "../../context/ProfileContext";
 
@@ -48,7 +49,7 @@ export default function Hero() {
   const description = hero?.description ||
     "I build modern, responsive and high-performance web applications with clean code and great user experience.";
 
-  const heroImg = hero?.profileImage || "/hero-developer.png";
+  const heroImg = resolveUrl(hero?.profileImage) || "/hero-developer.png";
 
   const socialLinks = (() => {
     try {

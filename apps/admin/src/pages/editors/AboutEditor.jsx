@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { aboutAPI } from '../../services/api';
+import { resolveUrl } from '../../utils/resolveUrl';
 import { Save, Loader2, Plus, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import ImagePicker from '../../components/ImagePicker';
 
@@ -146,7 +147,7 @@ export default function AboutEditor() {
               </div>
               {form.profileImage && (
                 <div className="mt-2 w-24 h-20 rounded-lg overflow-hidden border border-slate-200">
-                  <img src={form.profileImage} alt="" className="w-full h-full object-cover" />
+                  <img src={resolveUrl(form.profileImage)} alt="" className="w-full h-full object-cover" />
                 </div>
               )}
             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { testimonialsAPI } from '../../services/api';
+import { resolveUrl } from '../../utils/resolveUrl';
 import { Plus, Save, Trash2, Pencil, Star, Image as ImageIcon } from 'lucide-react';
 import ImagePicker from '../../components/ImagePicker';
 
@@ -71,7 +72,7 @@ export default function TestimonialsEditor() {
             </div>
             {form.avatar && (
               <div className="mt-2 w-14 h-14 rounded-full overflow-hidden border border-slate-200">
-                <img src={form.avatar} alt="" className="w-full h-full object-cover" />
+                <img src={resolveUrl(form.avatar)} alt="" className="w-full h-full object-cover" />
               </div>
             )}
           </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { experienceAPI } from '../../services/api';
+import { resolveUrl } from '../../utils/resolveUrl';
 import { Plus, Save, Loader2, Trash2, Pencil, Image as ImageIcon, GripVertical, X } from 'lucide-react';
 import ImagePicker from '../../components/ImagePicker';
 
@@ -168,7 +169,7 @@ export default function ExperienceEditor() {
                 <ImageIcon size={16} />
               </button>
             </div>
-            {form.logo && <div className="mt-2 w-16 h-16 rounded-lg overflow-hidden border border-slate-200"><img src={form.logo} alt="" className="w-full h-full object-contain" /></div>}
+            {form.logo && <div className="mt-2 w-16 h-16 rounded-lg overflow-hidden border border-slate-200"><img src={resolveUrl(form.logo)} alt="" className="w-full h-full object-contain" /></div>}
           </div>
 
           <div>
@@ -181,7 +182,7 @@ export default function ExperienceEditor() {
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.galleryImages.map((img, i) => (
                   <div key={i} className="relative group">
-                    <img src={img} alt="" className="w-16 h-16 rounded-lg object-cover border border-slate-200" />
+                    <img src={resolveUrl(img)} alt="" className="w-16 h-16 rounded-lg object-cover border border-slate-200" />
                     <button type="button" onClick={() => removeGalleryImage(i)} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                       <X size={10} className="text-slate-900" />
                     </button>
@@ -204,7 +205,7 @@ export default function ExperienceEditor() {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 {item.logo ? (
-                  <img src={item.logo} alt="" className="w-10 h-10 rounded-lg object-contain bg-white/5 border border-slate-200" />
+                  <img src={resolveUrl(item.logo)} alt="" className="w-10 h-10 rounded-lg object-contain bg-white/5 border border-slate-200" />
                 ) : (
                   <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-sm font-bold">
                     {(item.company || 'C')[0]}

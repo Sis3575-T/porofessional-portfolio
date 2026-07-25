@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { settingsAPI } from '../../services/api';
-import { Save, Loader2, RefreshCw } from 'lucide-react';
+import api, { settingsAPI } from '../../services/api';
+import { Save, Loader2, RefreshCw, Trash2 } from 'lucide-react';
 
 const MODE_OPTIONS = [
   { value: 'photoCard', label: '3D Photo Card' },
@@ -386,6 +386,31 @@ export default function SettingsEditor() {
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </form>
+
+      <div className="mt-12 p-6 border border-red-200 rounded-xl bg-red-50">
+        <h3 className="text-lg font-semibold text-red-900 mb-2 flex items-center gap-2">
+          <Trash2 size={18} /> Database Cleanup
+        </h3>
+        <p className="text-sm text-red-700 mb-4">
+          Remove all old localhost URLs from the database. After cleanup, re-upload images through the admin panel — they will be stored permanently on Cloudinary.
+        </p>
+        <button
+          onClick={async () => {
+            if (!confirm('This will remove all broken localhost image URLs from your database. Re-upload images after. Continue?')) return;
+            try {
+              const res = await api.post('/admin/cleanup-urls');
+              const counts = res.data.cleaned || {};
+              const total = Object.values(counts).reduce((a, b) => a + b, 0);
+              toast.success(`Cleaned ${total} broken URL(s) from database`);
+            } catch (err) {
+              toast.error(err.response?.data?.message || 'Cleanup failed');
+            }
+          }}
+          className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition flex items-center gap-2"
+        >
+          <Trash2 size={14} /> Clean Broken Image URLs
+        </button>
+      </div>
     </div>
   );
 }

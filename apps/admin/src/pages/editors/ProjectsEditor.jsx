@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import api, { API_URL, projectsAPI } from '../../services/api';
+import { resolveUrl } from '../../utils/resolveUrl';
 import { Plus, Save, Trash2, Pencil, ExternalLink, Github, Upload, Image as ImageIcon, X } from 'lucide-react';
 
 const CATEGORIES = ['FRONTEND', 'BACKEND', 'FULLSTACK', 'MOBILE', 'UIUX', 'AI', 'OTHER'];
@@ -45,7 +46,7 @@ function ThumbnailUpload({ value, onChange }) {
   if (value) {
     return (
       <div className="relative w-full h-48 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group">
-        <img src={value} alt="Thumbnail" className="w-full h-full object-cover" />
+        <img src={resolveUrl(value)} alt="Thumbnail" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
           <button type="button" onClick={() => inputRef.current?.click()}
             className="px-3 py-1.5 bg-white/90 text-slate-900 rounded-lg text-xs font-medium hover:bg-white transition">
@@ -198,7 +199,7 @@ export default function ProjectsEditor() {
           <div key={p.id} className="bg-slate-50 border border-slate-200 rounded-xl p-5 group">
             <div className="flex items-start gap-4">
               {p.thumbnail && (
-                <img src={p.thumbnail} alt={p.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-slate-200" />
+                <img src={resolveUrl(p.thumbnail)} alt={p.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-slate-200" />
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 import { useRef, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { resolveUrl } from "../../utils/resolveUrl";
 import {
   GraduationCap,
   MapPin,
@@ -121,7 +122,7 @@ function EducationCard({ edu, index, total }) {
           <div className="edu-logo-container">
             {edu.logo ? (
               <img
-                src={edu.logo}
+                src={resolveUrl(edu.logo)}
                 alt={edu.institution}
                 className="edu-logo-img"
               />
