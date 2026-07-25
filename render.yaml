@@ -28,6 +28,18 @@ services:
         value: tJ7vjnboe1XocYAJjTJ73sufDMM
       - key: NODE_ENV
         value: production
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        value: ""
+      - key: SMTP_PASS
+        value: ""
+      - key: SITE_NAME
+        value: Porofessional Portfolio
 
   - type: web
     name: portfolio-web

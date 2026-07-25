@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { authenticateToken, requireAdmin } from "shared";
-import { sendContactNotification } from "../services/email.js";
+import { sendContactNotification, sendReplyToUser } from "../services/email.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -76,6 +76,40 @@ router.delete("/:id", authenticateToken, requireAdmin, async (req, res) => {
     res.json({ success: true, message: "Message deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to delete message" });
+  }
+});
+
+router.post("/:id/reply", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { reply } = req.body;
+    if (!reply || !reply.trim()) {
+      return res.status(400).json({ success: false, message: "Reply text is required" });
+    }
+
+    const message = await prisma.contactMessage.findUnique({ where: { id: req.params.id } });
+    if (!message) return res.status(404).json({ success: false, message: "Message not found" });
+
+    const emailSent = await sendReplyToUser({
+      to: message.email,
+      name: message.name,
+      subject: message.subject,
+      reply: reply.trim(),
+    });
+
+    const updated = await prisma.contactMessage.update({
+      where: { id: req.params.id },
+      data: { reply: reply.trim(), repliedAt: new Date(), isRead: true },
+    });
+
+    res.json({
+      success: true,
+      message: emailSent ? "Reply sent to user's email" : "Reply saved (email not sent — SMTP not configured)",
+      data: updated,
+      emailSent,
+    });
+  } catch (error) {
+    console.error("Reply error:", error);
+    res.status(500).json({ success: false, message: "Failed to send reply" });
   }
 });
 

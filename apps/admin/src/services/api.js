@@ -95,6 +95,7 @@ export const messagesAPI = {
   getById: (id) => api.get(`/contact/${id}`),
   update: (id, data) => api.put(`/contact/${id}`, data),
   delete: (id) => api.delete(`/contact/${id}`),
+  reply: (id, reply) => api.post(`/contact/${id}/reply`, { reply }),
 };
 
 export const settingsAPI = {
