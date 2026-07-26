@@ -10,23 +10,49 @@ function sleep(ms) {
 }
 
 async function main() {
-  console.log("\n--- Step 1: Push schema to database ---\n");
-  run("npx prisma db push");
+  console.log("\n--- Step 1: Generate Prisma Client ---\n");
+  try {
+    run("npx prisma generate");
+  } catch (e) {
+    console.log("Prisma generate failed, but continuing...\n");
+  }
+
+  console.log("\n--- Step 2: Push schema to database ---\n");
+  let pushOk = false;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      run("npx prisma db push");
+      pushOk = true;
+      break;
+    } catch (e) {
+      console.log(`\nPush failed (attempt ${attempt}/5). Retrying in 5s...`);
+      await sleep(5000);
+    }
+  }
+
+  if (!pushOk) {
+    console.error("\nDatabase push failed after 5 attempts.");
+    console.error("Your Neon database may be suspended.");
+    console.error("1. Go to https://console.neon.tech");
+    console.error("2. Open your project → it will auto-resume");
+    console.error("3. Then run: node setup-db.js");
+    process.exit(1);
+  }
 
   for (let attempt = 1; attempt <= 5; attempt++) {
     try {
-      console.log(`\n--- Step 2: Seed database (attempt ${attempt}/5) ---\n`);
+      console.log(`\n--- Step 3: Seed database (attempt ${attempt}/5) ---\n`);
       run("node prisma/seed.js");
       console.log("\nSetup complete!");
       return;
     } catch (e) {
-      console.log(`Seed failed (attempt ${attempt}/5). Retrying in 3s...`);
+      console.log(`\nSeed failed (attempt ${attempt}/5). Retrying in 3s...`);
       await sleep(3000);
     }
   }
 
-  console.error("\nSeed failed after 5 attempts. Your Neon database may be suspended.");
-  console.error("Go to https://console.neon.tech → wake up your database → run: node prisma/seed.js");
+  console.error("\nSeed failed after 5 attempts.");
+  console.error("Make sure your Neon database is active, then run: node setup-db.js");
   process.exit(1);
 }
 

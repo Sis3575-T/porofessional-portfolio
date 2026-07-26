@@ -82,10 +82,7 @@ export const testimonialsAPI = {
 
 export const contactAPI = {
   send: (data) => api.post("/contact", data),
-  getAll: (params) => api.get("/contact", { params }),
-  getById: (id) => api.get(`/contact/${id}`),
-  update: (id, data) => api.put(`/contact/${id}`, data),
-  delete: (id) => api.delete(`/contact/${id}`),
+  getReply: (token) => api.get(`/contact/reply/${token}`),
 };
 
 export const settingsAPI = {

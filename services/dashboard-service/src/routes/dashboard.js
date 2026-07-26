@@ -9,13 +9,14 @@ router.get("/", authenticateToken, async (req, res) => {
   try {
     const [projects, messages, skills, visitorCount, recentMessages] = await Promise.all([
       prisma.project.count({ where: { enabled: true } }),
-      prisma.contactMessage.count(),
+      prisma.contactMessage.count({ where: { isArchived: false } }),
       prisma.skill.count({ where: { enabled: true } }),
       prisma.project.aggregate({ _sum: { viewCount: true } }),
       prisma.contactMessage.findMany({
+        where: { isArchived: false },
         orderBy: { createdAt: "desc" },
         take: 5,
-        select: { id: true, name: true, subject: true, createdAt: true, isRead: true },
+        select: { id: true, fullName: true, subject: true, createdAt: true, isRead: true, reply: true },
       }),
     ]);
 
@@ -33,7 +34,10 @@ router.get("/", authenticateToken, async (req, res) => {
         messages,
         skills,
         visitors: totalViews,
-        recentMessages,
+        recentMessages: recentMessages.map((m) => ({
+          ...m,
+          fullName: m.fullName || "Anonymous",
+        })),
         mostViewedProject: mostViewed,
         totalViews,
       },

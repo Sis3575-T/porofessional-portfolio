@@ -64,14 +64,14 @@ model About {
   degree          String?
   availability    String    @default("Available for projects")
   freelance       String    @default("Available")
-  glbModel        String?   // GLB 3D avatar URL
-  statistics      String?   @db.Text // JSON: {projects, clients, yearsExp, technologies}
-  featureCards    String?   @db.Text // JSON array of {icon, title, description, order}
-  techIcons       String?   @db.Text // JSON array of tech icon names/urls
-  background      String?   @db.Text // JSON: {noise, grid, radialLights, blurredCircles}
-  decoration      String?   @db.Text // JSON: {particles, geometricShapes, animatedLines, glowCircles}
-  animationSettings String? @db.Text // JSON: {scrollReveal, hoverEffects, floatSpeed, parallaxIntensity}
-  visibility      String    @default("visible") // visible, hidden
+  glbModel        String?
+  statistics      String?   @db.Text
+  featureCards    String?   @db.Text
+  techIcons       String?   @db.Text
+  background      String?   @db.Text
+  decoration      String?   @db.Text
+  animationSettings String? @db.Text
+  visibility      String    @default("visible")
   order           Int       @default(0)
   enabled         Boolean   @default(true)
   createdAt       DateTime  @default(now())
@@ -85,7 +85,7 @@ model Skill {
   name        String
   icon        String?
   category    SkillCategory
-  proficiency Int       @default(80) // 0-100
+  proficiency Int       @default(80)
   description String?
   order       Int       @default(0)
   enabled     Boolean   @default(true)
@@ -116,10 +116,10 @@ model Service {
   icon             String?
   iconUrl          String?
   heroImage        String?
-  galleryImages    String?   @db.Text // JSON array of image URLs
-  technologies     String?   @db.Text // JSON array
-  features         String?   @db.Text // JSON array
-  tools            String?   @db.Text // JSON array
+  galleryImages    String?   @db.Text
+  technologies     String?   @db.Text
+  features         String?   @db.Text
+  tools            String?   @db.Text
   process          String?   @db.Text
   liveUrl          String?
   githubUrl        String?
@@ -172,9 +172,9 @@ model Education {
   isCurrent      Boolean   @default(false)
   gpa            String?
   location       String?
-  achievements   String?   @db.Text // JSON array
-  technologies   String?   @db.Text // JSON array
-  courses        String?   @db.Text // JSON array
+  achievements   String?   @db.Text
+  technologies   String?   @db.Text
+  courses        String?   @db.Text
   certificateUrl String?
   order          Int       @default(0)
   enabled        Boolean   @default(true)
@@ -190,10 +190,10 @@ model Project {
   slug            String    @unique
   description     String    @db.Text
   thumbnail       String?
-  images          String?   @db.Text // JSON array
+  images          String?   @db.Text
   category        ProjectCategory
-  technologies    String    @db.Text // JSON array
-  features        String    @db.Text // JSON array
+  technologies    String    @db.Text
+  features        String    @db.Text
   challenge       String    @db.Text
   solution        String    @db.Text
   lessonsLearned  String    @db.Text
@@ -225,7 +225,7 @@ model Testimonial {
   position    String
   company     String
   avatar      String?
-  rating      Int       @default(5) // 1-5
+  rating      Int       @default(5)
   review      String    @db.Text
   order       Int       @default(0)
   enabled     Boolean   @default(true)
@@ -235,22 +235,27 @@ model Testimonial {
   @@map("testimonials")
 }
 
+// ============== Contact Messaging ==============
 model ContactMessage {
-  id          String    @id @default(cuid())
-  name        String
-  email       String
-  subject     String
-  message     String    @db.Text
-  reply       String?   @db.Text
-  repliedAt   DateTime?
-  isRead      Boolean   @default(false)
-  isArchived  Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  visitorToken    String
+  fullName        String?
+  email           String?
+  phone           String?
+  subject         String?
+  message         String    @db.Text
+  reply           String?   @db.Text
+  repliedAt       DateTime?
+  isRead          Boolean   @default(false)
+  isArchived      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
+  @@index([visitorToken])
   @@map("contact_messages")
 }
 
+// ============== Settings ==============
 model Setting {
   id              String    @id @default(cuid())
   siteTitle       String    @default("Portfolio Pro")
@@ -259,7 +264,7 @@ model Setting {
   favicon         String?
   logo            String?
   logo_dark       String?
-  socialLinks     String?   @db.Text // JSON
+  socialLinks     String?   @db.Text
   contactEmail    String?
   contactPhone    String?
   address         String?
@@ -270,9 +275,9 @@ model Setting {
   metaDescription String?
   ogImage         String?
   googleAnalytics String?
-  hero3dConfig    String?   @db.Text // JSON: mode, rotationSpeed, floatSpeed, etc.
-  uiConfig        String?   @db.Text // JSON: customCursor, backgroundEffects, etc.
-  sectionVisibility String?  @db.Text // JSON: {hero, about, skills, services, experience, education, projects, testimonials, contact, footer}
+  hero3dConfig    String?   @db.Text
+  uiConfig        String?   @db.Text
+  sectionVisibility String?  @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -283,12 +288,12 @@ model MediaAsset {
   id        String    @id @default(cuid())
   filename  String
   url       String
-  publicId  String?   // For Cloudinary
+  publicId  String?
   mimeType  String?
   size      Int?
   width     Int?
   height    Int?
-  usedIn    String?   @db.Text // JSON array of sections using it
+  usedIn    String?   @db.Text
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -300,9 +305,9 @@ model Activity {
   userId    String
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   action    ActivityAction
-  entity    String    // Model name
+  entity    String
   entityId  String
-  changes   String?   @db.Text // JSON diff
+  changes   String?   @db.Text
   createdAt DateTime  @default(now())
 
   @@map("activities")
@@ -335,9 +340,9 @@ model Avatar3D {
   modelUrl    String?
   gender      String    @default("male")
   clothing    String    @default("default")
-  position    String?   @db.Text // JSON: {x, y, z}
-  rotation    String?   @db.Text // JSON: {x, y, z}
-  scale       String?   @db.Text // JSON: {x, y, z}
+  position    String?   @db.Text
+  rotation    String?   @db.Text
+  scale       String?   @db.Text
   visible     Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

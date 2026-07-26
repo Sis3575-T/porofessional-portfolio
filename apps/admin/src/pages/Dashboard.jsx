@@ -6,7 +6,7 @@ import {
   Star, Wrench, FileText, Image, Activity, Box, PanelLeftClose, PanelLeftOpen,
   BarChart3,
 } from "lucide-react";
-import { dashboardAPI, settingsAPI, aboutAPI } from "../services/api";
+import { dashboardAPI, settingsAPI, aboutAPI, messagesAPI } from "../services/api";
 
 let _profileCache = null;
 let _profilePromise = null;
@@ -37,6 +37,7 @@ export default function Dashboard({ children, title }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(_profileCache || { name: "", email: "", initials: "??" });
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchProfile = useCallback(async () => {
     if (_profilePromise) return _profilePromise;
@@ -84,6 +85,19 @@ export default function Dashboard({ children, title }) {
     else setLoading(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    let mounted = true;
+    const poll = async () => {
+      try {
+        const res = await messagesAPI.unreadCount();
+        if (mounted) setUnreadCount(res.data.data?.count || 0);
+      } catch {}
+    };
+    poll();
+    const interval = setInterval(poll, 30000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -124,6 +138,11 @@ export default function Dashboard({ children, title }) {
                 >
                   <Icon size={18} />
                   {!sidebarCollapsed && <span>{item.label}</span>}
+                  {!sidebarCollapsed && item.label === "Messages" && unreadCount > 0 && (
+                    <span className="ml-auto px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] text-center">
+                      {unreadCount}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -204,11 +223,11 @@ export default function Dashboard({ children, title }) {
                           {stats.recentMessages.map((msg) => (
                             <div key={msg.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                               <div>
-                                <p className="text-sm text-slate-900">{msg.name}</p>
+                                <p className="text-sm text-slate-900">{msg.fullName}</p>
                                 <p className="text-xs text-slate-400">{msg.subject}</p>
                               </div>
-                              <span className={`text-xs px-2 py-1 rounded-full ${msg.isRead ? "bg-slate-100 text-slate-500" : "bg-cyan-50 text-cyan-600"}`}>
-                                {msg.isRead ? "Read" : "New"}
+                              <span className={`text-xs px-2 py-1 rounded-full ${msg.status === "UNREAD" ? "bg-cyan-50 text-cyan-600" : "bg-slate-100 text-slate-500"}`}>
+                                {msg.status === "UNREAD" ? "New" : msg.status === "REPLIED" ? "Replied" : "Read"}
                               </span>
                             </div>
                           ))}

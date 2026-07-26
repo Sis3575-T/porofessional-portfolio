@@ -93,9 +93,11 @@ export const testimonialsAPI = {
 export const messagesAPI = {
   getAll: (params) => api.get("/contact", { params }),
   getById: (id) => api.get(`/contact/${id}`),
-  update: (id, data) => api.put(`/contact/${id}`, data),
-  delete: (id) => api.delete(`/contact/${id}`),
   reply: (id, reply) => api.post(`/contact/${id}/reply`, { reply }),
+  markRead: (id) => api.patch(`/contact/${id}/read`),
+  archive: (id) => api.patch(`/contact/${id}/archive`),
+  delete: (id) => api.delete(`/contact/${id}`),
+  unreadCount: () => api.get("/contact/unread-count/admin"),
 };
 
 export const settingsAPI = {
