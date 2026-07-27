@@ -4,9 +4,8 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { PrismaClient } from "@prisma/client";
 
-import { requestLogger, errorHandler, rateLimiter, authenticateToken, requireAdmin } from "shared";
+import { requestLogger, errorHandler, rateLimiter, authenticateToken, requireAdmin, prisma } from "shared";
 
 import authRoutes from "../../auth-service/src/routes/auth.js";
 import heroRoutes from "../../portfolio-service/src/routes/hero.js";
@@ -114,7 +113,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-const prisma = new PrismaClient();
 const LOCALHOST_RE = /^https?:\/\/localhost:\d+/;
 
 app.post("/api/v1/admin/cleanup-urls", authenticateToken, requireAdmin, async (req, res) => {

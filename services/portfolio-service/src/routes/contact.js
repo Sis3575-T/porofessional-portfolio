@@ -1,11 +1,9 @@
 import express from "express";
 import crypto from "crypto";
-import { PrismaClient } from "@prisma/client";
-import { authenticateToken, requireAdmin, rateLimiter } from "shared";
+import { authenticateToken, requireAdmin, rateLimiter, prisma } from "shared";
 import { sendReplyToUser } from "../services/email.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const publicRateLimit = rateLimiter(15 * 60 * 1000, 30);
 

@@ -1,7 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { PrismaClient } from "@prisma/client";
-import { authenticateToken, requireAdmin } from "shared";
+import { authenticateToken, requireAdmin, prisma } from "shared";
 import { v2 as cloudinary } from "cloudinary";
 
 function configureCloudinary() {
@@ -15,7 +14,6 @@ function configureCloudinary() {
 }
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const upload = multer({
   storage: multer.memoryStorage(),

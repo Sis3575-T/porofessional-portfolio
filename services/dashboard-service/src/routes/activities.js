@@ -1,9 +1,7 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
-import { authenticateToken } from "shared";
+import { authenticateToken, prisma } from "shared";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 router.get("/", authenticateToken, async (req, res) => {
   try {

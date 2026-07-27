@@ -1,11 +1,18 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
-import { generateToken } from "shared";
-import { authenticateToken } from "shared";
+import { generateToken, authenticateToken, prisma } from "shared";
 
 const router = express.Router();
-const prisma = new PrismaClient();
+
+async function logActivity(userId, action, entity, entityId) {
+  try {
+    await prisma.activity.create({
+      data: { userId, action, entity, entityId },
+    });
+  } catch (err) {
+    console.error("Activity logging failed (non-critical):", err.message);
+  }
+}
 
 router.post("/login", async (req, res) => {
   try {
@@ -18,7 +25,16 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    let user;
+    try {
+      user = await prisma.user.findUnique({ where: { email } });
+    } catch (dbError) {
+      console.error("Database query failed:", dbError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Database connection failed. Please try again later.",
+      });
+    }
 
     if (!user) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -31,20 +47,31 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    let isPasswordValid;
+    try {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    } catch (bcryptError) {
+      console.error("Password comparison failed:", bcryptError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Authentication error. Please try again.",
+      });
+    }
 
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLogin: new Date() },
-    });
+    try {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLogin: new Date() },
+      });
+    } catch (updateError) {
+      console.error("Failed to update lastLogin:", updateError.message);
+    }
 
-    await prisma.activity.create({
-      data: { userId: user.id, action: "LOGIN", entity: "User", entityId: user.id },
-    });
+    logActivity(user.id, "LOGIN", "User", user.id);
 
     const token = generateToken(user.id, user.email, user.role);
 
@@ -62,10 +89,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/logout", authenticateToken, async (req, res) => {
   try {
-    await prisma.activity.create({
-      data: { userId: req.userId, action: "LOGOUT", entity: "User", entityId: req.userId },
-    });
-
+    logActivity(req.userId, "LOGOUT", "User", req.userId);
     res.json({ success: true, message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Logout failed" });
@@ -85,6 +109,7 @@ router.get("/me", authenticateToken, async (req, res) => {
 
     res.json({ success: true, data: user });
   } catch (error) {
+    console.error("Failed to fetch user:", error.message);
     res.status(500).json({ success: false, message: "Failed to fetch user" });
   }
 });

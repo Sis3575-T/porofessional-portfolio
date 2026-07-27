@@ -1,10 +1,8 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
-import { authenticateToken, requireAdmin } from "shared";
+import { authenticateToken, requireAdmin, prisma } from "shared";
 import http from "http";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 function parseUA(ua) {
   if (!ua) return { browser: "Unknown", os: "Unknown", deviceType: "desktop" };

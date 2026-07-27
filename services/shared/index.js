@@ -4,3 +4,4 @@ export { requestLogger } from "./middleware/logger.js";
 export { rateLimiter } from "./middleware/rateLimiter.js";
 export { validate } from "./middleware/validate.js";
 export { generateToken, verifyToken } from "./utils/jwt.js";
+export { prisma } from "./utils/prisma.js";
