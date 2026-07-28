@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 10000;
 
 async function syncDatabase() {
   try {
-    const schemaPath = path.join(__dirname, "../../prisma/schema.prisma");
+    const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
     console.log("[DB] Syncing database schema from:", schemaPath);
     execSync(`npx prisma db push --schema=${schemaPath} --accept-data-loss`, {
       stdio: "pipe",
