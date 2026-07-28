@@ -5,7 +5,7 @@ import { sendReplyToUser } from "../services/email.js";
 
 const router = express.Router();
 
-const publicRateLimit = rateLimiter(15 * 60 * 1000, 30);
+const publicRateLimit = rateLimiter(15 * 60 * 1000, 100);
 
 function sanitize(str) {
   if (typeof str !== "string") return "";
@@ -72,6 +72,7 @@ router.get("/reply/:token", async (req, res) => {
 
     res.json({ success: true, data: contact });
   } catch (error) {
+    console.error("Reply check error:", error);
     res.status(500).json({ success: false, message: "Failed to check reply" });
   }
 });
