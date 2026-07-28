@@ -14,7 +14,7 @@ router.get("/", authenticateToken, async (req, res) => {
         where: { isArchived: false },
         orderBy: { createdAt: "desc" },
         take: 5,
-        select: { id: true, fullName: true, subject: true, createdAt: true, isRead: true, reply: true },
+        select: { id: true, name: true, subject: true, createdAt: true, isRead: true, reply: true },
       }),
     ]);
 
@@ -34,7 +34,7 @@ router.get("/", authenticateToken, async (req, res) => {
         visitors: totalViews,
         recentMessages: recentMessages.map((m) => ({
           ...m,
-          fullName: m.fullName || "Anonymous",
+          name: m.name || "Anonymous",
         })),
         mostViewedProject: mostViewed,
         totalViews,

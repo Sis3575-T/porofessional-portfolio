@@ -36,7 +36,7 @@ router.post("/", publicRateLimit, async (req, res) => {
     const contact = await prisma.contactMessage.create({
       data: {
         visitorToken: token,
-        fullName: name && name.trim() ? sanitize(name.trim()) : null,
+        name: name && name.trim() ? sanitize(name.trim()) : null,
         email: email && email.trim() ? email.trim().toLowerCase() : null,
         phone: phone && phone.trim() ? sanitize(phone.trim()) : null,
         subject: subject && subject.trim() ? sanitize(subject.trim()) : null,
@@ -44,7 +44,7 @@ router.post("/", publicRateLimit, async (req, res) => {
       },
     });
 
-    console.log(`[CONTACT] New message from ${contact.fullName || "Anonymous"} (${contact.email || "no email"})`);
+    console.log(`[CONTACT] New message from ${contact.name || "Anonymous"} (${contact.email || "no email"})`);
 
     res.status(201).json({
       success: true,
@@ -105,7 +105,7 @@ router.get("/", authenticateToken, requireAdmin, async (req, res) => {
 
     if (search) {
       where.OR = [
-        { fullName: { contains: search, mode: "insensitive" } },
+        { name: { contains: search, mode: "insensitive" } },
         { email: { contains: search, mode: "insensitive" } },
         { subject: { contains: search, mode: "insensitive" } },
         { message: { contains: search, mode: "insensitive" } },
@@ -165,7 +165,7 @@ router.post("/:id/reply", authenticateToken, requireAdmin, async (req, res) => {
       try {
         emailSent = await sendReplyToUser({
           to: message.email,
-          name: message.fullName || "Visitor",
+          name: message.name || "Visitor",
           subject: message.subject || "Your message",
           reply: reply.trim(),
         });

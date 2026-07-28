@@ -238,8 +238,8 @@ model Testimonial {
 // ============== Contact Messaging ==============
 model ContactMessage {
   id              String    @id @default(cuid())
-  visitorToken    String
-  fullName        String?
+  visitorToken    String    @default("")
+  name            String    @default("")
   email           String?
   phone           String?
   subject         String?
