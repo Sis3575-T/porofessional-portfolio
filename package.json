@@ -8,7 +8,7 @@
     "backend/*"
   ],
   "scripts": {
-    "dev": "docker compose up --build",
+    "dev": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:backend": "node --watch backend/src/server.js",
     "dev:web": "npm --workspace frontend/web run dev",
