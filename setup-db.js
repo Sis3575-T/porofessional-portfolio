@@ -12,7 +12,7 @@ function sleep(ms) {
 async function main() {
   console.log("\n--- Step 1: Generate Prisma Client ---\n");
   try {
-    run("npx prisma generate");
+    run("npx prisma generate --schema=backend/prisma/schema.prisma");
   } catch (e) {
     console.log("Prisma generate failed, but continuing...\n");
   }
@@ -21,7 +21,7 @@ async function main() {
   let pushOk = false;
   for (let attempt = 1; attempt <= 5; attempt++) {
     try {
-      run("npx prisma db push");
+      run("npx prisma db push --schema=backend/prisma/schema.prisma");
       pushOk = true;
       break;
     } catch (e) {
@@ -42,7 +42,7 @@ async function main() {
   for (let attempt = 1; attempt <= 5; attempt++) {
     try {
       console.log(`\n--- Step 3: Seed database (attempt ${attempt}/5) ---\n`);
-      run("node prisma/seed.js");
+      run("node backend/prisma/seed.js");
       console.log("\nSetup complete!");
       return;
     } catch (e) {

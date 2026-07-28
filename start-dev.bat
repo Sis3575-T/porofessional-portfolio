@@ -22,7 +22,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [2/5] Pushing database schema to Neon...
-call npx prisma db push --schema=prisma/schema.prisma
+call npx prisma db push --schema=backend/prisma/schema.prisma
 if %errorlevel% neq 0 (
     echo [ERROR] Prisma db push failed. Check your DATABASE_URL in .env
     pause
@@ -31,11 +31,11 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [3/5] Generating Prisma Client...
-call npx prisma generate --schema=prisma/schema.prisma
+call npx prisma generate --schema=backend/prisma/schema.prisma
 
 echo.
 echo [4/5] Seeding database...
-call node prisma/seed.js
+call node backend/prisma/seed.js
 if %errorlevel% neq 0 (
     echo [WARNING] Seed failed (data may already exist). Continuing...
 )
@@ -49,13 +49,13 @@ echo ============================================
 echo.
 
 REM Start Unified Backend (port 5000)
-start "Backend - port 5000" cmd /k "cd /d %~dp0 && node --watch services/backend/src/server.js"
+start "Backend - port 5000" cmd /k "cd /d %~dp0 && node --watch backend/src/server.js"
 
 REM Start Web Frontend (port 5175)
-start "Web Frontend - port 5175" cmd /k "cd /d %~dp0\apps\web && npm run dev"
+start "Web Frontend - port 5175" cmd /k "cd /d %~dp0\frontend\web && npm run dev"
 
 REM Start Admin Dashboard (port 5174)
-start "Admin Dashboard - port 5174" cmd /k "cd /d %~dp0\apps\admin && npm run dev"
+start "Admin Dashboard - port 5174" cmd /k "cd /d %~dp0\frontend\admin && npm run dev"
 
 echo.
 echo ============================================

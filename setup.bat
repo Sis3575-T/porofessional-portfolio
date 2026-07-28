@@ -15,7 +15,7 @@ set DATABASE_URL=postgresql://neondb_owner:npg_o1mGAvbFN0gQ@ep-misty-shape-avslq
 
 echo.
 echo Step 3: Pushing database schema...
-npx prisma db push --schema=prisma/schema.prisma
+npx prisma db push --schema=backend/prisma/schema.prisma
 if %errorlevel% neq 0 (
     echo Database push failed. Check your DATABASE_URL in .env
     exit /b %errorlevel%
@@ -23,7 +23,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo Step 4: Seeding database...
-node prisma/seed.js
+node backend/prisma/seed.js
 
 echo.
 echo === Setup Complete! ===

@@ -5,7 +5,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const child = spawn('node', [join(__dirname, 'services/backend/src/server.js')], {
+const child = spawn('node', [join(__dirname, 'backend/src/server.js')], {
   stdio: 'inherit',
   env: {
     ...process.env,

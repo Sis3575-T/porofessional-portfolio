@@ -3,21 +3,22 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "apps/*",
-    "services/*"
+    "frontend/*",
+    "backend",
+    "backend/*"
   ],
   "scripts": {
     "dev": "docker compose up --build",
-    "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch services/backend/src/server.js\" \"cd apps/web && npm run dev\" \"cd apps/admin && npm run dev\"",
-    "dev:backend": "node --watch services/backend/src/server.js",
-    "dev:web": "npm --workspace apps/web run dev",
-    "dev:admin": "npm --workspace apps/admin run dev",
-    "start": "node services/backend/src/server.js"
+    "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
+    "dev:backend": "node --watch backend/src/server.js",
+    "dev:web": "npm --workspace frontend/web run dev",
+    "dev:admin": "npm --workspace frontend/admin run dev",
+    "start": "node backend/src/server.js"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
   },
   "dependencies": {
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^6.9.0"
   }
 }

@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: services/backend/Dockerfile
+      dockerfile: backend/Dockerfile
     container_name: portfolio_backend
     restart: unless-stopped
     ports:
@@ -18,7 +18,7 @@ services:
 
   web:
     build:
-      context: ./apps/web
+      context: ./frontend/web
       dockerfile: Dockerfile
     container_name: portfolio_web
     restart: unless-stopped
@@ -31,7 +31,7 @@ services:
 
   admin:
     build:
-      context: ./apps/admin
+      context: ./frontend/admin
       dockerfile: Dockerfile
     container_name: portfolio_admin
     restart: unless-stopped
