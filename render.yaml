@@ -3,7 +3,7 @@ services:
     name: portfolio-backend
     runtime: node
     plan: free
-    buildCommand: npm install && cd backend/shared && npm install && cd .. && npm install && npx prisma generate --schema=prisma/schema.prisma
+    buildCommand: npm install && npx prisma generate --schema=backend/prisma/schema.prisma
     startCommand: cd backend && node src/server.js
     envVars:
       - key: PORT
