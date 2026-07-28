@@ -100,10 +100,21 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/health", (req, res) => {
+app.get("/health", async (req, res) => {
+  let dbOk = false;
+  let dbError = null;
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    dbOk = true;
+  } catch (e) {
+    dbError = e.message;
+  }
+
   res.json({
     status: "ok",
     service: "portfolio-backend",
+    database: dbOk ? "connected" : "disconnected",
+    dbError,
     cloudinary: {
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? "set" : "missing",
       api_key: process.env.CLOUDINARY_API_KEY ? "set" : "missing",
