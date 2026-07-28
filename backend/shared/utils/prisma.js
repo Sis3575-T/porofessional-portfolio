@@ -8,15 +8,15 @@ const prismaClientSingleton = () => {
   });
 };
 
-export const prisma =
+const rawPrisma =
   globalForPrisma.prisma ??
   prismaClientSingleton();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = rawPrisma;
 
 const MAX_RETRIES = 2;
 const RETRY_DELAY = 3000;
-const wrappedModels = new Set();
+const wrappedModels = new Map();
 
 const MODEL_METHODS = [
   "findUnique", "findFirst", "findMany", "create", "update",
@@ -58,11 +58,18 @@ function wrapWithRetry(model) {
   return wrapped;
 }
 
-for (const key of Object.keys(prisma)) {
-  if (key.startsWith("$")) continue;
-  const model = prisma[key];
-  if (model && typeof model === "object" && !wrappedModels.has(key)) {
-    prisma[key] = wrapWithRetry(model);
-    wrappedModels.add(key);
-  }
-}
+export const prisma = new Proxy(rawPrisma, {
+  get(target, prop) {
+    if (typeof prop !== "string" || prop.startsWith("$")) {
+      return target[prop];
+    }
+    if (!wrappedModels.has(prop)) {
+      const model = target[prop];
+      if (model && typeof model === "object") {
+        const wrapped = wrapWithRetry(model);
+        wrappedModels.set(prop, wrapped);
+      }
+    }
+    return wrappedModels.get(prop) ?? target[prop];
+  },
+});
