@@ -2,26 +2,17 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis;
 
-const prismaClientSingleton = () => {
-  return new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
-};
-
 const rawPrisma =
   globalForPrisma.prisma ??
-  prismaClientSingleton();
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = rawPrisma;
 
 const MAX_RETRIES = 2;
 const RETRY_DELAY = 3000;
 const wrappedModels = new Map();
-
-const MODEL_METHODS = [
-  "findUnique", "findFirst", "findMany", "create", "update",
-  "upsert", "delete", "count", "aggregate", "groupBy",
-];
 
 function isConnectionError(error) {
   const msg = error?.message?.toLowerCase() || "";
@@ -32,44 +23,50 @@ function isConnectionError(error) {
     msg.includes("ecancelled") ||
     msg.includes("etimedout") ||
     msg.includes("could not connect") ||
-    msg.includes("database is starting")
+    msg.includes("database is starting") ||
+    msg.includes("p1001")
   );
 }
 
 function wrapWithRetry(model) {
-  const wrapped = {};
-  for (const method of MODEL_METHODS) {
+  const methods = {};
+  for (const method of ["findUnique", "findFirst", "findMany", "create", "update", "upsert", "delete", "count", "aggregate", "groupBy"]) {
     if (typeof model[method] === "function") {
-      wrapped[method] = async (...args) => {
-        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-          try {
-            return await model[method](...args);
-          } catch (error) {
-            if (attempt === MAX_RETRIES || !isConnectionError(error)) {
-              throw error;
-            }
-            console.warn(`[PRISMA] ${method} failed (attempt ${attempt}/${MAX_RETRIES}), retrying...`);
-            await new Promise((r) => setTimeout(r, RETRY_DELAY));
-          }
-        }
+      methods[method] = (...args) => {
+        const call = () => model[method](...args);
+        return callWithRetry(call, 1);
       };
     }
   }
-  return wrapped;
+  return new Proxy(model, {
+    get(target, prop) {
+      if (prop in methods) return methods[prop];
+      return target[prop];
+    },
+  });
 }
 
-export const prisma = new Proxy(rawPrisma, {
-  get(target, prop) {
-    if (typeof prop !== "string" || prop.startsWith("$")) {
-      return target[prop];
+function callWithRetry(call, attempt) {
+  return call().catch((error) => {
+    if (attempt < MAX_RETRIES && isConnectionError(error)) {
+      console.warn(`[PRISMA] Query failed (attempt ${attempt}/${MAX_RETRIES}), retrying...`);
+      return new Promise((r) => setTimeout(r, RETRY_DELAY)).then(() => callWithRetry(call, attempt + 1));
     }
-    if (!wrappedModels.has(prop)) {
-      const model = target[prop];
-      if (model && typeof model === "object") {
-        const wrapped = wrapWithRetry(model);
-        wrappedModels.set(prop, wrapped);
-      }
-    }
-    return wrappedModels.get(prop) ?? target[prop];
-  },
-});
+    throw error;
+  });
+}
+
+const MODEL_NAMES = [
+  "user", "hero", "about", "skill", "service", "experience", "education",
+  "project", "testimonial", "contactMessage", "setting", "mediaAsset",
+  "activity", "statistic", "avatar3D", "visitor", "visit",
+];
+
+for (const name of MODEL_NAMES) {
+  const original = rawPrisma[name];
+  if (original && typeof original === "object" && typeof original.findMany === "function") {
+    rawPrisma[name] = wrapWithRetry(original);
+  }
+}
+
+export { rawPrisma as prisma };
