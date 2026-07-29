@@ -2,14 +2,6 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis;
 
-const rawPrisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = rawPrisma;
-
 const MAX_RETRIES = 2;
 const RETRY_DELAY = 3000;
 const wrappedModels = new Map();
@@ -62,11 +54,32 @@ const MODEL_NAMES = [
   "activity", "statistic", "avatar3D", "visitor", "visit",
 ];
 
-for (const name of MODEL_NAMES) {
-  const original = rawPrisma[name];
-  if (original && typeof original === "object" && typeof original.findMany === "function") {
-    rawPrisma[name] = wrapWithRetry(original);
+let _prisma = null;
+
+function createPrismaClient() {
+  if (_prisma) return _prisma;
+
+  _prisma = globalForPrisma.prisma ??
+    new PrismaClient({
+      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    });
+
+  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = _prisma;
+
+  for (const name of MODEL_NAMES) {
+    const original = _prisma[name];
+    if (original && typeof original === "object" && typeof original.findMany === "function") {
+      _prisma[name] = wrapWithRetry(original);
+    }
   }
+
+  return _prisma;
 }
 
-export { rawPrisma as prisma };
+const prisma = new Proxy({}, {
+  get(_, prop) {
+    return createPrismaClient()[prop];
+  },
+});
+
+export { prisma };

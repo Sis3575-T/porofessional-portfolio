@@ -36,7 +36,7 @@ router.post("/", publicRateLimit, async (req, res) => {
     const contact = await prisma.contactMessage.create({
       data: {
         visitorToken: token,
-        name: name && name.trim() ? sanitize(name.trim()) : null,
+        name: name && name.trim() ? sanitize(name.trim()) : "",
         email: email && email.trim() ? email.trim().toLowerCase() : null,
         phone: phone && phone.trim() ? sanitize(phone.trim()) : null,
         subject: subject && subject.trim() ? sanitize(subject.trim()) : null,

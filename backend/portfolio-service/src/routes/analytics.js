@@ -91,8 +91,9 @@ router.post("/track", async (req, res) => {
     let visitor = await prisma.visitor.findFirst({ where: { visitorId } });
 
     if (!visitor) {
-      visitor = await prisma.visitor.create({
-        data: {
+      visitor = await prisma.visitor.upsert({
+        where: { visitorId },
+        create: {
           visitorId,
           browser, os, deviceType, language, referrer,
           country: location.country, region: location.region, city: location.city,
@@ -104,6 +105,15 @@ router.post("/track", async (req, res) => {
           experienceViewed: page === "/#experience" || page === "/experience",
           educationViewed: page === "/#education" || page === "/education",
           contactViewed: page === "/#contact" || page === "/contact",
+        },
+        update: {
+          lastVisitAt: new Date(),
+          totalVisits: { increment: 1 },
+          browser, os, deviceType, language,
+          country: location.country || undefined,
+          region: location.region || undefined,
+          city: location.city || undefined,
+          timezone: location.timezone || req.body.timezone || undefined,
         },
       });
 

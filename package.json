@@ -13,7 +13,8 @@
     "dev:backend": "node --watch backend/src/server.js",
     "dev:web": "npm --workspace frontend/web run dev",
     "dev:admin": "npm --workspace frontend/admin run dev",
-    "start": "node backend/src/server.js"
+    "start": "node backend/src/server.js",
+    "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
