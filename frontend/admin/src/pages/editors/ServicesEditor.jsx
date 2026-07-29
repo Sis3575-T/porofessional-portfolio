@@ -85,8 +85,6 @@ export default function ServicesEditor() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) { toast.error('Title required'); return; }
-
     try {
       const data = {
         ...form,
@@ -216,9 +214,9 @@ export default function ServicesEditor() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="block text-xs text-slate-500 mb-1">Title *</label>
+              <label className="block text-xs text-slate-500 mb-1">Title</label>
               <input value={form.title} onChange={e => setForm({...form, title: e.target.value})}
-                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" required />
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-white" />
             </div>
 
             <div className="col-span-2">

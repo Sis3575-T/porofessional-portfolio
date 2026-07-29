@@ -54,14 +54,14 @@ export default function TestimonialsEditor() {
         <form onSubmit={handleSubmit} className="max-w-2xl mb-8 p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
           <h3 className="font-semibold text-slate-900">{editing ? 'Edit' : 'New'} Testimonial</h3>
           <div className="grid sm:grid-cols-2 gap-4">
-            <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full" placeholder="Name" required />
+            <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full" placeholder="Name" />
             <input value={form.position} onChange={(e) => setForm({...form, position: e.target.value})} className="w-full" placeholder="Position" />
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <input value={form.company} onChange={(e) => setForm({...form, company: e.target.value})} className="w-full" placeholder="Company" />
             <input type="number" min="1" max="5" value={form.rating} onChange={(e) => setForm({...form, rating: parseInt(e.target.value)})} className="w-full" />
           </div>
-          <textarea value={form.review} onChange={(e) => setForm({...form, review: e.target.value})} rows={4} className="w-full" placeholder="Review" required />
+          <textarea value={form.review} onChange={(e) => setForm({...form, review: e.target.value})} rows={4} className="w-full" placeholder="Review" />
           <div>
             <label className="block text-sm text-slate-400 mb-1">Avatar</label>
             <div className="flex gap-2">

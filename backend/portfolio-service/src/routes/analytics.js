@@ -35,8 +35,24 @@ const geoCache = new Map();
 
 function getClientIp(req) {
   const xff = req.headers["x-forwarded-for"];
-  if (xff) return xff.split(",")[0].trim();
-  return req.socket?.remoteAddress || req.ip || null;
+  if (xff) {
+    const ips = xff.split(",").map((ip) => ip.trim());
+    for (const ip of ips) {
+      if (!isPrivateIp(ip)) return ip;
+    }
+  }
+  const remote = req.socket?.remoteAddress || req.ip || null;
+  if (remote && !isPrivateIp(remote)) return remote;
+  return null;
+}
+
+function isPrivateIp(ip) {
+  if (!ip) return true;
+  const clean = ip.replace(/^::ffff:/, "");
+  if (clean === "127.0.0.1" || clean === "::1" || clean === "localhost") return true;
+  if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(clean)) return true;
+  if (/^(0\.|255\.255\.255\.255)/.test(clean)) return true;
+  return false;
 }
 
 async function detectLocation(ip) {
@@ -68,9 +84,7 @@ async function detectLocation(ip) {
       return loc;
     }
   } catch {}
-  const fallback = { country: null, region: null, city: null, timezone: null };
-  geoCache.set(ip, fallback);
-  return fallback;
+  return { country: null, region: null, city: null, timezone: null };
 }
 
 // ============ PUBLIC: Track page view / event ============
@@ -114,6 +128,7 @@ router.post("/track", async (req, res) => {
           region: location.region || undefined,
           city: location.city || undefined,
           timezone: location.timezone || req.body.timezone || undefined,
+          referrer,
         },
       });
 
@@ -149,10 +164,11 @@ router.post("/track", async (req, res) => {
         totalVisits: newVisitCount,
         pagesVisited: JSON.stringify(pages),
         projectsViewed: JSON.stringify(projects),
-        country: visitor.country || location.country,
-        region: visitor.region || location.region,
-        city: visitor.city || location.city,
-        timezone: visitor.timezone || location.timezone || req.body.timezone,
+        country: location.country || visitor.country,
+        region: location.region || visitor.region,
+        city: location.city || visitor.city,
+        timezone: location.timezone || req.body.timezone || visitor.timezone,
+        browser, os, deviceType, language,
         skillsViewed: visitor.skillsViewed || page.includes("skills"),
         servicesViewed: visitor.servicesViewed || page.includes("services"),
         experienceViewed: visitor.experienceViewed || page.includes("experience"),

@@ -173,16 +173,16 @@ export default function EducationEditor() {
           {/* Row 1: Institution + Degree */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Institution *</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Institution</label>
               <input value={form.institution} onChange={(e) => setForm({ ...form, institution: e.target.value })}
                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                placeholder="University name" required />
+                placeholder="University name" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Degree *</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Degree</label>
               <input value={form.degree} onChange={(e) => setForm({ ...form, degree: e.target.value })}
                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                placeholder="BSc, MSc, Certificate..." required />
+                placeholder="BSc, MSc, Certificate..." />
             </div>
           </div>
 
@@ -206,10 +206,9 @@ export default function EducationEditor() {
           {/* Row 4: Dates + Current */}
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Start Date *</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Start Date</label>
               <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-500"
-                required />
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1.5">End Date</label>

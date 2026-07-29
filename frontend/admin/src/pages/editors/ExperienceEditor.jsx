@@ -92,12 +92,12 @@ export default function ExperienceEditor() {
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-slate-500 mb-1">Company *</label>
-              <input value={form.company} onChange={(e) => setForm({...form, company: e.target.value})} className="w-full" placeholder="Company name" required />
+              <label className="block text-sm text-slate-500 mb-1">Company</label>
+              <input value={form.company} onChange={(e) => setForm({...form, company: e.target.value})} className="w-full" placeholder="Company name" />
             </div>
             <div>
-              <label className="block text-sm text-slate-500 mb-1">Position *</label>
-              <input value={form.position} onChange={(e) => setForm({...form, position: e.target.value})} className="w-full" placeholder="Job title" required />
+              <label className="block text-sm text-slate-500 mb-1">Position</label>
+              <input value={form.position} onChange={(e) => setForm({...form, position: e.target.value})} className="w-full" placeholder="Job title" />
             </div>
           </div>
 
@@ -108,8 +108,8 @@ export default function ExperienceEditor() {
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-slate-500 mb-1">Start Date *</label>
-              <input type="date" value={form.startDate} onChange={(e) => setForm({...form, startDate: e.target.value})} className="w-full" required />
+              <label className="block text-sm text-slate-500 mb-1">Start Date</label>
+              <input type="date" value={form.startDate} onChange={(e) => setForm({...form, startDate: e.target.value})} className="w-full" />
             </div>
             <div>
               <label className="block text-sm text-slate-500 mb-1">End Date</label>

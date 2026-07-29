@@ -113,8 +113,8 @@ export default function SkillsEditor() {
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-slate-500 mb-1">Name *</label>
-              <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full" required />
+              <label className="block text-sm text-slate-500 mb-1">Name</label>
+              <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full" />
             </div>
             <div>
               <label className="block text-sm text-slate-500 mb-1">Category</label>

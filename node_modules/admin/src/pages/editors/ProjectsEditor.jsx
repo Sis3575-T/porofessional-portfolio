@@ -156,10 +156,10 @@ export default function ProjectsEditor() {
         <form onSubmit={handleSubmit} className="max-w-3xl mb-8 p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
           <h3 className="font-semibold text-slate-900">{editing ? 'Edit' : 'New'} Project</h3>
           <div className="grid sm:grid-cols-2 gap-4">
-            <input value={form.title} onChange={(e) => setForm({...form, title: e.target.value, slug: editing ? form.slug : generateSlug(e.target.value) })} className="w-full" placeholder="Title" required />
-            <input value={form.slug} onChange={(e) => setForm({...form, slug: e.target.value})} className="w-full" placeholder="slug-url" required />
+            <input value={form.title} onChange={(e) => setForm({...form, title: e.target.value, slug: editing ? form.slug : generateSlug(e.target.value) })} className="w-full" placeholder="Title" />
+            <input value={form.slug} onChange={(e) => setForm({...form, slug: e.target.value})} className="w-full" placeholder="slug-url" />
           </div>
-          <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={3} className="w-full" placeholder="Description" required />
+          <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={3} className="w-full" placeholder="Description" />
           <div className="grid sm:grid-cols-2 gap-4">
             <select value={form.category} onChange={(e) => setForm({...form, category: e.target.value})} className="w-full">
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
