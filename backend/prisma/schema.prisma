@@ -376,6 +376,7 @@ model Visitor {
   contactViewed      Boolean  @default(false)
   resumeDownloads    Int      @default(0)
   contactSubmissions Int      @default(0)
+  isBot              Boolean  @default(false)
   visits             Visit[]
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

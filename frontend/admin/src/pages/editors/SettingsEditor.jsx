@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api, { settingsAPI } from '../../services/api';
-import { Save, Loader2, RefreshCw, Trash2 } from 'lucide-react';
+import { Save, Loader2, RefreshCw, Trash2, Upload, X } from 'lucide-react';
+import ImagePicker from '../../components/ImagePicker';
 
 const MODE_OPTIONS = [
   { value: 'photoCard', label: '3D Photo Card' },
@@ -59,11 +60,17 @@ export default function SettingsEditor() {
     address: '', metaKeywords: '', metaDescription: '', socialLinks: '',
     availability: '', responseTime: '', workingHours: '',
   });
+  const [favicon, setFavicon] = useState('');
+  const [logo, setLogo] = useState('');
+  const [logoDark, setLogoDark] = useState('');
   const [hero3d, setHero3d] = useState(DEFAULT_3D);
   const [uiConfig, setUiConfig] = useState(DEFAULT_UI);
   const [sectionVisibility, setSectionVisibility] = useState(DEFAULT_SECTIONS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [faviconPickerOpen, setFaviconPickerOpen] = useState(false);
+  const [logoPickerOpen, setLogoPickerOpen] = useState(false);
+  const [logoDarkPickerOpen, setLogoDarkPickerOpen] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -78,6 +85,9 @@ export default function SettingsEditor() {
             socialLinks: s.socialLinks ? JSON.stringify(JSON.parse(s.socialLinks), null, 2) : '{}',
             availability: s.availability || '', responseTime: s.responseTime || '', workingHours: s.workingHours || '',
           });
+          setFavicon(s.favicon || '');
+          setLogo(s.logo || '');
+          setLogoDark(s.logo_dark || '');
           if (s.hero3dConfig) {
             try { setHero3d({ ...DEFAULT_3D, ...JSON.parse(s.hero3dConfig) }); }
             catch { /* use defaults */ }
@@ -106,6 +116,9 @@ export default function SettingsEditor() {
       catch { toast.error('Invalid JSON in social links'); setSaving(false); return; }
       await settingsAPI.update({
         ...form,
+        favicon: favicon || null,
+        logo: logo || null,
+        logo_dark: logoDark || null,
         socialLinks: JSON.stringify(socialLinks),
         hero3dConfig: JSON.stringify(hero3d),
         uiConfig: JSON.stringify(uiConfig),
@@ -129,6 +142,85 @@ export default function SettingsEditor() {
     <div>
       <h2 className="text-2xl font-bold text-slate-900 mb-8">Site Settings</h2>
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900">Branding</h3>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className={labelClass}>Favicon</label>
+              <p className="text-xs text-slate-400">Browser tab icon (recommended: 64x64 or 128x128)</p>
+              <div className="relative group">
+                <button type="button" onClick={() => setFaviconPickerOpen(true)}
+                  className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-cyan-400 bg-white flex items-center justify-center overflow-hidden transition-all">
+                  {favicon ? (
+                    <img src={favicon} alt="Favicon" className="w-full h-full object-contain p-2" />
+                  ) : (
+                    <div className="text-center">
+                      <Upload size={24} className="mx-auto mb-2 text-slate-400" />
+                      <span className="text-xs text-slate-400">Choose Favicon</span>
+                    </div>
+                  )}
+                </button>
+                {favicon && (
+                  <button type="button" onClick={() => setFavicon('')}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Logo (Light Mode)</label>
+              <p className="text-xs text-slate-400">Display logo in navbar</p>
+              <div className="relative group">
+                <button type="button" onClick={() => setLogoPickerOpen(true)}
+                  className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-cyan-400 bg-white flex items-center justify-center overflow-hidden transition-all">
+                  {logo ? (
+                    <img src={logo} alt="Logo" className="w-full h-full object-contain p-2" />
+                  ) : (
+                    <div className="text-center">
+                      <Upload size={24} className="mx-auto mb-2 text-slate-400" />
+                      <span className="text-xs text-slate-400">Choose Logo</span>
+                    </div>
+                  )}
+                </button>
+                {logo && (
+                  <button type="button" onClick={() => setLogo('')}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Logo (Dark Mode)</label>
+              <p className="text-xs text-slate-400">Display logo when dark mode is active</p>
+              <div className="relative group">
+                <button type="button" onClick={() => setLogoDarkPickerOpen(true)}
+                  className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-cyan-400 bg-white flex items-center justify-center overflow-hidden transition-all">
+                  {logoDark ? (
+                    <img src={logoDark} alt="Logo Dark" className="w-full h-full object-contain p-2" />
+                  ) : (
+                    <div className="text-center">
+                      <Upload size={24} className="mx-auto mb-2 text-slate-400" />
+                      <span className="text-xs text-slate-400">Choose Dark Logo</span>
+                    </div>
+                  )}
+                </button>
+                {logoDark && (
+                  <button type="button" onClick={() => setLogoDark('')}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ImagePicker open={faviconPickerOpen} onSelect={(url) => { setFavicon(url); setFaviconPickerOpen(false); }} onClose={() => setFaviconPickerOpen(false)} />
+        <ImagePicker open={logoPickerOpen} onSelect={(url) => { setLogo(url); setLogoPickerOpen(false); }} onClose={() => setLogoPickerOpen(false)} />
+        <ImagePicker open={logoDarkPickerOpen} onSelect={(url) => { setLogoDark(url); setLogoDarkPickerOpen(false); }} onClose={() => setLogoDarkPickerOpen(false)} />
+
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
           <h3 className="text-lg font-semibold text-slate-900">General</h3>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -387,7 +479,29 @@ export default function SettingsEditor() {
         </button>
       </form>
 
-      <div className="mt-12 p-6 border border-red-200 rounded-xl bg-red-50">
+      <div className="mt-12 p-6 border border-blue-200 rounded-xl bg-blue-50">
+        <h3 className="text-lg font-semibold text-blue-900 mb-2">Analytics Opt-Out</h3>
+        <p className="text-sm text-blue-700 mb-4">
+          Your visits are tracked by default. To exclude your own browser from analytics, visit your portfolio with the opt-out parameter:
+        </p>
+        <div className="flex items-center gap-3">
+          <code className="flex-1 bg-white border border-blue-200 rounded-lg px-3 py-2 text-sm text-blue-800 font-mono break-all">
+            {window.location.origin.replace("5174", "5175")}/?exclude_analytics=true
+          </code>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.origin.replace("5174", "5175") + "/?exclude_analytics=true");
+              toast.success("Link copied!");
+            }}
+            className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition shrink-0"
+          >
+            Copy
+          </button>
+        </div>
+        <p className="text-xs text-blue-600 mt-2">Visit this link once to opt out. To re-enable tracking, visit with <code>?exclude_analytics=false</code></p>
+      </div>
+
+      <div className="mt-8 p-6 border border-red-200 rounded-xl bg-red-50">
         <h3 className="text-lg font-semibold text-red-900 mb-2 flex items-center gap-2">
           <Trash2 size={18} /> Database Cleanup
         </h3>

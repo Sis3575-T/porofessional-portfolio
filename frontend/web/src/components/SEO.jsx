@@ -1,8 +1,19 @@
 import { useEffect } from "react";
 import { usePortfolio } from "../context/PortfolioContext";
+import { useProfile } from "../context/ProfileContext";
+import { resolveUrl } from "../utils/resolveUrl";
+
+function generateInitialsFavicon(initials, size = 64) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <rect width="${size}" height="${size}" rx="${size * 0.2}" fill="#2563eb"/>
+    <text x="50%" y="50%" dy=".1em" fill="white" font-family="Inter,sans-serif" font-weight="700" font-size="${size * 0.45}" text-anchor="middle" dominant-baseline="central">${initials}</text>
+  </svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
 
 export default function SEO({ title, description }) {
   const { settings } = usePortfolio();
+  const { initials } = useProfile();
 
   useEffect(() => {
     const siteTitle = settings?.siteTitle || "Portfolio";
@@ -31,7 +42,20 @@ export default function SEO({ title, description }) {
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", title || siteTitle);
     setMeta("twitter:description", siteDesc);
-  }, [title, description, settings]);
+
+    let link = document.querySelector('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+
+    if (settings?.favicon) {
+      link.href = resolveUrl(settings.favicon);
+    } else if (initials) {
+      link.href = generateInitialsFavicon(initials);
+    }
+  }, [title, description, settings, initials]);
 
   return null;
 }

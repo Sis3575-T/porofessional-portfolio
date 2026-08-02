@@ -5,6 +5,15 @@ import axios from "axios";
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "");
 const VISITOR_ID_KEY = "portfolio_visitor_id";
 const SESSION_START_KEY = "portfolio_session_start";
+const EXCLUDE_KEY = "portfolio_analytics_exclude";
+
+function isAdminBypass() {
+  return localStorage.getItem(EXCLUDE_KEY) === "true";
+}
+
+function getAdminHeaders() {
+  return isAdminBypass() ? { "x-admin-bypass": "true" } : {};
+}
 
 async function generateFingerprint() {
   const parts = [];
@@ -144,7 +153,7 @@ export function useAnalytics() {
         data,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         referrer: document.referrer || null,
-      });
+      }, { headers: getAdminHeaders() });
     } catch (err) {
       console.warn("Analytics track failed:", err.message);
     }
@@ -160,7 +169,7 @@ export function useAnalytics() {
         event,
         data,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      });
+      }, { headers: getAdminHeaders() });
     } catch (err) {
       console.warn("Analytics event failed:", err.message);
     }
@@ -173,7 +182,7 @@ export function useAnalytics() {
       await axios.post(`${API_URL}/api/v1/analytics/session/end`, {
         visitorId,
         duration,
-      });
+      }, { headers: getAdminHeaders() });
     } catch (err) {
       console.warn("Analytics session end failed:", err.message);
     }

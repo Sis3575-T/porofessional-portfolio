@@ -6,9 +6,21 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 10000;
 
+function findPrismaBin() {
+  const candidates = [
+    path.join(__dirname, "../../node_modules/.bin/prisma"),
+    path.join(__dirname, "../../node_modules/prisma/build/index.js"),
+    path.join(__dirname, "../node_modules/.bin/prisma"),
+  ];
+  for (const c of candidates) {
+    try { execSync(`"${c}" --version`, { stdio: "pipe" }); return `"${c}"`; } catch {}
+  }
+  return "npx prisma";
+}
+
 function runCommand(cmd) {
   try {
-    execSync(cmd, { stdio: "pipe", timeout: 60000 });
+    execSync(cmd, { stdio: "pipe", timeout: 60000, shell: true });
     return true;
   } catch (error) {
     console.error(`[DB] Command failed: ${cmd}`, error.stderr?.toString() || error.message);
@@ -18,12 +30,13 @@ function runCommand(cmd) {
 
 async function syncDatabase() {
   const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
+  const prismaBin = findPrismaBin();
   console.log("[DB] Syncing database schema from:", schemaPath);
 
-  const pushed = runCommand(`npx prisma db push --schema=${schemaPath} --accept-data-loss`);
+  const pushed = runCommand(`${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`);
   if (pushed) console.log("[DB] Schema push complete");
 
-  const generated = runCommand(`npx prisma generate --schema=${schemaPath}`);
+  const generated = runCommand(`${prismaBin} generate --schema="${schemaPath}"`);
   if (generated) console.log("[DB] Prisma client generated");
 }
 

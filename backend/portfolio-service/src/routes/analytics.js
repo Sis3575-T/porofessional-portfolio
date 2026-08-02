@@ -1,9 +1,38 @@
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
 import http from "http";
+import https from "https";
 
 const router = express.Router();
 
+const IPINFO_TOKEN = process.env.IPINFO_TOKEN || "";
+
+// ============ Bot Detection ============
+const BOT_PATTERNS = [
+  /googlebot/i, /bingbot/i, /slurp/i, /duckduckbot/i, /baiduspider/i,
+  /yandexbot/i, /sogou/i, /exabot/i, /facebot/i, /facebookexternalhit/i,
+  /ia_archiver/i, /alexabot/i, /mj12bot/i, /ahrefsbot/i, /semrushbot/i,
+  /dotbot/i, /rogerbot/i, /linkedinbot/i, /embedly/i, /quora link preview/i,
+  /showyoubot/i, /outbrain/i, /pinterest/i, /slackbot/i, /vkShare/i,
+  /W3C_Validator/i, /whatsapp/i, /flipboard/i, /tumblr/i, /bitlybot/i,
+  /skypeuripreview/i, /nuzzel/i, /discordbot/i, /qwantify/i, /pinterestbot/i,
+  /bitrix link preview/i, /xing-contenttabreceiver/i, /chrome-lighthouse/i,
+  /telegrambot/i, /seznambot/i, /crawler/i, /spider/i, /bot\//i,
+  /Lighthouse/i, /HeadlessChrome/i, /Puppeteer/i, /Playwright/i,
+  /Selenium/i, /PhantomJS/i, /Nightmare/i, /Webdriver/i,
+];
+
+function isBot(ua) {
+  if (!ua) return false;
+  return BOT_PATTERNS.some((pattern) => pattern.test(ua));
+}
+
+// ============ Admin Bypass ============
+function isAdminBypass(req) {
+  return req.headers["x-admin-bypass"] === "true";
+}
+
+// ============ Helpers ============
 function parseUA(ua) {
   if (!ua) return { browser: "Unknown", os: "Unknown", deviceType: "desktop" };
   let browser = "Other";
@@ -31,8 +60,7 @@ function parseJSON(str, fallback) {
   catch { return fallback; }
 }
 
-const geoCache = new Map();
-
+// ============ IP Detection ============
 function getClientIp(req) {
   const xff = req.headers["x-forwarded-for"];
   if (xff) {
@@ -55,6 +83,9 @@ function isPrivateIp(ip) {
   return false;
 }
 
+// ============ Geolocation (ipinfo.io) ============
+const geoCache = new Map();
+
 async function detectLocation(ip) {
   if (!ip || ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
     return { country: null, region: null, city: null, timezone: null };
@@ -63,7 +94,11 @@ async function detectLocation(ip) {
 
   try {
     const data = await new Promise((resolve, reject) => {
-      const req = http.get(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,timezone`, { timeout: 2000 }, (res) => {
+      const url = IPINFO_TOKEN
+        ? `https://ipinfo.io/${ip}/json?token=${IPINFO_TOKEN}`
+        : `https://ipinfo.io/${ip}/json`;
+      const mod = url.startsWith("https") ? https : http;
+      const req = mod.get(url, { timeout: 2000 }, (res) => {
         let body = "";
         res.on("data", (chunk) => body += chunk);
         res.on("end", () => {
@@ -74,8 +109,13 @@ async function detectLocation(ip) {
       req.on("timeout", () => { req.destroy(); reject(new Error("timeout")); });
     });
 
-    if (data.status === "success") {
-      const loc = { country: data.country || null, region: data.regionName || null, city: data.city || null, timezone: data.timezone || null };
+    if (data.country) {
+      const loc = {
+        country: data.country || null,
+        region: data.region || null,
+        city: data.city || null,
+        timezone: data.timezone || null,
+      };
       geoCache.set(ip, loc);
       if (geoCache.size > 500) {
         const firstKey = geoCache.keys().next().value;
@@ -96,6 +136,17 @@ router.post("/track", async (req, res) => {
     }
 
     const ua = req.headers["user-agent"] || "";
+
+    // Skip bots
+    if (isBot(ua)) {
+      return res.json({ success: true, data: { skipped: true, reason: "bot" } });
+    }
+
+    // Skip admin bypass
+    if (isAdminBypass(req)) {
+      return res.json({ success: true, data: { skipped: true, reason: "admin" } });
+    }
+
     const { browser, os, deviceType } = parseUA(ua);
     const language = req.headers["accept-language"]?.split(",")[0]?.split(";")[0] || "en";
     const referrer = req.headers["referer"] || req.body.referrer || null;
@@ -221,6 +272,10 @@ router.post("/session/end", async (req, res) => {
     const { visitorId, duration } = req.body;
     if (!visitorId) return res.status(400).json({ success: false, message: "visitorId required" });
 
+    if (isAdminBypass(req)) {
+      return res.json({ success: true });
+    }
+
     const visitor = await prisma.visitor.findFirst({ where: { visitorId } });
     if (!visitor) return res.json({ success: true });
 
@@ -252,12 +307,14 @@ router.post("/session/end", async (req, res) => {
 // ============ ADMIN: Dashboard stats ============
 router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const totalVisitors = await prisma.visitor.count();
+    const where = { isBot: false };
+
+    const totalVisitors = await prisma.visitor.count({ where });
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-    const onlineNow = await prisma.visitor.count({ where: { lastVisitAt: { gte: oneHourAgo } } });
+    const onlineNow = await prisma.visitor.count({ where: { isBot: false, lastVisitAt: { gte: oneHourAgo } } });
 
-    const visitors = await prisma.visitor.findMany({ select: { totalVisits: true, totalTimeSpent: true } });
+    const visitors = await prisma.visitor.findMany({ where, select: { totalVisits: true, totalTimeSpent: true } });
     const returningVisitors = visitors.filter((v) => v.totalVisits > 1).length;
     const totalVisits = visitors.reduce((sum, v) => sum + v.totalVisits, 0);
     const totalTime = visitors.reduce((sum, v) => sum + v.totalTimeSpent, 0);
@@ -269,6 +326,7 @@ router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
     const osCounts = {};
     const deviceCounts = {};
     const allVisitors = await prisma.visitor.findMany({
+      where,
       select: { country: true, city: true, browser: true, os: true, deviceType: true },
     });
     for (const v of allVisitors) {
@@ -285,7 +343,7 @@ router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
     const osList = Object.entries(osCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
     const devices = Object.entries(deviceCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
 
-    const allPages = await prisma.visitor.findMany({ select: { pagesVisited: true } });
+    const allPages = await prisma.visitor.findMany({ where, select: { pagesVisited: true } });
     const pageCount = {};
     for (const v of allPages) {
       const pages = parseJSON(v.pagesVisited, []);
@@ -293,7 +351,7 @@ router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
     }
     const topPages = Object.entries(pageCount).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
 
-    const allProjects = await prisma.visitor.findMany({ select: { projectsViewed: true } });
+    const allProjects = await prisma.visitor.findMany({ where, select: { projectsViewed: true } });
     const projCount = {};
     for (const v of allProjects) {
       const projs = parseJSON(v.projectsViewed, []);
@@ -301,8 +359,8 @@ router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
     }
     const topProjects = Object.entries(projCount).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
 
-    const totalDownloads = await prisma.visitor.aggregate({ _sum: { resumeDownloads: true } });
-    const totalSubmissions = await prisma.visitor.aggregate({ _sum: { contactSubmissions: true } });
+    const totalDownloads = await prisma.visitor.aggregate({ where, _sum: { resumeDownloads: true } });
+    const totalSubmissions = await prisma.visitor.aggregate({ where, _sum: { contactSubmissions: true } });
 
     res.json({
       success: true,
@@ -336,7 +394,7 @@ router.get("/visitors", authenticateToken, requireAdmin, async (req, res) => {
     const { page = 1, limit = 20, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const where = {};
+    const where = { isBot: false };
     if (search) {
       where.OR = [
         { visitorId: { contains: search, mode: "insensitive" } },

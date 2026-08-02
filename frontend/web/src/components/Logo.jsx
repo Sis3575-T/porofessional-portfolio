@@ -1,12 +1,32 @@
 import { useTheme } from "../context/ThemeContext";
 import { useProfile } from "../context/ProfileContext";
+import { usePortfolio } from "../context/PortfolioContext";
+import { resolveUrl } from "../utils/resolveUrl";
 
 export default function Logo({ size = 52 }) {
   const { dark } = useTheme();
   const { initials } = useProfile();
+  const { settings } = usePortfolio();
   const innerSize = Math.round(size * 0.69);
   const fontSize = Math.round(size * 0.35);
   const borderRadius = Math.round(size * 0.27);
+
+  const logoUrl = dark ? (settings?.logo_dark || settings?.logo) : settings?.logo;
+
+  if (logoUrl) {
+    return (
+      <img
+        src={resolveUrl(logoUrl)}
+        alt="Logo"
+        className="shrink-0 object-contain"
+        style={{
+          width: size,
+          height: size,
+          borderRadius: borderRadius,
+        }}
+      />
+    );
+  }
 
   return (
     <div
