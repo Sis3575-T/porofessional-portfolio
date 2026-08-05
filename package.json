@@ -14,7 +14,7 @@
     "dev:web": "npm --workspace frontend/web run dev",
     "dev:admin": "npm --workspace frontend/admin run dev",
     "start": "node backend/src/server.js",
-    "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma"
+    "postinstall": "node -e \"if(process.env.DATABASE_URL){require('child_process').execSync('npx prisma generate --schema=backend/prisma/schema.prisma',{stdio:'inherit'})}\""
   },
   "devDependencies": {
     "concurrently": "^10.0.3",
