@@ -1,31 +1,16 @@
-import axios from "axios";
+// Re-export everything from the shared package
+// This file exists for backward compatibility - new code should import from "frontend-shared/api"
+export { API_URL, default as default } from "frontend-shared/api";
+export { default as api } from "frontend-shared/api";
 
-export const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "");
+// Re-export all API modules
+import api from "frontend-shared/api";
 
-const api = axios.create({
-  baseURL: `${API_URL}/api/v1`,
-  headers: { "Content-Type": "application/json" },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default api;
+export const authAPI = {
+  login: (data) => api.post("/auth/login", data),
+  me: () => api.get("/auth/me"),
+  logout: () => api.post("/auth/logout"),
+};
 
 export const heroAPI = {
   get: () => api.get("/hero"),
@@ -92,12 +77,6 @@ export const settingsAPI = {
 
 export const dashboardAPI = {
   get: () => api.get("/dashboard"),
-};
-
-export const authAPI = {
-  login: (data) => api.post("/auth/login", data),
-  me: () => api.get("/auth/me"),
-  logout: () => api.post("/auth/logout"),
 };
 
 export const analyticsAPI = {

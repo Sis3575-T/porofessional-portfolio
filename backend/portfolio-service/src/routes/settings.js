@@ -5,7 +5,16 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const settings = await prisma.setting.findFirst();
+    const settings = await prisma.setting.findFirst({
+      select: {
+        id: true, siteTitle: true, siteDescription: true, siteUrl: true,
+        favicon: true, logo: true, logo_dark: true, socialLinks: true,
+        contactEmail: true, contactPhone: true, address: true,
+        availability: true, responseTime: true, workingHours: true,
+        metaKeywords: true, metaDescription: true, ogImage: true,
+        hero3dConfig: true, uiConfig: true, sectionVisibility: true,
+      },
+    });
     res.json({ success: true, data: settings });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch settings" });

@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
-import { Download, Send } from "lucide-react";
+import { Download, Eye, Send } from "lucide-react";
+import { resolveUrl } from "../../utils/resolveUrl";
 
 export default function ButtonGroup({ downloadCVUrl, onContact }) {
+  const cvUrl = downloadCVUrl ? resolveUrl(downloadCVUrl) : null;
+
   return (
     <motion.div
       className="flex flex-wrap gap-4 pt-2"
@@ -10,15 +13,32 @@ export default function ButtonGroup({ downloadCVUrl, onContact }) {
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.6 }}
     >
-      <motion.a
-        href={downloadCVUrl || "#"}
-        className="btn-ceramic px-7 py-3.5 font-semibold text-sm flex items-center gap-2.5"
-        whileHover={{ y: -3 }}
-        whileTap={{ scale: 0.97 }}
-      >
-        <Download size={18} />
-        <span>Download Resume</span>
-      </motion.a>
+      {cvUrl && (
+        <>
+          <motion.a
+            href={cvUrl}
+            download
+            className="btn-ceramic px-7 py-3.5 font-semibold text-sm flex items-center gap-2.5"
+            whileHover={{ y: -3 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <Download size={18} />
+            <span>Download Resume</span>
+          </motion.a>
+
+          <motion.a
+            href={cvUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ceramic px-7 py-3.5 font-semibold text-sm flex items-center gap-2.5"
+            whileHover={{ y: -3 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <Eye size={18} />
+            <span>View Resume</span>
+          </motion.a>
+        </>
+      )}
 
       <motion.button
         onClick={onContact}

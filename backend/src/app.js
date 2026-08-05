@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import compression from "compression";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import { requestLogger, errorHandler, rateLimiter, authenticateToken, requireAdmin, prisma } from "shared";
+import { setupSocketIO } from "shared/services/socketService";
 
 import authRoutes from "../auth-service/src/routes/auth.js";
 import heroRoutes from "../portfolio-service/src/routes/hero.js";
@@ -31,7 +33,20 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const app = express();
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(compression({
+  level: 6,
+  threshold: 1024,
+  filter: (req, res) => {
+    if (req.headers["x-no-compression"]) return false;
+    return compression.filter(req, res);
+  },
+}));
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
 
 const allowedOrigins = [
   "http://localhost:5175",
@@ -48,7 +63,19 @@ const corsOptions = {
     if (allowedOrigins.some((o) => origin.startsWith(o.replace(/\/$/, "")))) {
       cb(null, true); return;
     }
-    if (/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+    if (/^https?:\/\/localhost:\d+/.test(origin)) {
+      cb(null, true); return;
+    }
+    if (/^https?:\/\/127\.\d+\.\d+\.\d+:\d+/.test(origin)) {
+      cb(null, true); return;
+    }
+    if (/^https?:\/\/172\.\d+\.\d+\.\d+:\d+/.test(origin)) {
+      cb(null, true); return;
+    }
+    if (/^https?:\/\/192\.168\.\d+\.\d+:\d+/.test(origin)) {
+      cb(null, true); return;
+    }
+    if (/^https?:\/\/10\.\d+\.\d+\.\d+:\d+/.test(origin)) {
       cb(null, true); return;
     }
     if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
@@ -65,9 +92,38 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(requestLogger);
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  if (req.method === "GET") {
+    if (req.path.startsWith("/uploads/") || req.path.startsWith("/api/v1/hero") || req.path.startsWith("/api/v1/about")) {
+      res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600");
+    } else if (req.path.startsWith("/api/v1/skills") || req.path.startsWith("/api/v1/services") ||
+               req.path.startsWith("/api/v1/experience") || req.path.startsWith("/api/v1/education") ||
+               req.path.startsWith("/api/v1/projects") || req.path.startsWith("/api/v1/testimonials") ||
+               req.path.startsWith("/api/v1/settings")) {
+      res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
+    } else if (req.path.startsWith("/api/v1/")) {
+      res.setHeader("Cache-Control", "private, no-cache, must-revalidate");
+    }
+  }
+
+  if (req.method === "GET" && req.path.startsWith("/api/v1/")) {
+    const etag = `W/"${Date.now()}"`;
+    res.setHeader("ETag", etag);
+    if (req.headers["if-none-match"] === etag) {
+      res.status(304).end();
+      return;
+    }
+  }
+
+  next();
+});
+
 app.use(rateLimiter());
-
-
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/hero", heroRoutes);
@@ -115,11 +171,6 @@ app.get("/health", async (req, res) => {
     service: "portfolio-backend",
     database: dbOk ? "connected" : "disconnected",
     dbError,
-    cloudinary: {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? "set" : "missing",
-      api_key: process.env.CLOUDINARY_API_KEY ? "set" : "missing",
-      api_secret: process.env.CLOUDINARY_API_SECRET ? "set" : "missing",
-    },
     timestamp: new Date().toISOString(),
   });
 });

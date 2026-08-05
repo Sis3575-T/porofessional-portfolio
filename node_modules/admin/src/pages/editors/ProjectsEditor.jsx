@@ -96,7 +96,7 @@ export default function ProjectsEditor() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({
-    title: '', slug: '', description: '', thumbnail: '', category: 'FULLSTACK',
+    title: '', slug: '', description: '', shortDescription: '', thumbnail: '', category: 'FULLSTACK',
     technologies: '', features: '', challenge: '', solution: '', lessonsLearned: '',
     liveUrl: '', githubUrl: '', featured: false,
   });
@@ -121,13 +121,13 @@ export default function ProjectsEditor() {
       };
       if (editing) { await projectsAPI.update(editing, data); toast.success('Updated'); }
       else { await projectsAPI.create(data); toast.success('Created'); }
-      setShowForm(false); setEditing(null); setForm({ title: '', slug: '', description: '', thumbnail: '', category: 'FULLSTACK', technologies: '', features: '', challenge: '', solution: '', lessonsLearned: '', liveUrl: '', githubUrl: '', featured: false }); fetch();
+      setShowForm(false); setEditing(null); setForm({ title: '', slug: '', description: '', shortDescription: '', thumbnail: '', category: 'FULLSTACK', technologies: '', features: '', challenge: '', solution: '', lessonsLearned: '', liveUrl: '', githubUrl: '', featured: false }); fetch();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed to save'); }
   };
 
   const handleEdit = (p) => {
     setForm({
-      title: p.title, slug: p.slug, description: p.description, thumbnail: p.thumbnail || '', category: p.category,
+      title: p.title, slug: p.slug, description: p.description, shortDescription: p.shortDescription || '', thumbnail: p.thumbnail || '', category: p.category,
       technologies: p.technologies ? JSON.parse(p.technologies).join(', ') : '',
       features: p.features ? JSON.parse(p.features).join('\n') : '',
       challenge: p.challenge || '', solution: p.solution || '', lessonsLearned: p.lessonsLearned || '',
@@ -160,6 +160,7 @@ export default function ProjectsEditor() {
             <input value={form.slug} onChange={(e) => setForm({...form, slug: e.target.value})} className="w-full" placeholder="slug-url" />
           </div>
           <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={3} className="w-full" placeholder="Description" />
+          <input value={form.shortDescription} onChange={(e) => setForm({...form, shortDescription: e.target.value})} className="w-full" placeholder="Short description (shown over image, max 200 chars)" maxLength={200} />
           <div className="grid sm:grid-cols-2 gap-4">
             <select value={form.category} onChange={(e) => setForm({...form, category: e.target.value})} className="w-full">
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}

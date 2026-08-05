@@ -8,6 +8,10 @@ router.get("/", async (req, res) => {
     const testimonials = await prisma.testimonial.findMany({
       where: { enabled: true },
       orderBy: { order: "asc" },
+      select: {
+        id: true, name: true, position: true, company: true,
+        avatar: true, rating: true, review: true, order: true,
+      },
     });
     res.json({ success: true, data: testimonials });
   } catch (error) {

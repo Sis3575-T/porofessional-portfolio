@@ -1,7 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import { authenticateToken, requireAdmin, rateLimiter, prisma } from "shared";
-import { sendReplyToUser } from "../services/email.js";
+import { sendReplyToUser, sendContactNotification } from "../services/email.js";
 
 const router = express.Router();
 
@@ -45,6 +45,14 @@ router.post("/", publicRateLimit, async (req, res) => {
     });
 
     console.log(`[CONTACT] New message from ${contact.name || "Anonymous"} (${contact.email || "no email"})`);
+
+    // Send notification email to admin (non-blocking)
+    sendContactNotification({
+      name: contact.name,
+      email: contact.email,
+      subject: contact.subject,
+      message: contact.message,
+    }).catch(() => {});
 
     res.status(201).json({
       success: true,
@@ -201,46 +209,25 @@ router.post("/test-email", authenticateToken, requireAdmin, async (req, res) => 
   try {
     const { to } = req.body;
     const testAddress = to || process.env.ADMIN_EMAIL || "sisay3575@gmail.com";
-    console.log("[EMAIL-TEST] Testing SMTP config, sending test to:", testAddress);
-    console.log("[EMAIL-TEST] SMTP_HOST:", process.env.SMTP_HOST);
-    console.log("[EMAIL-TEST] SMTP_USER:", process.env.SMTP_USER);
-    console.log("[EMAIL-TEST] SMTP_PORT:", process.env.SMTP_PORT);
-    console.log("[EMAIL-TEST] SMTP_PASS set:", !!process.env.SMTP_PASS);
 
-    const nodemailer = (await import("nodemailer")).default;
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: parseInt(process.env.SMTP_PORT) || 465,
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-      logger: true,
-      debug: true,
-    });
+    const { Resend } = await import("resend");
+    const client = new Resend(process.env.RESEND_API_KEY);
 
-    const info = await transporter.sendMail({
-      from: `"${process.env.SITE_NAME || "Portfolio"}" <${process.env.SMTP_USER}>`,
+    await client.emails.send({
+      from: "Portfolio <onboarding@resend.dev>",
       to: testAddress,
       subject: "Test email from Portfolio Admin",
-      html: "<h2>Test Email</h2><p>If you receive this, your SMTP configuration is working correctly.</p>",
+      html: "<h2>Test Email</h2><p>If you receive this, your Resend email configuration is working correctly.</p>",
     });
 
-    console.log("[EMAIL-TEST] Success! messageId:", info.messageId);
-    res.json({ success: true, message: "Test email sent successfully", messageId: info.messageId });
+    console.log("[EMAIL-TEST] Resend test email sent to:", testAddress);
+    res.json({ success: true, message: "Test email sent successfully via Resend" });
   } catch (error) {
-    console.error("[EMAIL-TEST] Failed:", error);
+    console.error("[EMAIL-TEST] Failed:", error.message);
     res.status(500).json({
       success: false,
       message: "Test email failed",
       error: error.message,
-      code: error.code,
-      command: error.command,
     });
   }
 });

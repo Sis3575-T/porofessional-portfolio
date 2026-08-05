@@ -57,7 +57,7 @@ const defaultVisibility = {
 };
 
 function HomePage() {
-  const { settings } = usePortfolio();
+  const { settings, hasData } = usePortfolio();
   const visibility = (() => {
     try {
       if (settings?.sectionVisibility) {
@@ -70,19 +70,21 @@ function HomePage() {
     return defaultVisibility;
   })();
 
+  const show = (key) => visibility[key] && (hasData[key] || key === "hero" || key === "about" || key === "contact");
+
   return (
     <Suspense fallback={<SectionLoader />}>
       <AnimatedPage>
         <SEO />
-        {visibility.hero && <Hero />}
-        {visibility.about && <About />}
-        {visibility.skills && <Skills />}
-        {visibility.projects && <Projects />}
-        {visibility.services && <Services />}
-        {visibility.experience && <Experience />}
-        {visibility.education && <Education />}
-        {visibility.testimonials && <Testimonials />}
-        {visibility.contact && <Contact />}
+        {show("hero") && <Hero />}
+        {show("about") && <About />}
+        {show("skills") && <Skills />}
+        {show("projects") && <Projects />}
+        {show("services") && <Services />}
+        {show("experience") && <Experience />}
+        {show("education") && <Education />}
+        {show("testimonials") && <Testimonials />}
+        {show("contact") && <Contact />}
       </AnimatedPage>
     </Suspense>
   );

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { aboutAPI } from '../../services/api';
+import api from '../../services/api';
 import { resolveUrl } from '../../utils/resolveUrl';
-import { Save, Loader2, Plus, Trash2, Image as ImageIcon, X } from 'lucide-react';
+import { Save, Loader2, Plus, Trash2, Image as ImageIcon, X, Upload, FileText } from 'lucide-react';
 import ImagePicker from '../../components/ImagePicker';
 
 const inputClass = "w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm";
@@ -44,6 +45,7 @@ export default function AboutEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pickerField, setPickerField] = useState(null);
+  const [uploadingCV, setUploadingCV] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -91,6 +93,28 @@ export default function AboutEditor() {
   };
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
+
+  const handleCVUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingCV(true);
+    try {
+      const formData = new FormData();
+      formData.append("cv", file);
+      const res = await api.post("/upload/cv", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (res.data.success) {
+        set("downloadCVUrl", res.data.data.url);
+        toast.success("CV uploaded successfully");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to upload CV");
+    } finally {
+      setUploadingCV(false);
+      e.target.value = "";
+    }
+  };
 
   if (loading) return <div className="animate-pulse text-slate-500">Loading...</div>;
 
@@ -199,8 +223,34 @@ export default function AboutEditor() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Download CV URL</label>
-            <input value={form.downloadCVUrl || ''} onChange={(e) => set('downloadCVUrl', e.target.value)} className={inputClass} />
+            <label className={labelClass}>Download CV / Resume</label>
+            <div className="flex gap-2">
+              <input value={form.downloadCVUrl || ''} onChange={(e) => set('downloadCVUrl', e.target.value)} className={inputClass} placeholder="https://... or upload a file" />
+              <label className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-lg transition cursor-pointer flex items-center gap-1.5 text-sm font-medium shrink-0">
+                {uploadingCV ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                {uploadingCV ? 'Uploading...' : 'Upload CV'}
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={handleCVUpload}
+                  className="hidden"
+                  disabled={uploadingCV}
+                />
+              </label>
+              {form.downloadCVUrl && (
+                <a
+                  href={resolveUrl(form.downloadCVUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition flex items-center gap-1.5 text-sm shrink-0"
+                >
+                  <FileText size={14} /> View
+                </a>
+              )}
+            </div>
+            {form.downloadCVUrl && (
+              <p className="mt-1.5 text-xs text-slate-400 truncate">{form.downloadCVUrl}</p>
+            )}
           </div>
           <div>
             <label className={labelClass}>Visibility</label>

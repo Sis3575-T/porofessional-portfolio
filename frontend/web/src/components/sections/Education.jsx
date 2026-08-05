@@ -12,45 +12,6 @@ import {
   Check,
 } from "lucide-react";
 
-const defaultEducation = [
-  {
-    id: "edu-1",
-    degree: "BSc. Computer Science",
-    institution: "University of Applied Sciences",
-    startDate: "2021-01-01",
-    endDate: "2025-01-01",
-    isCurrent: false,
-    field: "Software Engineering, Algorithms, and Emerging Technologies",
-    gpa: "3.7/4.0",
-    description:
-      "Focused on software engineering fundamentals, distributed systems, and AI-driven product development.",
-    location: "Addis Ababa, Ethiopia",
-    achievements: ["Graduated with Distinction", "Dean's List 2023", "Best Final Year Project"],
-    technologies: ["Python", "Java", "SQL", "Machine Learning"],
-    courses: ["Data Structures", "Operating Systems", "Computer Networks"],
-    certificateUrl: null,
-    logo: null,
-  },
-  {
-    id: "edu-2",
-    degree: "Professional Development",
-    institution: "Self-directed Learning",
-    startDate: "2022-01-01",
-    endDate: "2026-01-01",
-    isCurrent: true,
-    field: "Frontend, Backend, and Modern Web Architecture",
-    description:
-      "Built practical projects around React, Node.js, databases, deployment, and product design.",
-    achievements: ["10+ certifications", "Open source contributor"],
-    technologies: ["React", "Node.js", "TypeScript", "PostgreSQL", "AWS"],
-    courses: ["System Design", "Cloud Architecture", "DevOps"],
-    gpa: null,
-    location: "Online",
-    certificateUrl: null,
-    logo: null,
-  },
-];
-
 function parseJSON(val) {
   if (!val) return [];
   if (Array.isArray(val)) return val;
@@ -234,7 +195,7 @@ function EducationCard({ edu, index, total }) {
 export default function Education() {
   const { education, loading } = usePortfolio();
   const educationItems = useMemo(
-    () => (education && education.length > 0 ? education : defaultEducation),
+    () => education || [],
     [education]
   );
 

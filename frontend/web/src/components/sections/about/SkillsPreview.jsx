@@ -1,20 +1,7 @@
 import { motion } from "framer-motion";
 
-const defaultSkills = [
-  { name: "React", proficiency: 95 },
-  { name: "Express", proficiency: 90 },
-  { name: "MongoDB", proficiency: 85 },
-  { name: "Node.js", proficiency: 88 },
-  { name: "Docker", proficiency: 80 },
-  { name: "Three.js", proficiency: 75 },
-  { name: "Next.js", proficiency: 85 },
-  { name: "TypeScript", proficiency: 90 },
-];
-
 export default function SkillsPreview({ skills }) {
-  const items = skills && skills.length > 0
-    ? skills.filter((s) => s.enabled !== false).slice(0, 8)
-    : defaultSkills;
+  const items = (skills || []).filter((s) => s.enabled !== false).slice(0, 8);
 
   return (
     <div className="flex flex-wrap gap-2.5">

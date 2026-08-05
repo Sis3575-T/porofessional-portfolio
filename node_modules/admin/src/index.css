@@ -101,3 +101,20 @@ button {
   background: rgba(34, 211, 238, 0.12);
   color: #22d3ee;
 }
+
+/* Performance optimizations */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.btn-primary,
+.btn-danger,
+.sidebar-link {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.card {
+  contain: layout style;
+}

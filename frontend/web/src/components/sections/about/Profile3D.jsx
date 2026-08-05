@@ -126,6 +126,7 @@ export default function Profile3D({ profileImage, glbModel, name, isLowEnd: _isL
                   alt="Profile"
                   className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${imgLoaded ? "opacity-100" : "opacity-0 absolute inset-0"}`}
                   loading="lazy"
+                  decoding="async"
                   onLoad={() => setImgLoaded(true)}
                   onError={() => { setImgError(true); setImgLoaded(true); }}
                 />

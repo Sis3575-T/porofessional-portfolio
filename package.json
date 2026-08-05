@@ -17,7 +17,9 @@
     "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma"
   },
   "devDependencies": {
-    "concurrently": "^10.0.3"
+    "concurrently": "^10.0.3",
+    "lightningcss": "^1.33.0",
+    "terser": "^5.49.1"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

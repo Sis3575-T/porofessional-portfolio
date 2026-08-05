@@ -3,51 +3,6 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { resolveUrl } from "../../utils/resolveUrl";
 import { X, ExternalLink, Building2, MapPin, Calendar, Briefcase, Award, ChevronLeft, ChevronRight } from "lucide-react";
 
-const defaultExperiences = [
-  {
-    id: "exp-1",
-    company: "Tech Company Inc",
-    position: "Senior Full Stack Developer",
-    startDate: "2023-01-01",
-    endDate: "2026-01-01",
-    isCurrent: true,
-    description: "Leading development of scalable web applications with modern technologies.",
-    technologies: ["React", "Node.js", "TypeScript", "PostgreSQL", "AWS"],
-    responsibilities: ["Led team of 5 developers", "Architected microservices", "Reduced load time by 40%"],
-    achievements: ["Delivered 10+ projects", "99% uptime maintained"],
-    location: "Remote",
-    employmentType: "Full-time",
-  },
-  {
-    id: "exp-2",
-    company: "Digital Agency Co",
-    position: "Frontend Developer",
-    startDate: "2022-01-01",
-    endDate: "2024-01-01",
-    isCurrent: false,
-    description: "Built responsive web interfaces for enterprise clients.",
-    technologies: ["React", "Next.js", "Tailwind CSS", "Framer Motion"],
-    responsibilities: ["Developed client dashboards", "Built component libraries"],
-    achievements: ["Improved performance by 60%", "Won agency award"],
-    location: "New York, NY",
-    employmentType: "Full-time",
-  },
-  {
-    id: "exp-3",
-    company: "StartUp Labs",
-    position: "Junior Developer",
-    startDate: "2021-01-01",
-    endDate: "2022-06-01",
-    isCurrent: false,
-    description: "Developed full-stack features for a SaaS platform.",
-    technologies: ["React", "Express", "MongoDB", "JWT"],
-    responsibilities: ["Built REST APIs", "Implemented auth system"],
-    achievements: ["Shipped MVP in 3 months"],
-    location: "San Francisco, CA",
-    employmentType: "Full-time",
-  },
-];
-
 function parseJSON(val) {
   if (!val) return [];
   if (Array.isArray(val)) return val;
@@ -287,7 +242,7 @@ function ExperienceCard({ experience, index, onOpen }) {
 
 export default function Experience() {
   const { experiences } = usePortfolio();
-  const experienceList = experiences && experiences.length > 0 ? experiences : defaultExperiences;
+  const experienceList = experiences || [];
   const [activeIndex, setActiveIndex] = useState(-1);
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

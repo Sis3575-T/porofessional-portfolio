@@ -9,6 +9,14 @@ router.get("/", async (req, res) => {
     const services = await prisma.service.findMany({
       where: { enabled: true },
       orderBy: { order: "asc" },
+      select: {
+        id: true, slug: true, title: true, shortDescription: true,
+        description: true, icon: true, iconUrl: true, heroImage: true,
+        technologies: true, features: true, process: true,
+        liveUrl: true, githubUrl: true, docsUrl: true,
+        buttonText: true, buttonColor: true, accentColor: true,
+        order: true,
+      },
     });
     res.json({ success: true, data: services });
   } catch (error) {

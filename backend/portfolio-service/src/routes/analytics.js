@@ -1,11 +1,8 @@
 import express from "express";
+import crypto from "crypto";
 import { authenticateToken, requireAdmin, prisma } from "shared";
-import http from "http";
-import https from "https";
 
 const router = express.Router();
-
-const IPINFO_TOKEN = process.env.IPINFO_TOKEN || "";
 
 // ============ Bot Detection ============
 const BOT_PATTERNS = [
@@ -32,7 +29,13 @@ function isAdminBypass(req) {
   return req.headers["x-admin-bypass"] === "true";
 }
 
-// ============ Helpers ============
+// ============ IP Hashing (SHA-256 for privacy) ============
+function hashIp(ip) {
+  if (!ip) return null;
+  return crypto.createHash("sha256").update(ip).digest("hex");
+}
+
+// ============ UA Parsing ============
 function parseUA(ua) {
   if (!ua) return { browser: "Unknown", os: "Unknown", deviceType: "desktop" };
   let browser = "Other";
@@ -40,6 +43,7 @@ function parseUA(ua) {
   else if (ua.includes("Edg")) browser = "Edge";
   else if (ua.includes("Chrome")) browser = "Chrome";
   else if (ua.includes("Safari")) browser = "Safari";
+  else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
 
   let os = "Other";
   if (ua.includes("Windows")) os = "Windows";
@@ -55,6 +59,7 @@ function parseUA(ua) {
   return { browser, os, deviceType };
 }
 
+// ============ JSON Parser ============
 function parseJSON(str, fallback) {
   try { return typeof str === "string" ? JSON.parse(str) : (str || fallback); }
   catch { return fallback; }
@@ -62,6 +67,9 @@ function parseJSON(str, fallback) {
 
 // ============ IP Detection ============
 function getClientIp(req) {
+  const cf = req.headers["cf-connecting-ip"];
+  if (cf && !isPrivateIp(cf)) return cf;
+
   const xff = req.headers["x-forwarded-for"];
   if (xff) {
     const ips = xff.split(",").map((ip) => ip.trim());
@@ -69,6 +77,10 @@ function getClientIp(req) {
       if (!isPrivateIp(ip)) return ip;
     }
   }
+
+  const realIp = req.headers["x-real-ip"];
+  if (realIp && !isPrivateIp(realIp)) return realIp;
+
   const remote = req.socket?.remoteAddress || req.ip || null;
   if (remote && !isPrivateIp(remote)) return remote;
   return null;
@@ -83,39 +95,59 @@ function isPrivateIp(ip) {
   return false;
 }
 
-// ============ Geolocation (ipinfo.io) ============
+// ============ Geolocation (ip-api.com free fallback + ipinfo.io with token) ============
 const geoCache = new Map();
 
 async function detectLocation(ip) {
   if (!ip || ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
-    return { country: null, region: null, city: null, timezone: null };
+    return { country: null, region: null, city: null, latitude: null, longitude: null, timezone: null };
   }
   if (geoCache.has(ip)) return geoCache.get(ip);
 
-  try {
-    const data = await new Promise((resolve, reject) => {
-      const url = IPINFO_TOKEN
-        ? `https://ipinfo.io/${ip}/json?token=${IPINFO_TOKEN}`
-        : `https://ipinfo.io/${ip}/json`;
-      const mod = url.startsWith("https") ? https : http;
-      const req = mod.get(url, { timeout: 2000 }, (res) => {
-        let body = "";
-        res.on("data", (chunk) => body += chunk);
-        res.on("end", () => {
-          try { resolve(JSON.parse(body)); } catch { reject(new Error("parse error")); }
-        });
-      });
-      req.on("error", reject);
-      req.on("timeout", () => { req.destroy(); reject(new Error("timeout")); });
-    });
+  const IPINFO_TOKEN = process.env.IPINFO_TOKEN || "";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2000);
 
-    if (data.country) {
-      const loc = {
-        country: data.country || null,
-        region: data.region || null,
-        city: data.city || null,
-        timezone: data.timezone || null,
-      };
+  try {
+    let loc = null;
+
+    if (IPINFO_TOKEN) {
+      try {
+        const response = await fetch(`https://ipinfo.io/${ip}/json?token=${IPINFO_TOKEN}`, { signal: controller.signal });
+        const data = await response.json();
+        if (data.country) {
+          loc = {
+            country: data.country || null,
+            region: data.region || null,
+            city: data.city || null,
+            latitude: data.loc?.split(",")?.[0] || null,
+            longitude: data.loc?.split(",")?.[1] || null,
+            timezone: data.timezone || null,
+          };
+        }
+      } catch {}
+    }
+
+    if (!loc) {
+      try {
+        const response = await fetch(`https://ip-api.com/json/${ip}?fields=country,regionName,city,lat,lon,timezone`, { signal: controller.signal });
+        const data = await response.json();
+        if (data.status === "success" && data.country) {
+          loc = {
+            country: data.country || null,
+            region: data.regionName || null,
+            city: data.city || null,
+            latitude: data.lat?.toString() || null,
+            longitude: data.lon?.toString() || null,
+            timezone: data.timezone || null,
+          };
+        }
+      } catch {}
+    }
+
+    clearTimeout(timeout);
+
+    if (loc) {
       geoCache.set(ip, loc);
       if (geoCache.size > 500) {
         const firstKey = geoCache.keys().next().value;
@@ -124,11 +156,40 @@ async function detectLocation(ip) {
       return loc;
     }
   } catch {}
-  return { country: null, region: null, city: null, timezone: null };
+  clearTimeout(timeout);
+  return { country: null, region: null, city: null, latitude: null, longitude: null, timezone: null };
 }
 
+// ============ In-memory rate limiter for track endpoint ============
+const trackRateMap = new Map();
+const TRACK_WINDOW_MS = 60 * 1000;
+const TRACK_MAX = 30;
+
+function trackRateLimit(req, res, next) {
+  const ip = getClientIp(req) || req.ip || "unknown";
+  const now = Date.now();
+  const entry = trackRateMap.get(ip);
+  if (!entry || now - entry.start > TRACK_WINDOW_MS) {
+    trackRateMap.set(ip, { start: now, count: 1 });
+    return next();
+  }
+  entry.count++;
+  if (entry.count > TRACK_MAX) {
+    return res.status(429).json({ success: false, message: "Too many requests" });
+  }
+  next();
+}
+
+// Clean up stale entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of trackRateMap) {
+    if (now - val.start > TRACK_WINDOW_MS * 2) trackRateMap.delete(key);
+  }
+}, 60000);
+
 // ============ PUBLIC: Track page view / event ============
-router.post("/track", async (req, res) => {
+router.post("/track", trackRateLimit, async (req, res) => {
   try {
     const { visitorId, page, event, data } = req.body;
     if (!visitorId || !page) {
@@ -137,12 +198,9 @@ router.post("/track", async (req, res) => {
 
     const ua = req.headers["user-agent"] || "";
 
-    // Skip bots
     if (isBot(ua)) {
       return res.json({ success: true, data: { skipped: true, reason: "bot" } });
     }
-
-    // Skip admin bypass
     if (isAdminBypass(req)) {
       return res.json({ success: true, data: { skipped: true, reason: "admin" } });
     }
@@ -150,7 +208,9 @@ router.post("/track", async (req, res) => {
     const { browser, os, deviceType } = parseUA(ua);
     const language = req.headers["accept-language"]?.split(",")[0]?.split(";")[0] || "en";
     const referrer = req.headers["referer"] || req.body.referrer || null;
+    const screenResolution = data?.screen ? `${data.screen.width}x${data.screen.height}` : null;
     const ip = getClientIp(req);
+    const ipHash = hashIp(ip);
     const location = await detectLocation(ip);
 
     let visitor = await prisma.visitor.findFirst({ where: { visitorId } });
@@ -160,25 +220,29 @@ router.post("/track", async (req, res) => {
         where: { visitorId },
         create: {
           visitorId,
-          browser, os, deviceType, language, referrer,
+          browser, os, deviceType, language, referrer, screenResolution,
+          ipHash,
           country: location.country, region: location.region, city: location.city,
-          timezone: location.timezone || req.body.timezone || null,
+          latitude: location.latitude, longitude: location.longitude,
+          timezone: location.timezone || data?.timezone || null,
           pagesVisited: JSON.stringify([page]),
           projectsViewed: JSON.stringify(data?.projectSlug ? [data.projectSlug] : []),
-          skillsViewed: page === "/#skills" || page === "/skills",
-          servicesViewed: page === "/#services" || page === "/services",
-          experienceViewed: page === "/#experience" || page === "/experience",
-          educationViewed: page === "/#education" || page === "/education",
-          contactViewed: page === "/#contact" || page === "/contact",
+          skillsViewed: /skills/i.test(page),
+          servicesViewed: /services/i.test(page),
+          experienceViewed: /experience/i.test(page),
+          educationViewed: /education/i.test(page),
+          contactViewed: /contact/i.test(page),
         },
         update: {
           lastVisitAt: new Date(),
           totalVisits: { increment: 1 },
-          browser, os, deviceType, language,
+          browser, os, deviceType, language, screenResolution,
           country: location.country || undefined,
           region: location.region || undefined,
           city: location.city || undefined,
-          timezone: location.timezone || req.body.timezone || undefined,
+          latitude: location.latitude || undefined,
+          longitude: location.longitude || undefined,
+          timezone: location.timezone || data?.timezone || undefined,
           referrer,
         },
       });
@@ -218,24 +282,25 @@ router.post("/track", async (req, res) => {
         country: location.country || visitor.country,
         region: location.region || visitor.region,
         city: location.city || visitor.city,
-        timezone: location.timezone || req.body.timezone || visitor.timezone,
-        browser, os, deviceType, language,
-        skillsViewed: visitor.skillsViewed || page.includes("skills"),
-        servicesViewed: visitor.servicesViewed || page.includes("services"),
-        experienceViewed: visitor.experienceViewed || page.includes("experience"),
-        educationViewed: visitor.educationViewed || page.includes("education"),
-        contactViewed: visitor.contactViewed || page.includes("contact"),
+        latitude: location.latitude || visitor.latitude,
+        longitude: location.longitude || visitor.longitude,
+        timezone: location.timezone || data?.timezone || visitor.timezone,
+        browser, os, deviceType, language, screenResolution,
+        skillsViewed: visitor.skillsViewed || /skills/i.test(page),
+        servicesViewed: visitor.servicesViewed || /services/i.test(page),
+        experienceViewed: visitor.experienceViewed || /experience/i.test(page),
+        educationViewed: visitor.educationViewed || /education/i.test(page),
+        contactViewed: visitor.contactViewed || /contact/i.test(page),
         contactSubmissions: visitor.contactSubmissions + (event === "contact_submit" ? 1 : 0),
         resumeDownloads: visitor.resumeDownloads + (event === "resume_download" ? 1 : 0),
       },
     });
 
     if (isNewSession) {
-      const visitNumber = newVisitCount;
       await prisma.visit.create({
         data: {
           visitorId: visitor.id,
-          visitNumber,
+          visitNumber: newVisitCount,
           pagesViewed: JSON.stringify([page]),
           actions: JSON.stringify(event ? [{ event, data, page, time: new Date().toISOString() }] : []),
           referrer,
@@ -266,15 +331,45 @@ router.post("/track", async (req, res) => {
   }
 });
 
+// ============ PUBLIC: Start session ============
+router.post("/session/start", async (req, res) => {
+  try {
+    const { visitorId } = req.body;
+    if (!visitorId) return res.status(400).json({ success: false, message: "visitorId required" });
+    if (isAdminBypass(req)) return res.json({ success: true });
+
+    const visitor = await prisma.visitor.findFirst({ where: { visitorId } });
+    if (!visitor) return res.json({ success: true });
+
+    const now = new Date();
+    const lastVisit = new Date(visitor.lastVisitAt);
+    const diffHours = (now - lastVisit) / (1000 * 60 * 60);
+
+    if (diffHours > 0.5) {
+      await prisma.visit.create({
+        data: {
+          visitorId: visitor.id,
+          visitNumber: visitor.totalVisits + 1,
+          startedAt: now,
+          pagesViewed: JSON.stringify([]),
+          actions: JSON.stringify([]),
+        },
+      });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Session start error:", error);
+    res.status(500).json({ success: false, message: "Failed to start session" });
+  }
+});
+
 // ============ PUBLIC: End session ============
 router.post("/session/end", async (req, res) => {
   try {
     const { visitorId, duration } = req.body;
     if (!visitorId) return res.status(400).json({ success: false, message: "visitorId required" });
-
-    if (isAdminBypass(req)) {
-      return res.json({ success: true });
-    }
+    if (isAdminBypass(req)) return res.json({ success: true });
 
     const visitor = await prisma.visitor.findFirst({ where: { visitorId } });
     if (!visitor) return res.json({ success: true });
@@ -291,10 +386,7 @@ router.post("/session/end", async (req, res) => {
     if (visit) {
       await prisma.visit.update({
         where: { id: visit.id },
-        data: {
-          endedAt: new Date(),
-          duration: duration || visit.duration,
-        },
+        data: { endedAt: new Date(), duration: duration || visit.duration },
       });
     }
 
@@ -308,27 +400,34 @@ router.post("/session/end", async (req, res) => {
 router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const where = { isBot: false };
+    const now = new Date();
 
     const totalVisitors = await prisma.visitor.count({ where });
-    const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     const onlineNow = await prisma.visitor.count({ where: { isBot: false, lastVisitAt: { gte: oneHourAgo } } });
 
-    const visitors = await prisma.visitor.findMany({ where, select: { totalVisits: true, totalTimeSpent: true } });
-    const returningVisitors = visitors.filter((v) => v.totalVisits > 1).length;
-    const totalVisits = visitors.reduce((sum, v) => sum + v.totalVisits, 0);
-    const totalTime = visitors.reduce((sum, v) => sum + v.totalTimeSpent, 0);
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const uniqueToday = await prisma.visitor.count({ where: { isBot: false, lastVisitAt: { gte: todayStart } } });
+
+    const totalPageViews = await prisma.visit.count();
+    const totalVisitsResult = await prisma.visitor.aggregate({ where, _sum: { totalVisits: true, totalTimeSpent: true } });
+    const totalVisits = totalVisitsResult._sum.totalVisits || 0;
+    const totalTime = totalVisitsResult._sum.totalTimeSpent || 0;
     const avgDuration = totalVisitors > 0 ? Math.round(totalTime / totalVisitors) : 0;
 
+    const visitors = await prisma.visitor.findMany({ where, select: { totalVisits: true } });
+    const returningVisitors = visitors.filter((v) => v.totalVisits > 1).length;
+
+    // Breakdowns
+    const allVisitors = await prisma.visitor.findMany({
+      where,
+      select: { country: true, city: true, browser: true, os: true, deviceType: true },
+    });
     const countryCounts = {};
     const cityCounts = {};
     const browserCounts = {};
     const osCounts = {};
     const deviceCounts = {};
-    const allVisitors = await prisma.visitor.findMany({
-      where,
-      select: { country: true, city: true, browser: true, os: true, deviceType: true },
-    });
     for (const v of allVisitors) {
       if (v.country) countryCounts[v.country] = (countryCounts[v.country] || 0) + 1;
       if (v.city) cityCounts[v.city] = (cityCounts[v.city] || 0) + 1;
@@ -337,30 +436,41 @@ router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
       if (v.deviceType) deviceCounts[v.deviceType] = (deviceCounts[v.deviceType] || 0) + 1;
     }
 
-    const topCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
-    const topCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
-    const browsers = Object.entries(browserCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
-    const osList = Object.entries(osCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
-    const devices = Object.entries(deviceCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
+    const sortEntries = (obj) => Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
 
+    // Top pages
     const allPages = await prisma.visitor.findMany({ where, select: { pagesVisited: true } });
     const pageCount = {};
     for (const v of allPages) {
       const pages = parseJSON(v.pagesVisited, []);
       for (const p of pages) pageCount[p] = (pageCount[p] || 0) + 1;
     }
-    const topPages = Object.entries(pageCount).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
 
+    // Top projects
     const allProjects = await prisma.visitor.findMany({ where, select: { projectsViewed: true } });
     const projCount = {};
     for (const v of allProjects) {
       const projs = parseJSON(v.projectsViewed, []);
       for (const p of projs) projCount[p] = (projCount[p] || 0) + 1;
     }
-    const topProjects = Object.entries(projCount).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, count]) => ({ name, count }));
 
+    // Totals
     const totalDownloads = await prisma.visitor.aggregate({ where, _sum: { resumeDownloads: true } });
     const totalSubmissions = await prisma.visitor.aggregate({ where, _sum: { contactSubmissions: true } });
+
+    // Growth data (last 30 days)
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const growthVisitors = await prisma.visitor.findMany({
+      where: { isBot: false, createdAt: { gte: thirtyDaysAgo } },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    });
+    const dailyGrowth = {};
+    for (const v of growthVisitors) {
+      const day = v.createdAt.toISOString().split("T")[0];
+      dailyGrowth[day] = (dailyGrowth[day] || 0) + 1;
+    }
+    const growth = Object.entries(dailyGrowth).map(([date, count]) => ({ date, count }));
 
     res.json({
       success: true,
@@ -368,18 +478,21 @@ router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
         totalVisitors,
         returningVisitors,
         newVisitors: totalVisitors - returningVisitors,
+        uniqueToday,
         totalVisits,
+        totalPageViews,
         onlineNow,
         avgDuration,
-        topCountries,
-        topCities,
-        browsers,
-        osList,
-        devices,
-        topPages,
-        topProjects,
+        topCountries: sortEntries(countryCounts),
+        topCities: sortEntries(cityCounts),
+        browsers: sortEntries(browserCounts),
+        osList: sortEntries(osCounts),
+        devices: sortEntries(deviceCounts),
+        topPages: sortEntries(pageCount),
+        topProjects: sortEntries(projCount),
         totalResumeDownloads: totalDownloads._sum.resumeDownloads || 0,
         totalContactSubmissions: totalSubmissions._sum.contactSubmissions || 0,
+        growth,
       },
     });
   } catch (error) {
@@ -401,6 +514,7 @@ router.get("/visitors", authenticateToken, requireAdmin, async (req, res) => {
         { country: { contains: search, mode: "insensitive" } },
         { city: { contains: search, mode: "insensitive" } },
         { browser: { contains: search, mode: "insensitive" } },
+        { os: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -417,9 +531,15 @@ router.get("/visitors", authenticateToken, requireAdmin, async (req, res) => {
     res.json({
       success: true,
       data: visitors,
-      pagination: { page: parseInt(page), limit: parseInt(limit), total, pages: Math.ceil(total / parseInt(limit)) },
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit)),
+      },
     });
   } catch (error) {
+    console.error("Visitors list error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch visitors" });
   }
 });
@@ -434,11 +554,12 @@ router.get("/visitors/:visitorId", authenticateToken, requireAdmin, async (req, 
     if (!visitor) return res.status(404).json({ success: false, message: "Visitor not found" });
     res.json({ success: true, data: visitor });
   } catch (error) {
+    console.error("Visitor profile error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch visitor" });
   }
 });
 
-// ============ ADMIN: Delete visitor ============
+// ============ ADMIN: Delete single visitor ============
 router.delete("/visitors/:visitorId", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const visitor = await prisma.visitor.findFirst({ where: { visitorId: req.params.visitorId } });
@@ -447,7 +568,29 @@ router.delete("/visitors/:visitorId", authenticateToken, requireAdmin, async (re
     await prisma.visitor.delete({ where: { id: visitor.id } });
     res.json({ success: true, message: "Visitor deleted" });
   } catch (error) {
+    console.error("Delete visitor error:", error);
     res.status(500).json({ success: false, message: "Failed to delete visitor" });
+  }
+});
+
+// ============ ADMIN: Delete ALL analytics data ============
+router.delete("/all", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const confirm = req.body.confirm;
+    if (confirm !== "DELETE_ALL_ANALYTICS") {
+      return res.status(400).json({
+        success: false,
+        message: "Send { confirm: 'DELETE_ALL_ANALYTICS' } to confirm",
+      });
+    }
+
+    await prisma.visit.deleteMany();
+    await prisma.visitor.deleteMany();
+
+    res.json({ success: true, message: "All analytics data deleted" });
+  } catch (error) {
+    console.error("Delete all analytics error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete analytics data" });
   }
 });
 

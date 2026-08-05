@@ -15,6 +15,7 @@ function getAdminHeaders() {
   return isAdminBypass() ? { "x-admin-bypass": "true" } : {};
 }
 
+// Generate a stable fingerprint hash from browser properties
 async function generateFingerprint() {
   const parts = [];
 
@@ -62,10 +63,9 @@ async function generateFingerprint() {
   // Timezone
   parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || "");
 
-  // Fonts (detect common fonts)
+  // Font detection
   try {
     const testFonts = ["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia", "Palatino", "Garamond", "Comic Sans MS", "Impact", "Lucida Console"];
-    const baseWidth = 600;
     const span = document.createElement("span");
     span.style.position = "absolute";
     span.style.left = "-9999px";
@@ -82,7 +82,6 @@ async function generateFingerprint() {
     parts.push(fontList);
   } catch {}
 
-  // Hash all parts into a stable ID
   const raw = parts.join("|||");
   const encoder = new TextEncoder();
   const data = encoder.encode(raw);
@@ -96,33 +95,27 @@ let cachedVisitorId = null;
 function getVisitorId() {
   if (cachedVisitorId) return cachedVisitorId;
 
-  // Check existing stored ID first
   let id = localStorage.getItem(VISITOR_ID_KEY);
   if (id && id.startsWith("fp-")) {
     cachedVisitorId = id;
     return id;
   }
 
-  // Generate fingerprint-based ID (async, falls back to UUID)
-  cachedVisitorId = generateFingerprint()
+  // Generate async, fall back to UUID
+  generateFingerprint()
     .then((hash) => {
       const fpId = `fp-${hash}`;
       localStorage.setItem(VISITOR_ID_KEY, fpId);
-      return fpId;
+      cachedVisitorId = fpId;
     })
     .catch(() => {
-      const fallback = crypto.randomUUID
-        ? `fp-${crypto.randomUUID()}`
-        : `fp-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+      const fallback = `fp-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
       localStorage.setItem(VISITOR_ID_KEY, fallback);
-      return fallback;
+      cachedVisitorId = fallback;
     });
 
-  // Return stored or fallback while fingerprint generates
   if (!id) {
-    id = crypto.randomUUID
-      ? `fp-${crypto.randomUUID()}`
-      : `fp-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    id = `fp-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     localStorage.setItem(VISITOR_ID_KEY, id);
   }
   cachedVisitorId = id;
@@ -138,28 +131,40 @@ function getSessionStart() {
   return parseInt(start);
 }
 
+function getScreenInfo() {
+  return {
+    width: screen.width,
+    height: screen.height,
+    colorDepth: screen.colorDepth,
+    pixelRatio: window.devicePixelRatio || 1,
+  };
+}
+
 export function useAnalytics() {
   const location = useLocation();
   const trackedPages = useRef(new Set());
   const sessionStart = useRef(getSessionStart());
+  const hasTrackedCurrentPage = useRef(false);
 
   const trackPage = useCallback(async (page, event, data) => {
+    if (isAdminBypass()) return;
     try {
       const visitorId = getVisitorId();
       await axios.post(`${API_URL}/api/v1/analytics/track`, {
         visitorId,
         page,
         event,
-        data,
+        data: { ...data, screen: getScreenInfo(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         referrer: document.referrer || null,
-      }, { headers: getAdminHeaders() });
+      }, { headers: getAdminHeaders(), timeout: 5000 });
     } catch (err) {
-      console.warn("Analytics track failed:", err.message);
+      // Silently fail - analytics should never break the app
     }
   }, []);
 
   const trackEvent = useCallback(async (event, data) => {
+    if (isAdminBypass()) return;
     try {
       const visitorId = getVisitorId();
       const page = window.location.hash || window.location.pathname;
@@ -167,40 +172,45 @@ export function useAnalytics() {
         visitorId,
         page,
         event,
-        data,
+        data: { ...data, screen: getScreenInfo() },
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }, { headers: getAdminHeaders() });
-    } catch (err) {
-      console.warn("Analytics event failed:", err.message);
-    }
+      }, { headers: getAdminHeaders(), timeout: 5000 });
+    } catch (err) {}
   }, []);
 
   const endSession = useCallback(async () => {
+    if (isAdminBypass()) return;
     try {
       const visitorId = getVisitorId();
       const duration = Math.floor((Date.now() - sessionStart.current) / 1000);
       await axios.post(`${API_URL}/api/v1/analytics/session/end`, {
         visitorId,
         duration,
-      }, { headers: getAdminHeaders() });
-    } catch (err) {
-      console.warn("Analytics session end failed:", err.message);
-    }
+      }, { headers: getAdminHeaders(), timeout: 3000 });
+    } catch (err) {}
   }, []);
 
+  // Track route changes
   useEffect(() => {
     const page = location.pathname + (location.hash || "");
     if (!trackedPages.current.has(page)) {
       trackedPages.current.add(page);
       trackPage(page);
     }
+    hasTrackedCurrentPage.current = true;
   }, [location, trackPage]);
 
+  // Session end on unload
   useEffect(() => {
     const handleBeforeUnload = () => endSession();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") endSession();
+    };
     window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       endSession();
     };
   }, [endSession]);
@@ -208,4 +218,4 @@ export function useAnalytics() {
   return { trackPage, trackEvent, endSession, visitorId: getVisitorId() };
 }
 
-export { getVisitorId };
+export { getVisitorId, isAdminBypass };

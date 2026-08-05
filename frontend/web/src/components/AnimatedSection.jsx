@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 
 const sectionVariants = {
@@ -13,7 +14,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-export function AnimatedSection({ children, className, id, theme, ...rest }) {
+export const AnimatedSection = memo(function AnimatedSection({ children, className, id, theme, ...rest }) {
   const baseClass = "px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-24 relative";
   const mergedClassName = className ? `${baseClass} ${className}` : baseClass;
 
@@ -37,10 +38,10 @@ export function AnimatedSection({ children, className, id, theme, ...rest }) {
       </div>
     </motion.section>
   );
-}
+});
 
 
-export function AnimatedItem({ children, className, delay = 0 }) {
+export const AnimatedItem = memo(function AnimatedItem({ children, className, delay = 0 }) {
   return (
     <motion.div
       className={className}
@@ -50,9 +51,9 @@ export function AnimatedItem({ children, className, delay = 0 }) {
       {children}
     </motion.div>
   );
-}
+});
 
-export function AnimatedTitle({ children, className }) {
+export const AnimatedTitle = memo(function AnimatedTitle({ children, className }) {
   return (
     <motion.h2
       className={className}
@@ -62,9 +63,9 @@ export function AnimatedTitle({ children, className }) {
       {children}
     </motion.h2>
   );
-}
+});
 
-export function AnimatedCard({ children, className, index = 0 }) {
+export const AnimatedCard = memo(function AnimatedCard({ children, className, index = 0 }) {
   return (
     <motion.div
       className={className}
@@ -77,4 +78,4 @@ export function AnimatedCard({ children, className, index = 0 }) {
       {children}
     </motion.div>
   );
-}
+});

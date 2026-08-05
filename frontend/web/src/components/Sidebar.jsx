@@ -1,33 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Home, User, Code, Briefcase, Settings, PenTool, BookOpen, Mail,
   Sun, Moon,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { usePortfolio } from "../context/PortfolioContext";
+import { throttle } from "../utils/performance";
 const navColors = {
   blue: { icon: "text-accent-blue", bg: "bg-accent-blue" },
   gray: { icon: "text-accent-gray", bg: "bg-accent-gray" },
 };
 
-const navItems = [
-  { label: "Home",     href: "#hero",       icon: Home,     color: "blue" },
-  { label: "About",    href: "#about",      icon: User,     color: "gray" },
-  { label: "Skills",   href: "#skills",     icon: Code,     color: "blue" },
-  { label: "Projects", href: "#projects",   icon: Briefcase, color: "gray" },
-  { label: "Services", href: "#services",   icon: Settings,  color: "blue" },
-  { label: "Experience", href: "#experience", icon: PenTool, color: "gray" },
-  { label: "Education", href: "#education",   icon: BookOpen, color: "blue" },
-  { label: "Contact",  href: "#contact",    icon: Mail,     color: "gray" },
+const allNavItems = [
+  { label: "Home",     href: "#hero",       icon: Home,     color: "blue",  always: true },
+  { label: "About",    href: "#about",      icon: User,     color: "gray",  always: true },
+  { label: "Skills",   href: "#skills",     icon: Code,     color: "blue",  dataKey: "skills" },
+  { label: "Projects", href: "#projects",   icon: Briefcase, color: "gray", dataKey: "projects" },
+  { label: "Services", href: "#services",   icon: Settings,  color: "blue", dataKey: "services" },
+  { label: "Experience", href: "#experience", icon: PenTool, color: "gray", dataKey: "experience" },
+  { label: "Education", href: "#education",   icon: BookOpen, color: "blue", dataKey: "education" },
+  { label: "Contact",  href: "#contact",    icon: Mail,     color: "gray",  always: true },
 ];
 
 export default function Sidebar() {
   const { dark, toggle } = useTheme();
+  const { hasData } = usePortfolio();
   const [activeSection, setActiveSection] = useState("hero");
 
+  const navItems = allNavItems.filter((item) =>
+    item.always || hasData[item.dataKey]
+  );
+
+  const navItemsRef = useRef(navItems);
+  navItemsRef.current = navItems;
+
   useEffect(() => {
-    const handleScroll = () => {
-      const ids = navItems.map((item) => item.href.slice(1));
+    const handleScroll = throttle(() => {
+      const ids = navItemsRef.current.map((item) => item.href.slice(1));
       for (const id of [...ids].reverse()) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= 200) {
@@ -35,7 +45,7 @@ export default function Sidebar() {
           break;
         }
       }
-    };
+    }, 100);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

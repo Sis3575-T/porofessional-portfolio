@@ -1,31 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Sun, Moon, Menu, X } from "lucide-react";
+import { Download, Eye, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useProfile } from "../context/ProfileContext";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useAnalytics } from "../hooks/useAnalytics";
 import Logo from "./Logo";
+import { resolveUrl } from "../utils/resolveUrl";
+import { throttle } from "../utils/performance";
 
-const navItems = [
-  { label: "Home",     href: "#hero" },
-  { label: "About",    href: "#about" },
-  { label: "Skills",   href: "#skills" },
-  { label: "Projects", href: "#projects" },
-  { label: "Services", href: "#services" },
-  { label: "Experience", href: "#experience" },
-  { label: "Contact",  href: "#contact" },
+const allNavItems = [
+  { label: "Home",     href: "#hero",      always: true },
+  { label: "About",    href: "#about",     always: true },
+  { label: "Skills",   href: "#skills",    dataKey: "skills" },
+  { label: "Projects", href: "#projects",  dataKey: "projects" },
+  { label: "Services", href: "#services",  dataKey: "services" },
+  { label: "Experience", href: "#experience", dataKey: "experience" },
+  { label: "Education", href: "#education", dataKey: "education" },
+  { label: "Contact",  href: "#contact",   always: true },
 ];
 
 export default function Navbar() {
   const { dark, toggle } = useTheme();
   const { siteTitle } = useProfile();
+  const { about, hasData } = usePortfolio();
   const { trackEvent } = useAnalytics();
   const [activeSection, setActiveSection] = useState("hero");
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const rawCvUrl = about?.downloadCVUrl;
+  const cvUrl = rawCvUrl ? resolveUrl(rawCvUrl) : null;
+
+  const navItems = allNavItems.filter((item) =>
+    item.always || hasData[item.dataKey]
+  );
+
+  const navItemsRef = useRef(navItems);
+  navItemsRef.current = navItems;
+
   useEffect(() => {
-    const handleScroll = () => {
-      const ids = navItems.map((item) => item.href.slice(1));
+    const handleScroll = throttle(() => {
+      const ids = navItemsRef.current.map((item) => item.href.slice(1));
       for (const id of [...ids].reverse()) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= 200) {
@@ -33,7 +48,7 @@ export default function Navbar() {
           break;
         }
       }
-    };
+    }, 100);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -81,15 +96,31 @@ export default function Navbar() {
 
           {/* Right actions */}
           <div className="flex items-center gap-3 ml-auto">
-            <a
-              href="/resume.pdf"
-              onClick={() => trackEvent("resume_download")}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 shadow-sm"
-              aria-label="Download CV"
-            >
-              <Download size={14} />
-              <span className="hidden lg:inline">Download CV</span>
-            </a>
+            {cvUrl && (
+              <>
+                <a
+                  href={cvUrl}
+                  onClick={() => trackEvent("resume_download")}
+                  download
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 shadow-sm"
+                  aria-label="Download CV"
+                >
+                  <Download size={14} />
+                  <span className="hidden lg:inline">Download CV</span>
+                </a>
+                <a
+                  href={cvUrl}
+                  onClick={() => trackEvent("resume_view")}
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 shadow-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="View CV"
+                >
+                  <Eye size={14} />
+                  <span className="hidden lg:inline">View CV</span>
+                </a>
+              </>
+            )}
 
             <button
               onClick={toggle}
@@ -166,13 +197,29 @@ export default function Navbar() {
                   {dark ? <Sun size={16} /> : <Moon size={16} />}
                   {dark ? "Light Mode" : "Dark Mode"}
                 </button>
-                <a
-                  href="/resume.pdf"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all"
-                >
-                  <Download size={16} />
-                  Download CV
-                </a>
+                {cvUrl && (
+                  <>
+                    <a
+                      href={cvUrl}
+                      onClick={() => trackEvent("resume_download")}
+                      download
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all"
+                    >
+                      <Download size={16} />
+                      Download CV
+                    </a>
+                    <a
+                      href={cvUrl}
+                      onClick={() => trackEvent("resume_view")}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Eye size={16} />
+                      View CV
+                    </a>
+                  </>
+                )}
               </div>
             </motion.aside>
           </>

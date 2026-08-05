@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { contactAPI } from "../../services/api";
 import { useAnalytics } from "../../hooks/useAnalytics";
 import {
   Send, Mail, MapPin, Phone, Loader2, CheckCircle,
-  User, Tag, MessageSquare, Briefcase, ArrowRight, Reply,
+  User, Tag, MessageSquare, Briefcase, ArrowRight,
 } from "lucide-react";
 
 const VISITOR_TOKEN_KEY = "portfolio_visitor_token";
@@ -58,8 +58,6 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
-  const [reply, setReply] = useState(null);
-  const [replyLoading, setReplyLoading] = useState(false);
   const [submitTime] = useState(() => Date.now());
   const submitRef = useRef(false);
   const visitorTokenRef = useRef(getVisitorToken());
@@ -75,18 +73,6 @@ export default function Contact() {
 
   let socialLinks = defaultSocialLinks;
   try { if (settings?.socialLinks) socialLinks = { ...defaultSocialLinks, ...JSON.parse(settings.socialLinks) }; } catch {}
-
-  useEffect(() => {
-    const checkReply = async () => {
-      setReplyLoading(true);
-      try {
-        const res = await contactAPI.getReply(visitorTokenRef.current);
-        if (res.data.data?.reply) setReply(res.data.data);
-      } catch {}
-      setReplyLoading(false);
-    };
-    checkReply();
-  }, []);
 
   const validate = () => {
     const errs = {};
@@ -147,19 +133,6 @@ export default function Contact() {
           <div className="ct-header-accent" />
           <p className="ct-header-desc">Have a project in mind? Let&apos;s build something meaningful together.</p>
         </motion.div>
-
-        {/* Reply from admin */}
-        {reply && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: "700px", margin: "0 auto 24px", padding: "20px", background: "var(--bg-secondary, #f0fdf4)", border: "1px solid #bbf7d0", borderRadius: "12px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <Reply size={16} style={{ color: "#16a34a" }} />
-              <span style={{ fontWeight: 600, fontSize: "14px", color: "#166534" }}>Reply from admin</span>
-              <span style={{ fontSize: "12px", color: "#16a34a", marginLeft: "auto" }}>{new Date(reply.repliedAt).toLocaleString()}</span>
-            </div>
-            <p style={{ fontSize: "14px", lineHeight: "1.6", color: "#166534", whiteSpace: "pre-wrap", margin: 0 }}>{reply.reply}</p>
-          </motion.div>
-        )}
-        {replyLoading && <div style={{ textAlign: "center", marginBottom: "16px", fontSize: "12px", color: "#94a3b8" }}>Checking for replies...</div>}
 
         <div className="ct-grid">
           <div className="ct-left">

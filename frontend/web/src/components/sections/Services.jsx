@@ -6,51 +6,6 @@ import { resolveUrl } from "../../utils/resolveUrl";
 import ServicePrism from "../three/ServicePrism";
 import { X, ExternalLink, Github, MessageSquare } from "lucide-react";
 
-const defaultServices = [
-  {
-    id: "svc-1",
-    title: "Full Stack Web Development",
-    shortDescription: "End-to-end web applications with modern architecture.",
-    description: "End-to-end web applications with modern architecture.",
-    fullDescription: "I build complete web applications from concept to deployment. Using React, Next.js, Node.js, and modern databases, I create scalable products that feel polished from day one.",
-    features: ["React & Next.js interfaces", "Node.js & Express APIs", "MongoDB & PostgreSQL databases", "Real-time features", "Authentication & authorization", "Automated testing"],
-    technologies: ["React", "Next.js", "Node.js", "Express", "MongoDB", "PostgreSQL", "TypeScript", "Tailwind CSS"],
-    tools: ["VS Code", "Git", "Docker", "Vercel", "AWS"],
-    liveUrl: "https://example.com",
-    githubUrl: "https://github.com",
-  },
-  {
-    id: "svc-2",
-    title: "UI/UX Design & Implementation",
-    shortDescription: "Beautiful interfaces with smooth interactions.",
-    description: "Beautiful interfaces with smooth interactions.",
-    fullDescription: "I transform product ideas into elegant, conversion-focused interfaces.",
-    features: ["Responsive design systems", "Micro-interactions & animations", "Accessibility (WCAG 2.1)", "Design-to-code workflow", "Performance-conscious UI", "Component libraries"],
-    technologies: ["React", "Framer Motion", "Tailwind CSS", "Figma", "Storybook", "CSS Modules"],
-    tools: ["Figma", "Adobe XD", "Storybook", "Chromatic"],
-  },
-  {
-    id: "svc-3",
-    title: "Cloud & DevOps",
-    shortDescription: "Infrastructure that scales with your product.",
-    description: "Infrastructure that scales with your product.",
-    fullDescription: "I set up and manage cloud infrastructure, CI/CD pipelines, and monitoring systems.",
-    features: ["AWS/GCP cloud architecture", "Docker containerization", "CI/CD pipelines", "Monitoring & alerting", "Auto-scaling", "Security hardening"],
-    technologies: ["AWS", "Docker", "GitHub Actions", "Nginx", "Linux", "Terraform"],
-    tools: ["AWS Console", "Docker Desktop", "GitHub Actions", "Grafana"],
-  },
-  {
-    id: "svc-4",
-    title: "AI & Machine Learning",
-    shortDescription: "Intelligent features powered by modern AI.",
-    description: "Intelligent features powered by modern AI.",
-    fullDescription: "I integrate AI capabilities into web applications.",
-    features: ["LLM integration (GPT, Claude)", "Natural language processing", "Image recognition", "Recommendation systems", "AI-powered search", "Automated content generation"],
-    technologies: ["Python", "TensorFlow", "OpenAI API", "LangChain", "FastAPI", "Hugging Face"],
-    tools: ["Jupyter", "Google Colab", "Hugging Face", "OpenAI"],
-  },
-];
-
 function ServiceCard({ service, onClose }) {
   const safeParse = (val) => {
     if (!val) return [];
@@ -163,7 +118,7 @@ function ServiceCard({ service, onClose }) {
 function ServicesContent() {
   const { services } = usePortfolio();
   const { setServices, doorOpen, activeIndex, closeDoor, animationDone } = useServiceViewer();
-  const serviceList = services && services.length > 0 ? services.slice(0, 4) : defaultServices;
+  const serviceList = (services || []).slice(0, 4);
   const serviceListRef = useRef(serviceList);
   serviceListRef.current = serviceList;
   const canvasContainerRef = useRef(null);
@@ -227,7 +182,7 @@ function ServicesContent() {
             <div className="w-10 h-10 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
           </div>
         }>
-          <Canvas camera={{ position: [0, 0, 12], fov: 50 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: false }} style={{ background: "transparent" }}>
+          <Canvas camera={{ position: [0, 0, 12], fov: 50 }} dpr={[1, 1.2]} gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }} style={{ background: "transparent" }}>
             <ServicePrism services={serviceList} />
           </Canvas>
         </Suspense>

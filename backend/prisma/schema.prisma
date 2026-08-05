@@ -186,10 +186,11 @@ model Education {
 
 model Project {
   id              String    @id @default(cuid())
-  title           String
-  slug            String    @unique
-  description     String    @db.Text
-  thumbnail       String?
+  title             String
+  slug              String    @unique
+  description       String    @db.Text
+  shortDescription  String?   @db.VarChar(200)
+  thumbnail         String?
   images          String?   @db.Text
   category        ProjectCategory
   technologies    String    @db.Text
@@ -361,10 +362,14 @@ model Visitor {
   country            String?
   region             String?
   city               String?
+  latitude           String?
+  longitude          String?
   timezone           String?
+  ipHash             String?
   browser            String?
   os                 String?
   deviceType         String?
+  screenResolution   String?
   language           String?
   referrer           String?
   pagesVisited       String   @default("[]")
@@ -382,6 +387,8 @@ model Visitor {
   updatedAt          DateTime @updatedAt
 
   @@index([visitorId])
+  @@index([lastVisitAt])
+  @@index([country])
   @@map("visitors")
 }
 
@@ -399,5 +406,6 @@ model Visit {
   createdAt   DateTime @default(now())
 
   @@index([visitorId])
+  @@index([startedAt])
   @@map("visits")
 }

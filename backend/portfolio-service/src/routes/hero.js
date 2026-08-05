@@ -5,7 +5,14 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const hero = await prisma.hero.findFirst({ where: { enabled: true } });
+    const hero = await prisma.hero.findFirst({
+      where: { enabled: true },
+      select: {
+        id: true, greeting: true, name: true, title: true,
+        description: true, primaryCTA: true, secondaryCTA: true,
+        profileImage: true, backgroundImage: true,
+      },
+    });
     res.json({ success: true, data: hero });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch hero" });

@@ -1,32 +1,8 @@
-import axios from "axios";
+// Admin API - uses admin-specific endpoints that return ALL records (including disabled)
+export { API_URL, default as default } from "frontend-shared/api";
+export { default as api } from "frontend-shared/api";
 
-export const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "");
-
-const api = axios.create({
-  baseURL: `${API_URL}/api/v1`,
-  headers: { "Content-Type": "application/json" },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default api;
+import api from "frontend-shared/api";
 
 export const authAPI = {
   login: (data) => api.post("/auth/login", data),
@@ -35,17 +11,17 @@ export const authAPI = {
 };
 
 export const heroAPI = {
-  get: () => api.get("/hero"),
+  get: () => api.get("/hero/admin"),
   update: (data) => api.put("/hero", data),
 };
 
 export const aboutAPI = {
-  get: () => api.get("/about"),
+  get: () => api.get("/about/admin"),
   update: (data) => api.put("/about", data),
 };
 
 export const skillsAPI = {
-  getAll: () => api.get("/skills"),
+  getAll: () => api.get("/skills/admin"),
   create: (data) => api.post("/skills", data),
   update: (id, data) => api.put(`/skills/${id}`, data),
   delete: (id) => api.delete(`/skills/${id}`),
@@ -53,8 +29,7 @@ export const skillsAPI = {
 };
 
 export const servicesAPI = {
-  getAll: () => api.get("/services"),
-  getAllAdmin: () => api.get("/services/all"),
+  getAll: () => api.get("/services/all"),
   create: (data) => api.post("/services", data),
   update: (id, data) => api.put(`/services/${id}`, data),
   delete: (id) => api.delete(`/services/${id}`),
@@ -62,21 +37,21 @@ export const servicesAPI = {
 };
 
 export const experienceAPI = {
-  getAll: () => api.get("/experience"),
+  getAll: () => api.get("/experience/admin"),
   create: (data) => api.post("/experience", data),
   update: (id, data) => api.put(`/experience/${id}`, data),
   delete: (id) => api.delete(`/experience/${id}`),
 };
 
 export const educationAPI = {
-  getAll: () => api.get("/education"),
+  getAll: () => api.get("/education/all"),
   create: (data) => api.post("/education", data),
   update: (id, data) => api.put(`/education/${id}`, data),
   delete: (id) => api.delete(`/education/${id}`),
 };
 
 export const projectsAPI = {
-  getAll: (params) => api.get("/projects", { params }),
+  getAll: (params) => api.get("/projects/admin", { params }),
   getById: (id) => api.get(`/projects/${id}`),
   create: (data) => api.post("/projects", data),
   update: (id, data) => api.put(`/projects/${id}`, data),
@@ -84,7 +59,7 @@ export const projectsAPI = {
 };
 
 export const testimonialsAPI = {
-  getAll: () => api.get("/testimonials"),
+  getAll: () => api.get("/testimonials/admin"),
   create: (data) => api.post("/testimonials", data),
   update: (id, data) => api.put(`/testimonials/${id}`, data),
   delete: (id) => api.delete(`/testimonials/${id}`),
@@ -132,4 +107,5 @@ export const analyticsAPI = {
   getVisitors: (params) => api.get("/analytics/visitors", { params }),
   getVisitor: (visitorId) => api.get(`/analytics/visitors/${visitorId}`),
   deleteVisitor: (visitorId) => api.delete(`/analytics/visitors/${visitorId}`),
+  deleteAll: (confirm) => api.delete("/analytics/all", { data: { confirm } }),
 };

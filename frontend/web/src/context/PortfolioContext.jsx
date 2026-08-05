@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { heroAPI, aboutAPI, skillsAPI, servicesAPI, experienceAPI, educationAPI, projectsAPI, testimonialsAPI, settingsAPI } from "../services/api";
 
 export const PortfolioContext = createContext();
@@ -85,14 +85,25 @@ export function PortfolioProvider({ children }) {
     fetchAll();
   }, [fetchAll]);
 
+  const hasData = useMemo(() => ({
+    hero: !!hero,
+    about: !!about,
+    skills: skills.length > 0,
+    services: services.length > 0,
+    experience: experiences.length > 0,
+    education: education.length > 0,
+    projects: projects.length > 0,
+    testimonials: testimonials.length > 0,
+  }), [hero, about, skills, services, experiences, education, projects, testimonials]);
+
+  const value = useMemo(() => ({
+    hero, about, skills, services, experiences,
+    education, projects, testimonials, settings,
+    loading, error, refetch: fetchAll, hasData,
+  }), [hero, about, skills, services, experiences, education, projects, testimonials, settings, loading, error, fetchAll, hasData]);
+
   return (
-    <PortfolioContext.Provider
-      value={{
-        hero, about, skills, services, experiences,
-        education, projects, testimonials, settings,
-        loading, error, refetch: fetchAll,
-      }}
-    >
+    <PortfolioContext.Provider value={value}>
       {children}
     </PortfolioContext.Provider>
   );

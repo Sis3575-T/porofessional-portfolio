@@ -8,6 +8,12 @@ router.get("/", async (req, res) => {
     const education = await prisma.education.findMany({
       where: { enabled: true },
       orderBy: { order: "asc" },
+      select: {
+        id: true, institution: true, degree: true, field: true,
+        description: true, logo: true, startDate: true, endDate: true,
+        isCurrent: true, gpa: true, location: true, achievements: true,
+        technologies: true, courses: true, certificateUrl: true, order: true,
+      },
     });
     res.json({ success: true, data: education });
   } catch (error) {

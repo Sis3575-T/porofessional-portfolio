@@ -2396,3 +2396,134 @@ h2[class*="text-4xl"] {
   background: var(--accent);
   border-color: var(--accent);
 }
+
+/* ================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ================================================================ */
+
+/* GPU-accelerate all transforms and animations */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.card,
+.skill-card,
+.edu-card,
+.ct-info-card,
+.ct-social-icon,
+.ft-social,
+.ft-scroll-top,
+.nav-text-link,
+.btn,
+.btn-premium,
+.btn-ceramic,
+.btn-aluminum,
+.btn-marble,
+btn-carbon,
+.btn-steel,
+.btn-silver,
+.btn-titanium,
+.btn-danger,
+.btn-success {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize animations to use transform and opacity only */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px) translateZ(0); }
+  to { opacity: 1; transform: translateY(0) translateZ(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px) translateZ(0); }
+  to { opacity: 1; transform: translateY(0) translateZ(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%) translateZ(0); }
+  to { transform: translateX(0) translateZ(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px) translateZ(0); }
+  to { opacity: 1; transform: translateY(0) translateZ(0); }
+}
+
+@keyframes sectionEnter {
+  from { opacity: 0; transform: translateY(30px) scale(0.98) translateZ(0); }
+  to { opacity: 1; transform: translateY(0) scale(1) translateZ(0); }
+}
+
+@keyframes slideFromLeft {
+  from { transform: translateX(-100%) translateZ(0); opacity: 0; }
+  to { transform: translateX(0) translateZ(0); opacity: 1; }
+}
+
+/* Prevent layout shifts from images */
+img {
+  content-visibility: auto;
+}
+
+/* Contain inline layout and style recalculation */
+.section-bg {
+  contain: layout style paint;
+}
+
+/* Optimize scrollbar rendering */
+::-webkit-scrollbar {
+  will-change: auto;
+}
+
+/* Reduce paint complexity for fixed elements */
+.fixed {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+/* Contain sections for better performance */
+section {
+  contain: layout style;
+}
+
+/* Optimize canvas rendering */
+canvas {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce reflow for animated elements */
+[style*="transform"],
+[style*="opacity"] {
+  will-change: auto;
+}
+
+/* Passive event listeners hint */
+a[href^="#"] {
+  scroll-behavior: smooth;
+}
+
+/* Content visibility for below-the-fold content */
+.ct-section,
+.skills,
+.edu-section-wrapper {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* Optimize backdrop-filter performance */
+.navbar-scrolled,
+.sidebar-3d,
+.skill-card {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Prevent forced reflow during animations */
+@supports (contain: layout style) {
+  section {
+    contain: layout style;
+  }
+}

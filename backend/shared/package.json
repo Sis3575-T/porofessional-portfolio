@@ -3,8 +3,24 @@
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./config": "./config.js",
+    "./config.js": "./config.js",
+    "./middleware": "./middleware/index.js",
+    "./services/socketService": "./services/socketService.js",
+    "./services/analytics": "./services/analytics.js",
+    "./services/fingerprintService": "./services/fingerprintService.js",
+    "./services/geolocationService": "./services/geolocationService.js"
+  },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs-pro-server-api": "^1.0.0",
+    "@prisma/client": "^5.22.0",
+    "axios": "^1.6.0",
+    "compression": "^1.8.1",
+    "express": "^4.18.2",
     "express-validator": "^7.0.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.7.0"
   }
 }

@@ -4,50 +4,11 @@ import { ExternalLink, Github, X } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { resolveUrl } from "../../utils/resolveUrl";
 
-const defaultProjects = [
-  {
-    id: "proj-1",
-    title: "StudioFlow Dashboard",
-    slug: "studioflow-dashboard",
-    description: "A premium analytics workspace for modern teams with rich dashboards, automations, and collaborative views.",
-    technologies: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
-    liveUrl: "https://example.com",
-    githubUrl: "https://github.com",
-  },
-  {
-    id: "proj-2",
-    title: "Northstar Commerce",
-    slug: "northstar-commerce",
-    description: "A polished e-commerce experience for a boutique brand with immersive storytelling and conversion-driven UI.",
-    technologies: ["React", "Stripe", "Tailwind CSS", "Framer Motion"],
-    liveUrl: "https://example.com",
-    githubUrl: "https://github.com",
-  },
-  {
-    id: "proj-3",
-    title: "Pulse CRM Platform",
-    slug: "pulse-crm-platform",
-    description: "A customer relationship platform that combines a calm interface with powerful operational workflows.",
-    technologies: ["Next.js", "Express", "PostgreSQL", "TypeScript"],
-    liveUrl: "https://example.com",
-    githubUrl: "https://github.com",
-  },
-  {
-    id: "proj-4",
-    title: "Atlas Studio Site",
-    slug: "atlas-studio-site",
-    description: "A refined portfolio website crafted to feel premium, minimal, and memorable for a creative studio.",
-    technologies: ["React", "Vite", "Tailwind CSS", "GSAP"],
-    liveUrl: "https://example.com",
-    githubUrl: "https://github.com",
-  },
-];
-
 export default function Projects() {
   const { projects, loading } = usePortfolio();
   const [selected, setSelected] = useState(null);
 
-  const projectList = projects && projects.length > 0 ? projects : defaultProjects;
+  const projectList = projects || [];
 
   if (loading) {
     return (
@@ -85,7 +46,10 @@ export default function Projects() {
                     src={resolveUrl(project.thumbnail)}
                     alt={project.title}
                     loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    style={{ contentVisibility: "auto" }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -95,7 +59,13 @@ export default function Projects() {
               </div>
 
               {/* Always visible buttons */}
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3">
+                {project.shortDescription && (
+                  <p className="text-white text-sm text-center px-6 max-w-xs leading-relaxed drop-shadow-lg">
+                    {project.shortDescription}
+                  </p>
+                )}
+                <div className="flex items-center gap-2">
                 {project.liveUrl && (
                   <a
                     href={project.liveUrl}
@@ -124,6 +94,8 @@ export default function Projects() {
                 >
                   View Details
                 </button>
+                </div>
+
               </div>
 
             </div>

@@ -8,6 +8,10 @@ router.get("/", async (req, res) => {
     const skills = await prisma.skill.findMany({
       where: { enabled: true },
       orderBy: { order: "asc" },
+      select: {
+        id: true, name: true, icon: true, category: true,
+        proficiency: true, description: true, order: true,
+      },
     });
     res.json({ success: true, data: skills });
   } catch (error) {

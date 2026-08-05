@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { analyticsAPI } from "../../services/api";
+import toast from "react-hot-toast";
 import {
   Users, UserCheck, Eye, Globe, Clock, TrendingUp,
-  Monitor, Smartphone, Tablet, Chrome, ArrowRight,
-  Download, Mail, ChevronRight, RefreshCw,
+  Monitor, Smartphone, Tablet, ArrowRight,
+  Download, Mail, ChevronRight, RefreshCw, Trash2, AlertTriangle,
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, color = "cyan" }) {
@@ -34,6 +35,58 @@ function BarItem({ label, count, max }) {
   );
 }
 
+function GrowthChart({ data }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 mb-4">Visitor Growth (30 Days)</h3>
+        <p className="text-sm text-slate-400">No growth data yet</p>
+      </div>
+    );
+  }
+
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
+
+  // Fill in missing days
+  const filled = [];
+  const now = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split("T")[0];
+    const existing = data.find((g) => g.date === dateStr);
+    filled.push({ date: dateStr, count: existing?.count || 0 });
+  }
+
+  const maxVal = Math.max(...filled.map((d) => d.count), 1);
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl p-6">
+      <h3 className="font-semibold text-slate-900 mb-4">Visitor Growth (30 Days)</h3>
+      <div className="flex items-end gap-1 h-40">
+        {filled.map((d) => (
+          <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
+            <div className="w-full bg-cyan-400 rounded-t transition-all hover:bg-cyan-500"
+                 style={{ height: `${(d.count / maxVal) * 100}%`, minHeight: d.count > 0 ? "4px" : "0" }} />
+            <span className="text-[9px] text-slate-400 rotate-45 origin-left hidden">
+              {d.date.slice(5)}
+            </span>
+            <div className="absolute bottom-full mb-2 hidden group-hover:block z-10">
+              <div className="bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                {d.date}: {d.count} visitors
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between mt-2">
+        <span className="text-[10px] text-slate-400">{filled[0]?.date?.slice(5)}</span>
+        <span className="text-[10px] text-slate-400">{filled[filled.length - 1]?.date?.slice(5)}</span>
+      </div>
+    </div>
+  );
+}
+
 function formatDuration(seconds) {
   if (!seconds || seconds < 60) return `${seconds || 0}s`;
   const m = Math.floor(seconds / 60);
@@ -55,6 +108,7 @@ export default function AnalyticsDashboard() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
   const [search, setSearch] = useState("");
+  const [deletingAll, setDeletingAll] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -75,6 +129,30 @@ export default function AnalyticsDashboard() {
 
   useEffect(() => { fetchStats(); }, [page, search]);
 
+  // Auto-refresh every 60 seconds
+  useEffect(() => {
+    const interval = setInterval(fetchStats, 60000);
+    return () => clearInterval(interval);
+  }, [page, search]);
+
+  const handleDeleteAll = async () => {
+    const confirm1 = window.confirm("Are you sure you want to delete ALL analytics data? This cannot be undone.");
+    if (!confirm1) return;
+    const confirm2 = window.confirm("This will permanently delete ALL visitor data, sessions, and page views. Type the confirmation in the next prompt.");
+    if (!confirm2) return;
+
+    try {
+      setDeletingAll(true);
+      await analyticsAPI.deleteAll("DELETE_ALL_ANALYTICS");
+      toast.success("All analytics data deleted");
+      fetchStats();
+    } catch (err) {
+      toast.error("Failed to delete analytics data");
+    } finally {
+      setDeletingAll(false);
+    }
+  };
+
   if (loading && !stats) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -87,26 +165,39 @@ export default function AnalyticsDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-slate-900">Analytics</h2>
-        <button onClick={fetchStats} className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDeleteAll}
+            disabled={deletingAll}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition disabled:opacity-50"
+          >
+            <Trash2 size={14} />
+            {deletingAll ? "Deleting..." : "Delete All"}
+          </button>
+          <button onClick={fetchStats} className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
+          </button>
+        </div>
       </div>
 
       {stats && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon={Users} label="Unique Visitors" value={stats.totalVisitors} />
-            <StatCard icon={UserCheck} label="Returning Visitors" value={stats.returningVisitors} />
-            <StatCard icon={Eye} label="Total Visits" value={stats.totalVisits} />
-            <StatCard icon={Globe} label="Online Now" value={stats.onlineNow} />
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <StatCard icon={Users} label="Total Visitors" value={stats.totalVisitors} />
+            <StatCard icon={UserCheck} label="Unique Today" value={stats.uniqueToday} color="green" />
+            <StatCard icon={Eye} label="Total Page Views" value={stats.totalPageViews || stats.totalVisits} color="blue" />
+            <StatCard icon={Globe} label="Online Now" value={stats.onlineNow} color="emerald" />
+            <StatCard icon={Clock} label="Avg. Duration" value={formatDuration(stats.avgDuration)} color="amber" />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon={Clock} label="Avg. Duration" value={formatDuration(stats.avgDuration)} />
+            <StatCard icon={TrendingUp} label="New Visitors" value={stats.newVisitors} color="purple" />
+            <StatCard icon={Users} label="Returning" value={stats.returningVisitors} color="indigo" />
             <StatCard icon={Download} label="Resume Downloads" value={stats.totalResumeDownloads} />
             <StatCard icon={Mail} label="Contact Submissions" value={stats.totalContactSubmissions} />
-            <StatCard icon={TrendingUp} label="New Visitors" value={stats.newVisitors} />
           </div>
+
+          <GrowthChart data={stats.growth} />
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white border border-slate-200 rounded-xl p-6">
@@ -152,18 +243,21 @@ export default function AnalyticsDashboard() {
               {stats.browsers?.map((b) => (
                 <BarItem key={b.name} label={b.name} count={b.count} max={stats.browsers[0]?.count} />
               ))}
+              {!stats.browsers?.length && <p className="text-sm text-slate-400">No data yet</p>}
             </div>
             <div className="bg-white border border-slate-200 rounded-xl p-6">
               <h3 className="font-semibold text-slate-900 mb-4">Operating Systems</h3>
               {stats.osList?.map((o) => (
                 <BarItem key={o.name} label={o.name} count={o.count} max={stats.osList[0]?.count} />
               ))}
+              {!stats.osList?.length && <p className="text-sm text-slate-400">No data yet</p>}
             </div>
             <div className="bg-white border border-slate-200 rounded-xl p-6">
               <h3 className="font-semibold text-slate-900 mb-4">Devices</h3>
               {stats.devices?.map((d) => (
                 <BarItem key={d.name} label={d.name} count={d.count} max={stats.devices[0]?.count} />
               ))}
+              {!stats.devices?.length && <p className="text-sm text-slate-400">No data yet</p>}
             </div>
           </div>
         </>
@@ -189,6 +283,7 @@ export default function AnalyticsDashboard() {
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Browser</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Device</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Visits</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Duration</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Last Visit</th>
                 <th className="px-6 py-3"></th>
               </tr>
@@ -210,6 +305,7 @@ export default function AnalyticsDashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-slate-700">{v.totalVisits}</td>
+                  <td className="px-6 py-4 text-sm text-slate-500">{formatDuration(v.totalTimeSpent)}</td>
                   <td className="px-6 py-4 text-sm text-slate-500">{formatDate(v.lastVisitAt)}</td>
                   <td className="px-6 py-4">
                     <ChevronRight size={16} className="text-slate-400" />
@@ -218,7 +314,7 @@ export default function AnalyticsDashboard() {
               ))}
               {visitors.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
                     No visitors tracked yet
                   </td>
                 </tr>

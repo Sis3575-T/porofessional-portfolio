@@ -13,23 +13,6 @@ const categoryLabels = {
   OTHER: "Other",
 };
 
-const defaultSkills = [
-  { id: "skill-react", name: "React", category: "FRONTEND", proficiency: 95 },
-  { id: "skill-tailwind", name: "Tailwind CSS", category: "FRONTEND", proficiency: 92 },
-  { id: "skill-next", name: "Next.js", category: "FRONTEND", proficiency: 90 },
-  { id: "skill-node", name: "Node.js", category: "BACKEND", proficiency: 88 },
-  { id: "skill-prisma", name: "Prisma", category: "BACKEND", proficiency: 87 },
-  { id: "skill-postgres", name: "PostgreSQL", category: "DATABASE", proficiency: 85 },
-  { id: "skill-mongodb", name: "MongoDB", category: "DATABASE", proficiency: 78 },
-  { id: "skill-docker", name: "Docker", category: "DEVOPS", proficiency: 80 },
-  { id: "skill-aws", name: "AWS", category: "DEVOPS", proficiency: 72 },
-  { id: "skill-ts", name: "TypeScript", category: "LANGUAGES", proficiency: 90 },
-  { id: "skill-python", name: "Python", category: "LANGUAGES", proficiency: 75 },
-  { id: "skill-git", name: "Git", category: "TOOLS", proficiency: 90 },
-  { id: "skill-problem", name: "Problem Solving", category: "SOFT_SKILLS", proficiency: 95 },
-  { id: "skill-comm", name: "Communication", category: "SOFT_SKILLS", proficiency: 90 },
-];
-
 const brandColors = {
   react: "#61DAFB",
   nextjs: "#FFFFFF",
@@ -187,7 +170,7 @@ function SkillCard({ skill, index }) {
 export default function Skills() {
   const { skills, loading } = usePortfolio();
   const skillList = useMemo(
-    () => (skills && skills.length > 0 ? skills : defaultSkills),
+    () => skills || [],
     [skills]
   );
 

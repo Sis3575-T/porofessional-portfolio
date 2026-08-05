@@ -73,7 +73,7 @@ export default function ServicesEditor() {
 
   const fetchServices = async () => {
     try {
-      const res = await servicesAPI.getAllAdmin();
+      const res = await servicesAPI.getAll();
       setServices(res.data.data || []);
     } catch { toast.error('Failed to load services'); }
     finally { setLoading(false); }

@@ -8,6 +8,13 @@ router.get("/", async (req, res) => {
     const experiences = await prisma.experience.findMany({
       where: { enabled: true },
       orderBy: { order: "asc" },
+      select: {
+        id: true, company: true, position: true, description: true,
+        logo: true, startDate: true, endDate: true, isCurrent: true,
+        employmentType: true, location: true, companyUrl: true,
+        technologies: true, responsibilities: true, achievements: true,
+        order: true,
+      },
     });
     res.json({ success: true, data: experiences });
   } catch (error) {
