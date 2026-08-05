@@ -3,7 +3,7 @@ services:
     name: portfolio-backend
     runtime: node
     plan: free
-    buildCommand: npm install && npx prisma db push --schema=backend/prisma/schema.prisma --accept-data-loss && npx prisma generate --schema=backend/prisma/schema.prisma
+    buildCommand: npm install && cd backend && npx prisma db push --accept-data-loss && npx prisma generate
     startCommand: cd backend && node src/server.js
     envVars:
       - key: NODE_VERSION

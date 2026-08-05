@@ -13,8 +13,7 @@
     "dev:backend": "node --watch backend/src/server.js",
     "dev:web": "npm --workspace frontend/web run dev",
     "dev:admin": "npm --workspace frontend/admin run dev",
-    "start": "node backend/src/server.js",
-    "postinstall": "node -e \"if(process.env.DATABASE_URL){require('child_process').execSync('npx prisma generate --schema=backend/prisma/schema.prisma',{stdio:'inherit'})}\""
+    "start": "node backend/src/server.js"
   },
   "devDependencies": {
     "concurrently": "^10.0.3",
@@ -22,8 +21,6 @@
     "terser": "^5.49.1"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "nodemailer": "^6.9.0",
-    "prisma": "^5.22.0"
+    "nodemailer": "^6.9.0"
   }
 }
