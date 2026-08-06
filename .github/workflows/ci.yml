@@ -37,6 +37,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx prisma generate --schema=backend/prisma/schema.prisma
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
       - run: npx prisma db push --schema=backend/prisma/schema.prisma
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test
@@ -55,6 +57,19 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm --workspace frontend/web run build
-      - run: npm --workspace frontend/admin run build
+      - name: Install web dependencies
+        working-directory: frontend/web
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+      - name: Build web
+        working-directory: frontend/web
+        run: npm run build
+      - name: Install admin dependencies
+        working-directory: frontend/admin
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+      - name: Build admin
+        working-directory: frontend/admin
+        run: npm run build
