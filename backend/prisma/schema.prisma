@@ -1,9 +1,7 @@
 // prisma/schema.prisma
 datasource db {
   provider = "postgresql"
-  // Connection URL moved to runtime configuration (prisma.config.ts or PrismaClient constructor)
-  // See https://pris.ly/d/config-datasource
-  
+  url      = env("DATABASE_URL")
 }
 
 generator client {
