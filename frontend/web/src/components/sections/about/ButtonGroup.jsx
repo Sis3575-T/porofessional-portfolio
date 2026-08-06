@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Download, Eye, Send } from "lucide-react";
-import { resolveUrl } from "../../utils/resolveUrl";
+import { resolveUrl } from "../../../utils/resolveUrl";
 
 export default function ButtonGroup({ downloadCVUrl, onContact }) {
   const cvUrl = downloadCVUrl ? resolveUrl(downloadCVUrl) : null;

@@ -3,6 +3,7 @@ import { usePortfolio } from "../../../context/PortfolioContext";
 import { useProfile } from "../../../context/ProfileContext";
 import { AnimatedSection } from "../../AnimatedSection";
 import { User, MapPin, Mail, Clock, Code2, Globe, Coffee, Award } from "lucide-react";
+import ButtonGroup from "./ButtonGroup";
 
 const fadeSlideUp = {
   hidden: { opacity: 0, y: 24 },
@@ -112,6 +113,12 @@ export default function AboutSection() {
               <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-lg">
                 {biography}
               </p>
+              <ButtonGroup downloadCVUrl={about?.downloadCVUrl} onContact={() => {
+                const contactSection = document.getElementById("contact");
+                if (contactSection) {
+                  contactSection.scrollIntoView({ behavior: "smooth" });
+                }
+              }} />
               <div className="space-y-3">
                 {infoItems.map((item, i) => {
                   const val = getValue(item.key);
