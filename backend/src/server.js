@@ -18,9 +18,11 @@ function findPrismaBin() {
   return "npx prisma";
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 function runCommand(cmd) {
   try {
-    execSync(cmd, { stdio: "pipe", timeout: 60000, shell: true });
+    execSync(cmd, { stdio: "pipe", timeout: 120000, shell: true });
     return true;
   } catch (error) {
     console.error(`[DB] Command failed: ${cmd}`, error.stderr?.toString() || error.message);
@@ -28,16 +30,46 @@ function runCommand(cmd) {
   }
 }
 
+async function runWithRetry(cmd, label, attempts = 3) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    if (runCommand(cmd)) {
+      console.log(`[DB] ${label} complete`);
+      return true;
+    }
+    if (attempt < attempts) {
+      console.warn(`[DB] ${label} failed (attempt ${attempt}/${attempts}), retrying in 5s...`);
+      await sleep(5000);
+    }
+  }
+  console.error(`[DB] ${label} failed after ${attempts} attempts`);
+  return false;
+}
+
+// Neon pauses idle free-tier databases; a cold start can exceed Prisma's default
+// ~5s connect timeout. Give the CLI commands and the client longer to connect.
+function ensureConnectTimeout(url) {
+  if (!url || url.includes("connect_timeout=")) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}connect_timeout=60`;
+}
+
 async function syncDatabase() {
   const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
   const prismaBin = findPrismaBin();
   console.log("[DB] Syncing database schema from:", schemaPath);
 
-  const pushed = runCommand(`${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`);
-  if (pushed) console.log("[DB] Schema push complete");
+  process.env.DATABASE_URL = ensureConnectTimeout(process.env.DATABASE_URL);
 
-  const generated = runCommand(`${prismaBin} generate --schema="${schemaPath}"`);
-  if (generated) console.log("[DB] Prisma client generated");
+  await runWithRetry(
+    `${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`,
+    "Schema push"
+  );
+
+  await runWithRetry(
+    `${prismaBin} generate --schema="${schemaPath}"`,
+    "Prisma client generated",
+    2
+  );
 }
 
 async function testDbConnection() {
