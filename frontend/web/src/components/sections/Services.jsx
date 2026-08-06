@@ -96,9 +96,12 @@ function ServiceCard({ service, onClose }) {
                 <Github size={14} /> GitHub
               </a>
             )}
-            <button onClick={onClose}
+<button onClick={() => {
+                onClose();
+                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+              }}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg hover:opacity-80 transition"
-              style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
+              style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)"}}>
               <MessageSquare size={14} /> Contact
             </button>
           </div>
