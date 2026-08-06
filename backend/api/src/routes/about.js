@@ -1,9 +1,8 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "shared/utils/prisma.js";
 import { authenticateToken, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 router.get("/", async (req, res) => {
   try {

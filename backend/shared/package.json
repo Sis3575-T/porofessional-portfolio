@@ -7,6 +7,8 @@
     ".": "./index.js",
     "./config": "./config.js",
     "./config.js": "./config.js",
+    "./utils/prisma": "./utils/prisma.js",
+    "./utils/prisma.js": "./utils/prisma.js",
     "./middleware": "./middleware/index.js",
     "./services/socketService": "./services/socketService.js",
     "./services/analytics": "./services/analytics.js",

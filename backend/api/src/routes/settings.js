@@ -1,10 +1,9 @@
 // services/api/src/routes/settings.ts
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "shared/utils/prisma.js";
 import { authenticateToken, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // GET /api/v1/settings (public)
 router.get("/", async (req, res) => {

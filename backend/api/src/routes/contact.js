@@ -1,11 +1,10 @@
 // services/api/src/routes/contact.ts
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "shared/utils/prisma.js";
 import { authenticateToken, requireAdmin } from "../middleware/auth.js";
 import { sendContactNotification } from "../services/email.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // POST /api/v1/contact (public)
 router.post("/", async (req, res) => {

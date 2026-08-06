@@ -10,15 +10,15 @@ generator client {
 
 // ============== Authentication ==============
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  role          UserRole  @default(EDITOR)
-  isActive      Boolean   @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  activities    Activity[]
+  id         String     @id @default(cuid())
+  email      String     @unique
+  password   String
+  role       UserRole   @default(EDITOR)
+  isActive   Boolean    @default(true)
+  lastLogin  DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  activities Activity[]
 
   @@map("users")
 }
@@ -30,67 +30,67 @@ enum UserRole {
 
 // ============== Portfolio Content ==============
 model Hero {
-  id              String    @id @default(cuid())
-  greeting        String    @default("Hello, I'm")
-  name            String    @default("Developer Name")
-  title           String    @default("Full Stack Developer")
-  description     String    @default("Crafting digital experiences with modern technology")
-  primaryCTA      String    @default("View My Work")
-  secondaryCTA    String    @default("Get In Touch")
+  id              String   @id @default(cuid())
+  greeting        String   @default("Hello, I'm")
+  name            String   @default("Developer Name")
+  title           String   @default("Full Stack Developer")
+  description     String   @default("Crafting digital experiences with modern technology")
+  primaryCTA      String   @default("View My Work")
+  secondaryCTA    String   @default("Get In Touch")
   profileImage    String?
   backgroundImage String?
-  enabled         Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("hero")
 }
 
 model About {
-  id              String    @id @default(cuid())
-  biography       String    @db.Text
-  summary         String    @db.Text
-  profileImage    String?
-  yearsOfExperience Int     @default(5)
-  downloadCVUrl   String?
-  location        String?
-  email           String?
-  phone           String?
-  nationality     String?
-  languages       String?
-  subtitle        String    @default("ABOUT ME")
-  heading         String    @default("Crafting Digital Experiences That Make an Impact")
-  name            String    @default("Sisay Temesgen")
-  degree          String?
-  availability    String    @default("Available for projects")
-  freelance       String    @default("Available")
-  glbModel        String?
-  statistics      String?   @db.Text
-  featureCards    String?   @db.Text
-  techIcons       String?   @db.Text
-  background      String?   @db.Text
-  decoration      String?   @db.Text
-  animationSettings String? @db.Text
-  visibility      String    @default("visible")
-  order           Int       @default(0)
-  enabled         Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String   @id @default(cuid())
+  biography         String   @db.Text
+  summary           String   @db.Text
+  profileImage      String?
+  yearsOfExperience Int      @default(5)
+  downloadCVUrl     String?
+  location          String?
+  email             String?
+  phone             String?
+  nationality       String?
+  languages         String?
+  subtitle          String   @default("ABOUT ME")
+  heading           String   @default("Crafting Digital Experiences That Make an Impact")
+  name              String   @default("Sisay Temesgen")
+  degree            String?
+  availability      String   @default("Available for projects")
+  freelance         String   @default("Available")
+  glbModel          String?
+  statistics        String?  @db.Text
+  featureCards      String?  @db.Text
+  techIcons         String?  @db.Text
+  background        String?  @db.Text
+  decoration        String?  @db.Text
+  animationSettings String?  @db.Text
+  visibility        String   @default("visible")
+  order             Int      @default(0)
+  enabled           Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@map("about")
 }
 
 model Skill {
-  id          String    @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   icon        String?
   category    SkillCategory
-  proficiency Int       @default(80)
+  proficiency Int           @default(80)
   description String?
-  order       Int       @default(0)
-  enabled     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  order       Int           @default(0)
+  enabled     Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@map("skills")
 }
@@ -107,55 +107,55 @@ enum SkillCategory {
 }
 
 model Service {
-  id               String    @id @default(cuid())
-  slug             String?   @unique
+  id               String   @id @default(cuid())
+  slug             String?  @unique
   title            String
   shortDescription String?
-  description      String    @db.Text
-  fullDescription  String?   @db.Text
+  description      String   @db.Text
+  fullDescription  String?  @db.Text
   icon             String?
   iconUrl          String?
   heroImage        String?
-  galleryImages    String?   @db.Text
-  technologies     String?   @db.Text
-  features         String?   @db.Text
-  tools            String?   @db.Text
-  process          String?   @db.Text
+  galleryImages    String?  @db.Text
+  technologies     String?  @db.Text
+  features         String?  @db.Text
+  tools            String?  @db.Text
+  process          String?  @db.Text
   liveUrl          String?
   githubUrl        String?
   docsUrl          String?
   caseStudyUrl     String?
-  buttonText       String?   @default("Live Demo")
-  buttonColor      String?   @default("#111111")
-  accentColor      String?   @default("#111111")
-  enabled          Boolean   @default(true)
-  order            Int       @default(0)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  buttonText       String?  @default("Live Demo")
+  buttonColor      String?  @default("#111111")
+  accentColor      String?  @default("#111111")
+  enabled          Boolean  @default(true)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@map("services")
 }
 
 model Experience {
-  id              String    @id @default(cuid())
-  company         String
-  position        String
-  description     String    @db.Text
-  logo            String?
-  startDate       DateTime
-  endDate         DateTime?
-  isCurrent       Boolean   @default(false)
-  employmentType  String?
-  location        String?
-  companyUrl      String?
-  technologies    String?   @db.Text
-  responsibilities String?  @db.Text
-  achievements    String?   @db.Text
-  galleryImages   String?   @db.Text
-  order           Int       @default(0)
-  enabled         Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  company          String
+  position         String
+  description      String    @db.Text
+  logo             String?
+  startDate        DateTime
+  endDate          DateTime?
+  isCurrent        Boolean   @default(false)
+  employmentType   String?
+  location         String?
+  companyUrl       String?
+  technologies     String?   @db.Text
+  responsibilities String?   @db.Text
+  achievements     String?   @db.Text
+  galleryImages    String?   @db.Text
+  order            Int       @default(0)
+  enabled          Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@map("experiences")
 }
@@ -185,27 +185,27 @@ model Education {
 }
 
 model Project {
-  id              String    @id @default(cuid())
-  title             String
-  slug              String    @unique
-  description       String    @db.Text
-  shortDescription  String?   @db.VarChar(200)
-  thumbnail         String?
-  images          String?   @db.Text
-  category        ProjectCategory
-  technologies    String    @db.Text
-  features        String    @db.Text
-  challenge       String    @db.Text
-  solution        String    @db.Text
-  lessonsLearned  String    @db.Text
-  liveUrl         String?
-  githubUrl       String?
-  featured        Boolean   @default(false)
-  order           Int       @default(0)
-  enabled         Boolean   @default(true)
-  viewCount       Int       @default(0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String          @id @default(cuid())
+  title            String
+  slug             String          @unique
+  description      String          @db.Text
+  shortDescription String?         @db.VarChar(200)
+  thumbnail        String?
+  images           String?         @db.Text
+  category         ProjectCategory
+  technologies     String          @db.Text
+  features         String          @db.Text
+  challenge        String          @db.Text
+  solution         String          @db.Text
+  lessonsLearned   String          @db.Text
+  liveUrl          String?
+  githubUrl        String?
+  featured         Boolean         @default(false)
+  order            Int             @default(0)
+  enabled          Boolean         @default(true)
+  viewCount        Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   @@map("projects")
 }
@@ -221,36 +221,36 @@ enum ProjectCategory {
 }
 
 model Testimonial {
-  id          String    @id @default(cuid())
-  name        String
-  position    String
-  company     String
-  avatar      String?
-  rating      Int       @default(5)
-  review      String    @db.Text
-  order       Int       @default(0)
-  enabled     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  position  String
+  company   String
+  avatar    String?
+  rating    Int      @default(5)
+  review    String   @db.Text
+  order     Int      @default(0)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("testimonials")
 }
 
 // ============== Contact Messaging ==============
 model ContactMessage {
-  id              String    @id @default(cuid())
-  visitorToken    String    @default("")
-  name            String    @default("")
-  email           String?
-  phone           String?
-  subject         String?
-  message         String    @db.Text
-  reply           String?   @db.Text
-  repliedAt       DateTime?
-  isRead          Boolean   @default(false)
-  isArchived      Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  visitorToken String    @default("")
+  name         String    @default("")
+  email        String?
+  phone        String?
+  subject      String?
+  message      String    @db.Text
+  reply        String?   @db.Text
+  repliedAt    DateTime?
+  isRead       Boolean   @default(false)
+  isArchived   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([visitorToken])
   @@map("contact_messages")
@@ -258,35 +258,35 @@ model ContactMessage {
 
 // ============== Settings ==============
 model Setting {
-  id              String    @id @default(cuid())
-  siteTitle       String    @default("Portfolio Pro")
-  siteDescription String    @db.Text @default("Professional Portfolio")
-  siteUrl         String?
-  favicon         String?
-  logo            String?
-  logo_dark       String?
-  socialLinks     String?   @db.Text
-  contactEmail    String?
-  contactPhone    String?
-  address         String?
-  availability    String?
-  responseTime    String?
-  workingHours    String?
-  metaKeywords    String?
-  metaDescription String?
-  ogImage         String?
-  googleAnalytics String?
-  hero3dConfig    String?   @db.Text
-  uiConfig        String?   @db.Text
+  id                String   @id @default(cuid())
+  siteTitle         String   @default("Portfolio Pro")
+  siteDescription   String   @default("Professional Portfolio") @db.Text
+  siteUrl           String?
+  favicon           String?
+  logo              String?
+  logo_dark         String?
+  socialLinks       String?  @db.Text
+  contactEmail      String?
+  contactPhone      String?
+  address           String?
+  availability      String?
+  responseTime      String?
+  workingHours      String?
+  metaKeywords      String?
+  metaDescription   String?
+  ogImage           String?
+  googleAnalytics   String?
+  hero3dConfig      String?  @db.Text
+  uiConfig          String?  @db.Text
   sectionVisibility String?  @db.Text
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@map("settings")
 }
 
 model MediaAsset {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   filename  String
   url       String
   publicId  String?
@@ -294,22 +294,22 @@ model MediaAsset {
   size      Int?
   width     Int?
   height    Int?
-  usedIn    String?   @db.Text
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  usedIn    String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("media_assets")
 }
 
 model Activity {
-  id        String    @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   action    ActivityAction
   entity    String
   entityId  String
-  changes   String?   @db.Text
-  createdAt DateTime  @default(now())
+  changes   String?        @db.Text
+  createdAt DateTime       @default(now())
 
   @@map("activities")
 }
@@ -324,10 +324,10 @@ enum ActivityAction {
 
 // ============== Helper Models ==============
 model Statistic {
-  id              String    @id @default(cuid())
-  yearsOfExp      Int       @default(5)
-  projectsCount   Int       @default(0)
-  clientsCount    Int       @default(0)
+  id                String @id @default(cuid())
+  yearsOfExp        Int    @default(5)
+  projectsCount     Int    @default(0)
+  clientsCount      Int    @default(0)
   technologiesCount Int    @default(0)
 
   @@map("statistics")
@@ -335,18 +335,18 @@ model Statistic {
 
 // ============== 3D Avatar ==============
 model Avatar3D {
-  id          String    @id @default(cuid())
-  avatarId    String    @unique
-  photoUrl    String?
-  modelUrl    String?
-  gender      String    @default("male")
-  clothing    String    @default("default")
-  position    String?   @db.Text
-  rotation    String?   @db.Text
-  scale       String?   @db.Text
-  visible     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  avatarId  String   @unique
+  photoUrl  String?
+  modelUrl  String?
+  gender    String   @default("male")
+  clothing  String   @default("default")
+  position  String?  @db.Text
+  rotation  String?  @db.Text
+  scale     String?  @db.Text
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("avatar3d")
 }
@@ -393,17 +393,17 @@ model Visitor {
 }
 
 model Visit {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   visitorId   String
-  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitor     Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   visitNumber Int
-  startedAt   DateTime @default(now())
+  startedAt   DateTime  @default(now())
   endedAt     DateTime?
-  duration    Int      @default(0)
-  pagesViewed String   @default("[]")
-  actions     String   @default("[]")
+  duration    Int       @default(0)
+  pagesViewed String    @default("[]")
+  actions     String    @default("[]")
   referrer    String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@index([visitorId])
   @@index([startedAt])

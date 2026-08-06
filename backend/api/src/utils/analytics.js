@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "shared/utils/prisma.js";
 
 export async function trackPageView(slug = null) {
   try {

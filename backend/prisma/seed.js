@@ -5,9 +5,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, "../api/.env") });
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
 async function seedIfEmpty(model, name, dataFn) {
   const count = await model.count();
