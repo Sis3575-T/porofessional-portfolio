@@ -13,34 +13,35 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "frontend-shared": "file:../shared",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.21.1",
+    "@react-three/drei": "^9.97.0",
+    "@react-three/fiber": "^8.15.0",
     "axios": "^1.6.0",
     "framer-motion": "10.18.0",
-    "three": "^0.160.0",
-    "@react-three/fiber": "^8.15.0",
-    "@react-three/drei": "^9.97.0",
+    "frontend-shared": "file:../shared",
     "lucide-react": "^0.294.0",
-    "react-hot-toast": "^2.4.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.21.1",
+    "three": "^0.160.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
+    "sharp": "^0.35.3",
     "tailwindcss": "^3.4.15",
     "vite": "^5.4.10"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.62.3",
-    "@rollup/rollup-linux-x64-musl": "4.62.3",
-    "@rollup/rollup-linux-arm64-gnu": "4.62.3",
-    "@rollup/rollup-linux-arm64-musl": "4.62.3",
     "@rollup/rollup-darwin-arm64": "4.62.3",
     "@rollup/rollup-darwin-x64": "4.62.3",
+    "@rollup/rollup-freebsd-x64": "4.62.3",
+    "@rollup/rollup-linux-arm64-gnu": "4.62.3",
+    "@rollup/rollup-linux-arm64-musl": "4.62.3",
+    "@rollup/rollup-linux-x64-gnu": "4.62.3",
+    "@rollup/rollup-linux-x64-musl": "4.62.3",
     "@rollup/rollup-win32-x64-gnu": "4.62.3",
-    "@rollup/rollup-win32-x64-msvc": "4.62.3",
-    "@rollup/rollup-freebsd-x64": "4.62.3"
+    "@rollup/rollup-win32-x64-msvc": "4.62.3"
   }
 }

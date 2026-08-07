@@ -16,6 +16,7 @@ import BackToTop from "./components/BackToTop";
 import LoadingOverlay from "./components/LoadingOverlay";
 import PhotoManager from "./components/PhotoManager";
 import ScreenshotButton from "./components/ScreenshotButton";
+import FaviconUpdater from "./components/FaviconUpdater";
 
 import NotFoundPage from "./components/NotFoundPage";
 
@@ -128,6 +129,7 @@ function MainLayout() {
   return (
     <div className="min-h-screen relative" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
       <SkipLink />
+      <FaviconUpdater />
       <Sidebar />
       <Navbar />
       <div className="ml-0 md:ml-[100px] xl:ml-[105px] 2xl:ml-[110px] pt-[120px]">
