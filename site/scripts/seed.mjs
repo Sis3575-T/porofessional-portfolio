@@ -14,8 +14,7 @@ const profile = {
     "I'm a full-stack developer based in Addis Ababa, Ethiopia. I love solving complex problems and creating intuitive user interfaces.",
     "I specialise in React, Node.js and modern web technologies, and I'm always learning and exploring new tools.",
   ].join("\n\n"),
-  // TODO: replace with the address you want shown publicly.
-  email: "you@example.com",
+  email: "sisay3575@gmail.com",
   // Served from /public; upload a new one from /admin (stored in Vercel Blob).
   photo_url: "/profile.webp",
   social_links: [{ label: "GitHub", url: "https://github.com/Sis3575-T" }],
