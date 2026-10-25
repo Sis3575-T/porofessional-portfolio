@@ -59,10 +59,7 @@ export async function requireAdmin(): Promise<void> {
 }
 
 const MAX_ATTEMPTS = 5;
-// Caps failures across all clients too, so rotating spoofed IPs cannot brute-force the password.
-const MAX_GLOBAL_ATTEMPTS = 30;
 const WINDOW_MINUTES = 15;
-const GLOBAL_KEY = "global";
 
 // On Vercel, x-forwarded-for is set by the platform (client-supplied values are overwritten).
 async function clientKey(): Promise<string> {
@@ -85,15 +82,14 @@ async function bump(key: string, max: number): Promise<number> {
   return row.attempts > max ? Math.max(1, row.wait) : 0;
 }
 
-// Fixed-window limiter (per client and global): returns minutes to wait, or 0 if the attempt is allowed.
+// Fixed-window limiter per client: returns minutes to wait, or 0 if the attempt is allowed.
+// No global cap on purpose: it would let anyone lock the owner out.
 export async function registerLoginAttempt(): Promise<number> {
   await db()`DELETE FROM login_attempts WHERE window_start < now() - interval '1 day'`;
-  const perClient = await bump(await clientKey(), MAX_ATTEMPTS);
-  const global = await bump(GLOBAL_KEY, MAX_GLOBAL_ATTEMPTS);
-  return Math.max(perClient, global);
+  return bump(await clientKey(), MAX_ATTEMPTS);
 }
 
 export async function clearLoginAttempts(): Promise<void> {
   const key = await clientKey();
-  await db()`DELETE FROM login_attempts WHERE key IN (${key}, ${GLOBAL_KEY})`;
+  await db()`DELETE FROM login_attempts WHERE key = ${key}`;
 }

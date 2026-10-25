@@ -88,19 +88,29 @@ try {
     }
     console.log("Profile inserted.");
 
-    for (const [i, p] of projects.entries()) {
-      await tx`
-        INSERT INTO projects (title, description, tech, link, image_url, position, visible)
-        VALUES (${p.title}, ${p.description}, ${p.tech}, ${p.link}, ${p.image_url}, ${i + 1}, true)`;
+    const [{ count: projectCount }] = await tx`SELECT count(*)::int AS count FROM projects`;
+    if (projectCount === 0) {
+      for (const [i, p] of projects.entries()) {
+        await tx`
+          INSERT INTO projects (title, description, tech, link, image_url, position, visible)
+          VALUES (${p.title}, ${p.description}, ${p.tech}, ${p.link}, ${p.image_url}, ${i + 1}, true)`;
+      }
+      console.log(`${projects.length} projects inserted.`);
+    } else {
+      console.log("Projects already exist, skipped.");
     }
-    console.log(`${projects.length} projects inserted.`);
 
-    for (const [i, s] of skills.entries()) {
-      await tx`
-        INSERT INTO skills (group_name, name, position)
-        VALUES (${s.group_name}, ${s.name}, ${i + 1})`;
+    const [{ count: skillCount }] = await tx`SELECT count(*)::int AS count FROM skills`;
+    if (skillCount === 0) {
+      for (const [i, s] of skills.entries()) {
+        await tx`
+          INSERT INTO skills (group_name, name, position)
+          VALUES (${s.group_name}, ${s.name}, ${i + 1})`;
+      }
+      console.log(`${skills.length} skills inserted.`);
+    } else {
+      console.log("Skills already exist, skipped.");
     }
-    console.log(`${skills.length} skills inserted.`);
   });
 } finally {
   await sql.end();

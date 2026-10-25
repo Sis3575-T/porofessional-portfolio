@@ -37,7 +37,11 @@ export async function storeImage(file: File, folder: string): Promise<string> {
   const name = `${folder}/${randomUUID()}.${type.ext}`;
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(name, Buffer.from(bytes), { access: "public", contentType: file.type });
+    const blob = await put(name, Buffer.from(bytes), {
+      access: "public",
+      contentType: file.type,
+      addRandomSuffix: false,
+    });
     return blob.url;
   }
 
