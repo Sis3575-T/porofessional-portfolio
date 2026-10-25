@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { del, put } from "@vercel/blob";
+import { db } from "@/lib/db";
 
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // Vercel functions accept 4.5 MB bodies.
 
@@ -51,14 +52,39 @@ export async function storeImage(file: File, folder: string): Promise<string> {
   throw new UploadError("BLOB_READ_WRITE_TOKEN is not set.");
 }
 
-// Removes a previously stored image so only current files are kept.
-export async function removeImage(url: string | null | undefined): Promise<void> {
-  if (!url) return;
+const OWNED_PATH = /^\/(?:profile|projects)\/[0-9a-f-]{36}\.(?:jpg|png|webp|avif)$/;
+
+// Only files this app uploaded (our folder/UUID naming, in our own Blob store) may be deleted.
+function isOwnedUpload(url: string): boolean {
+  if (url.startsWith("/uploads/")) {
+    return process.env.NODE_ENV !== "production" && OWNED_PATH.test(url.slice("/uploads".length));
+  }
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const storeId = token?.split("_")[3];
+  if (!storeId) return false;
   try {
-    if (url.startsWith("https://") && process.env.BLOB_READ_WRITE_TOKEN) await del(url);
-    else if (url.startsWith("/uploads/") && process.env.NODE_ENV !== "production") {
-      await unlink(path.join(process.cwd(), "public", url));
-    }
+    const u = new URL(url);
+    return (
+      u.protocol === "https:" &&
+      u.hostname === `${storeId.toLowerCase()}.public.blob.vercel-storage.com` &&
+      OWNED_PATH.test(u.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+// Deletes a stored image once no profile or project row references it, so only current files are kept.
+export async function removeImage(url: string | null | undefined): Promise<void> {
+  if (!url || !isOwnedUpload(url)) return;
+  try {
+    const [inUse] = await db()`
+      SELECT 1 FROM profile WHERE photo_url = ${url}
+      UNION ALL SELECT 1 FROM projects WHERE image_url = ${url}
+      LIMIT 1`;
+    if (inUse) return;
+    if (url.startsWith("/uploads/")) await unlink(path.join(process.cwd(), "public", url));
+    else await del(url);
   } catch (err) {
     console.error("Failed to remove image", err);
   }

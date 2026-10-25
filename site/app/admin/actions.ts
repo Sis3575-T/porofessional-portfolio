@@ -2,6 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import type { TransactionSql } from "postgres";
 import {
   clearLoginAttempts,
   createSession,
@@ -133,10 +134,18 @@ export async function saveProject(_prev: ActionState, formData: FormData): Promi
       }
       if (old.old_image !== imageUrl) await removeImage(old.old_image);
     } else {
-      await sql`
-        INSERT INTO projects (title, description, tech, link, image_url, visible, position)
-        VALUES (${p.title}, ${p.description}, ${p.tech}, ${p.link}, ${imageUrl}, ${p.visible},
-                (SELECT coalesce(max(position), 0) + 1 FROM projects))`;
+      try {
+        await sql.begin(async (tx) => {
+          await lockPositions(tx, "projects");
+          await tx`
+            INSERT INTO projects (title, description, tech, link, image_url, visible, position)
+            VALUES (${p.title}, ${p.description}, ${p.tech}, ${p.link}, ${imageUrl}, ${p.visible},
+                    (SELECT coalesce(max(position), 0) + 1 FROM projects))`;
+        });
+      } catch (err) {
+        await removeImage(uploaded);
+        throw err;
+      }
     }
     refresh();
     return ok(p.id ? "Project saved." : "Project added.");
@@ -165,9 +174,12 @@ export async function saveSkill(_prev: ActionState, formData: FormData): Promise
         UPDATE skills SET group_name = ${s.group_name}, name = ${s.name} WHERE id = ${s.id} RETURNING id`;
       if (!rows.length) return fail("Skill not found.");
     } else {
-      await sql`
-        INSERT INTO skills (group_name, name, position)
-        VALUES (${s.group_name}, ${s.name}, (SELECT coalesce(max(position), 0) + 1 FROM skills))`;
+      await sql.begin(async (tx) => {
+        await lockPositions(tx, "skills");
+        await tx`
+          INSERT INTO skills (group_name, name, position)
+          VALUES (${s.group_name}, ${s.name}, (SELECT coalesce(max(position), 0) + 1 FROM skills))`;
+      });
     }
     refresh();
     return ok(s.id ? "Skill saved." : "Skill added.");
@@ -184,6 +196,11 @@ export async function deleteSkill(_prev: ActionState, formData: FormData): Promi
   });
 }
 
+// Serialises position changes per table for the rest of the transaction.
+async function lockPositions(tx: TransactionSql, table: "projects" | "skills"): Promise<void> {
+  await tx`SELECT pg_advisory_xact_lock(hashtext(${"positions:" + table}))`;
+}
+
 // Swaps position with the neighbouring row; the deferred unique constraint allows the swap.
 async function move(table: "projects" | "skills", formData: FormData): Promise<ActionState> {
   const parsed = moveSchema.safeParse(Object.fromEntries(formData));
@@ -191,6 +208,7 @@ async function move(table: "projects" | "skills", formData: FormData): Promise<A
   const { id, direction } = parsed.data;
 
   const moved = await db().begin(async (tx) => {
+    await lockPositions(tx, table);
     const [cur] = await tx`SELECT position FROM ${tx(table)} WHERE id = ${id} FOR UPDATE`;
     if (!cur) return false;
     const [next] =

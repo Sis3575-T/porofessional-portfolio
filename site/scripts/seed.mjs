@@ -1,6 +1,6 @@
 // Inserts your real content once. Re-running never overwrites or duplicates:
-// the profile is only inserted if missing, and projects/skills only if their
-// table is empty. After seeding, edit everything from /admin.
+// if the profile row already exists the database counts as seeded and nothing
+// is inserted (so content deleted in /admin never comes back).
 // Usage: npm run db:seed
 import postgres from "postgres";
 
@@ -82,31 +82,25 @@ try {
               ${profile.email}, ${profile.photo_url}, ${tx.json(profile.social_links)})
       ON CONFLICT (id) DO NOTHING
       RETURNING id`;
-    console.log(inserted.length ? "Profile inserted." : "Profile exists, skipped.");
-
-    const [{ count: projectCount }] = await tx`SELECT count(*)::int AS count FROM projects`;
-    if (projectCount === 0) {
-      for (const [i, p] of projects.entries()) {
-        await tx`
-          INSERT INTO projects (title, description, tech, link, image_url, position, visible)
-          VALUES (${p.title}, ${p.description}, ${p.tech}, ${p.link}, ${p.image_url}, ${i + 1}, true)`;
-      }
-      console.log(`${projects.length} projects inserted.`);
-    } else {
-      console.log("Projects exist, skipped.");
+    if (!inserted.length) {
+      console.log("Already seeded (profile exists), nothing to do.");
+      return;
     }
+    console.log("Profile inserted.");
 
-    const [{ count: skillCount }] = await tx`SELECT count(*)::int AS count FROM skills`;
-    if (skillCount === 0) {
-      for (const [i, s] of skills.entries()) {
-        await tx`
-          INSERT INTO skills (group_name, name, position)
-          VALUES (${s.group_name}, ${s.name}, ${i + 1})`;
-      }
-      console.log(`${skills.length} skills inserted.`);
-    } else {
-      console.log("Skills exist, skipped.");
+    for (const [i, p] of projects.entries()) {
+      await tx`
+        INSERT INTO projects (title, description, tech, link, image_url, position, visible)
+        VALUES (${p.title}, ${p.description}, ${p.tech}, ${p.link}, ${p.image_url}, ${i + 1}, true)`;
     }
+    console.log(`${projects.length} projects inserted.`);
+
+    for (const [i, s] of skills.entries()) {
+      await tx`
+        INSERT INTO skills (group_name, name, position)
+        VALUES (${s.group_name}, ${s.name}, ${i + 1})`;
+    }
+    console.log(`${skills.length} skills inserted.`);
   });
 } finally {
   await sql.end();

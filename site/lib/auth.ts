@@ -59,20 +59,20 @@ export async function requireAdmin(): Promise<void> {
 }
 
 const MAX_ATTEMPTS = 5;
+// Caps failures across all clients too, so rotating spoofed IPs cannot brute-force the password.
+const MAX_GLOBAL_ATTEMPTS = 30;
 const WINDOW_MINUTES = 15;
+const GLOBAL_KEY = "global";
 
+// On Vercel, x-forwarded-for is set by the platform (client-supplied values are overwritten).
 async function clientKey(): Promise<string> {
   const h = await headers();
-  const ip = h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
   return createHash("sha256").update(`${process.env.SESSION_SECRET}:${ip}`).digest("hex");
 }
 
-// Fixed-window limiter: returns minutes to wait, or 0 if the attempt is allowed.
-export async function registerLoginAttempt(): Promise<number> {
-  const sql = db();
-  const key = await clientKey();
-  await sql`DELETE FROM login_attempts WHERE window_start < now() - interval '1 day'`;
-  const [row] = await sql`
+async function bump(key: string, max: number): Promise<number> {
+  const [row] = await db()`
     INSERT INTO login_attempts (key, attempts, window_start)
     VALUES (${key}, 1, now())
     ON CONFLICT (key) DO UPDATE SET
@@ -82,10 +82,18 @@ export async function registerLoginAttempt(): Promise<number> {
                           THEN now() ELSE login_attempts.window_start END
     RETURNING attempts,
       ceil(extract(epoch FROM (window_start + make_interval(mins => ${WINDOW_MINUTES}) - now())) / 60)::int AS wait`;
-  return row.attempts > MAX_ATTEMPTS ? Math.max(1, row.wait) : 0;
+  return row.attempts > max ? Math.max(1, row.wait) : 0;
+}
+
+// Fixed-window limiter (per client and global): returns minutes to wait, or 0 if the attempt is allowed.
+export async function registerLoginAttempt(): Promise<number> {
+  await db()`DELETE FROM login_attempts WHERE window_start < now() - interval '1 day'`;
+  const perClient = await bump(await clientKey(), MAX_ATTEMPTS);
+  const global = await bump(GLOBAL_KEY, MAX_GLOBAL_ATTEMPTS);
+  return Math.max(perClient, global);
 }
 
 export async function clearLoginAttempts(): Promise<void> {
   const key = await clientKey();
-  await db()`DELETE FROM login_attempts WHERE key = ${key}`;
+  await db()`DELETE FROM login_attempts WHERE key IN (${key}, ${GLOBAL_KEY})`;
 }
