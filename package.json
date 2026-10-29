@@ -25,6 +25,9 @@
     "terser": "^5.49.1"
   },
   "dependencies": {
-    "nodemailer": "^6.9.0"
+    "@neondatabase/serverless": "^0.10.4",
+    "@prisma/adapter-neon": "^5.22.0",
+    "nodemailer": "^6.9.0",
+    "ws": "^8.22.0"
   }
 }
