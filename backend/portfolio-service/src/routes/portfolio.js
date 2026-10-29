@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
   try {
     const cached = getCachedPortfolio();
     if (cached) {
-      res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+      res.setHeader("Cache-Control", "no-cache");
       res.setHeader("ETag", cached.etag);
       if (req.headers["if-none-match"] === cached.etag) {
         return res.status(304).end();
@@ -130,7 +130,7 @@ router.get("/", async (req, res) => {
     };
 
     const entry = setCachedPortfolio(payload);
-    res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+    res.setHeader("Cache-Control", "no-cache");
     res.setHeader("ETag", entry.etag);
 
     if (req.headers["if-none-match"] === entry.etag) {

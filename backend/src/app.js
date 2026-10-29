@@ -109,12 +109,12 @@ app.use((req, res, next) => {
     if (req.path.startsWith("/uploads/")) {
       res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600");
     } else if (req.path === "/api/v1/portfolio" || req.path.startsWith("/api/v1/hero") || req.path.startsWith("/api/v1/about")) {
-      res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+      res.setHeader("Cache-Control", "no-cache");
     } else if (req.path.startsWith("/api/v1/skills") || req.path.startsWith("/api/v1/services") ||
                req.path.startsWith("/api/v1/experience") || req.path.startsWith("/api/v1/education") ||
                req.path.startsWith("/api/v1/projects") || req.path.startsWith("/api/v1/testimonials") ||
                req.path.startsWith("/api/v1/settings")) {
-      res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+      res.setHeader("Cache-Control", "no-cache");
     } else if (req.path.startsWith("/api/v1/admin") || req.path.startsWith("/api/v1/auth")) {
       res.setHeader("Cache-Control", "private, no-cache, no-store, must-revalidate");
     }

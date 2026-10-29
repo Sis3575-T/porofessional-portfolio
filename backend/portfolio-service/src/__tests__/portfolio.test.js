@@ -53,7 +53,7 @@ describe("Portfolio Service", () => {
     const etag = res.headers.get("etag");
     const cacheControl = res.headers.get("cache-control");
     assert.ok(etag, "ETag header must be present");
-    assert.ok(cacheControl?.includes("public"), "Cache-Control must be public");
+    assert.ok(cacheControl?.includes("no-cache"), "Cache-Control must be no-cache");
 
     const body = await res.json();
     assert.equal(body.success, true);

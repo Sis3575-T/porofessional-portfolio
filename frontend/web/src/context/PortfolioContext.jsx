@@ -6,8 +6,8 @@ import {
 
 export const PortfolioContext = createContext();
 
-const CACHE_KEY = "portfolio_cache";
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_KEY = "portfolio_cache_v2";
+const CACHE_TTL = 60 * 1000; // 1 minute
 
 const defaultHero = {
   name: "Sisay Temesgen",
@@ -90,7 +90,7 @@ export function PortfolioProvider({ children }) {
 
     // Try consolidated endpoint first in 1 single network request
     try {
-      const res = await portfolioAPI.get();
+      const res = await portfolioAPI.get({ headers: { "Cache-Control": "no-cache" } });
       if (res.data?.success && res.data?.data) {
         const d = res.data.data;
         if (d.hero) setHero(d.hero);
