@@ -2,20 +2,24 @@ import { useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:10000").replace(/\/+$/, "");
 const VISITOR_ID_KEY = "portfolio_visitor_id";
 const SESSION_START_KEY = "portfolio_session_start";
 const EXCLUDE_KEY = "portfolio_analytics_exclude";
 
 function isAdminBypass() {
-  return localStorage.getItem(EXCLUDE_KEY) === "true";
+  try {
+    return localStorage.getItem(EXCLUDE_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 function getAdminHeaders() {
   return isAdminBypass() ? { "x-admin-bypass": "true" } : {};
 }
 
-// Generate a stable fingerprint hash from browser properties
+// Generate a stable fingerprint hash asynchronously in idle time
 async function generateFingerprint() {
   const parts = [];
 
@@ -23,15 +27,15 @@ async function generateFingerprint() {
   try {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    ctx.textBaseline = "top";
-    ctx.font = "14px 'Arial'";
-    ctx.fillStyle = "#f60";
-    ctx.fillRect(125, 1, 62, 20);
-    ctx.fillStyle = "#069";
-    ctx.fillText("portfolio-fp", 2, 15);
-    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-    ctx.fillText("portfolio-fp", 4, 17);
-    parts.push(canvas.toDataURL());
+    if (ctx) {
+      ctx.textBaseline = "top";
+      ctx.font = "14px 'Arial'";
+      ctx.fillStyle = "#f60";
+      ctx.fillRect(125, 1, 62, 20);
+      ctx.fillStyle = "#069";
+      ctx.fillText("portfolio-fp", 2, 15);
+      parts.push(canvas.toDataURL());
+    }
   } catch {}
 
   // WebGL renderer
@@ -61,25 +65,8 @@ async function generateFingerprint() {
   parts.push(navigator.cookieEnabled ? "1" : "0");
 
   // Timezone
-  parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || "");
-
-  // Font detection
   try {
-    const testFonts = ["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia", "Palatino", "Garamond", "Comic Sans MS", "Impact", "Lucida Console"];
-    const span = document.createElement("span");
-    span.style.position = "absolute";
-    span.style.left = "-9999px";
-    span.style.fontSize = "72px";
-    span.innerHTML = "mmmmmmmmmmlli";
-    document.body.appendChild(span);
-    const baseWidthPx = span.offsetWidth;
-    let fontList = "";
-    for (const font of testFonts) {
-      span.style.fontFamily = `'${font}', monospace`;
-      if (span.offsetWidth !== baseWidthPx) fontList += font;
-    }
-    document.body.removeChild(span);
-    parts.push(fontList);
+    parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || "");
   } catch {}
 
   const raw = parts.join("|||");
@@ -95,48 +82,59 @@ let cachedVisitorId = null;
 function getVisitorId() {
   if (cachedVisitorId) return cachedVisitorId;
 
-  let id = localStorage.getItem(VISITOR_ID_KEY);
-  if (id && id.startsWith("fp-")) {
-    cachedVisitorId = id;
-    return id;
-  }
+  try {
+    let id = localStorage.getItem(VISITOR_ID_KEY);
+    if (id && id.startsWith("fp-")) {
+      cachedVisitorId = id;
+      return id;
+    }
+  } catch {}
 
-  // Generate async, fall back to UUID
-  generateFingerprint()
-    .then((hash) => {
-      const fpId = `fp-${hash}`;
-      localStorage.setItem(VISITOR_ID_KEY, fpId);
-      cachedVisitorId = fpId;
-    })
-    .catch(() => {
-      const fallback = `fp-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-      localStorage.setItem(VISITOR_ID_KEY, fallback);
-      cachedVisitorId = fallback;
-    });
+  const fallback = `fp-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  cachedVisitorId = fallback;
+  try {
+    localStorage.setItem(VISITOR_ID_KEY, fallback);
+  } catch {}
 
-  if (!id) {
-    id = `fp-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-    localStorage.setItem(VISITOR_ID_KEY, id);
-  }
-  cachedVisitorId = id;
-  return id;
+  // Compute refined fingerprint in idle time without blocking UI
+  const scheduleIdle = typeof window !== "undefined" && window.requestIdleCallback
+    ? window.requestIdleCallback
+    : (cb) => setTimeout(cb, 2500);
+
+  scheduleIdle(() => {
+    generateFingerprint()
+      .then((hash) => {
+        const fpId = `fp-${hash}`;
+        try {
+          localStorage.setItem(VISITOR_ID_KEY, fpId);
+        } catch {}
+        cachedVisitorId = fpId;
+      })
+      .catch(() => {});
+  });
+
+  return fallback;
 }
 
 function getSessionStart() {
-  let start = sessionStorage.getItem(SESSION_START_KEY);
-  if (!start) {
-    start = Date.now().toString();
-    sessionStorage.setItem(SESSION_START_KEY, start);
+  try {
+    let start = sessionStorage.getItem(SESSION_START_KEY);
+    if (!start) {
+      start = Date.now().toString();
+      sessionStorage.setItem(SESSION_START_KEY, start);
+    }
+    return parseInt(start);
+  } catch {
+    return Date.now();
   }
-  return parseInt(start);
 }
 
 function getScreenInfo() {
   return {
-    width: screen.width,
-    height: screen.height,
-    colorDepth: screen.colorDepth,
-    pixelRatio: window.devicePixelRatio || 1,
+    width: typeof screen !== "undefined" ? screen.width : 1920,
+    height: typeof screen !== "undefined" ? screen.height : 1080,
+    colorDepth: typeof screen !== "undefined" ? screen.colorDepth : 24,
+    pixelRatio: typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
   };
 }
 
@@ -144,7 +142,6 @@ export function useAnalytics() {
   const location = useLocation();
   const trackedPages = useRef(new Set());
   const sessionStart = useRef(getSessionStart());
-  const hasTrackedCurrentPage = useRef(false);
 
   const trackPage = useCallback(async (page, event, data) => {
     if (isAdminBypass()) return;
@@ -158,8 +155,8 @@ export function useAnalytics() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         referrer: document.referrer || null,
       }, { headers: getAdminHeaders(), timeout: 5000 });
-    } catch (err) {
-      // Silently fail - analytics should never break the app
+    } catch {
+      // Silently fail - analytics should never break user experience
     }
   }, []);
 
@@ -175,7 +172,7 @@ export function useAnalytics() {
         data: { ...data, screen: getScreenInfo() },
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       }, { headers: getAdminHeaders(), timeout: 5000 });
-    } catch (err) {}
+    } catch {}
   }, []);
 
   const endSession = useCallback(async () => {
@@ -187,7 +184,7 @@ export function useAnalytics() {
         visitorId,
         duration,
       }, { headers: getAdminHeaders(), timeout: 3000 });
-    } catch (err) {}
+    } catch {}
   }, []);
 
   // Track route changes
@@ -197,7 +194,6 @@ export function useAnalytics() {
       trackedPages.current.add(page);
       trackPage(page);
     }
-    hasTrackedCurrentPage.current = true;
   }, [location, trackPage]);
 
   // Session end on unload
@@ -211,7 +207,6 @@ export function useAnalytics() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      endSession();
     };
   }, [endSession]);
 

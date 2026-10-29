@@ -6,6 +6,10 @@ export { default as api } from "frontend-shared/api";
 // Re-export all API modules
 import api from "frontend-shared/api";
 
+export const portfolioAPI = {
+  get: () => api.get("/portfolio"),
+};
+
 export const authAPI = {
   login: (data) => api.post("/auth/login", data),
   me: () => api.get("/auth/me"),
