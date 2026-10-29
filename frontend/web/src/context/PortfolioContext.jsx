@@ -7,7 +7,7 @@ import {
 export const PortfolioContext = createContext();
 
 const CACHE_KEY = "portfolio_cache_v2";
-const CACHE_TTL = 60 * 1000; // 1 minute
+const CACHE_TTL = 5 * 1000; // 5 seconds
 
 const defaultHero = {
   name: "Sisay Temesgen",
