@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { resolveUrl } from "../../utils/resolveUrl";
-import { X, ExternalLink, Building2, MapPin, Calendar, Briefcase, Award, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ExternalLink, Building2, MapPin, Calendar, Briefcase, ChevronLeft, ChevronRight, Check } from "lucide-react";
 
 function parseJSON(val) {
   if (!val) return [];
@@ -10,7 +11,9 @@ function parseJSON(val) {
     try {
       const parsed = JSON.parse(val);
       return Array.isArray(parsed) ? parsed : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   }
   return [];
 }
@@ -19,234 +22,296 @@ function DetailModal({ experience, onClose }) {
   const technologies = parseJSON(experience.technologies);
   const responsibilities = parseJSON(experience.responsibilities);
   const achievements = parseJSON(experience.achievements);
-  const gallery = parseJSON(experience.galleryImages);
 
-  const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "";
-  const endDate = experience.isCurrent ? "Present" : experience.endDate ? new Date(experience.endDate).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "";
+  const startDate = experience.startDate
+    ? new Date(experience.startDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "";
+  const endDate = experience.isCurrent
+    ? "Present"
+    : experience.endDate
+    ? new Date(experience.endDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "";
 
   useEffect(() => {
-    const handleEsc = (e) => { if (e.key === "Escape") onClose(); };
+    const handleEsc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div
-        className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl"
-        style={{ background: "var(--bg-primary)", border: "1px solid var(--border)", maxHeight: "85vh" }}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${experience.company} Experience Details`}
+    >
+      <div className="absolute inset-0 bg-[#0B0F17]/60 backdrop-blur-xs" />
+      <motion.div
+        className="relative w-full max-w-xl rounded-3xl bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-lg overflow-hidden z-10"
         onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.97 }}
+        transition={{ duration: 0.18 }}
       >
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: "85vh" }}>
+        <div className="p-6 sm:p-8 overflow-y-auto max-h-[85vh]">
+          {/* Header */}
           <div className="flex justify-between items-start mb-5">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3.5">
               {experience.logo ? (
-                <img src={resolveUrl(experience.logo)} alt={experience.company} className="w-12 h-12 rounded-xl object-cover" style={{ border: "1px solid var(--border)" }} />
+                <img
+                  src={resolveUrl(experience.logo)}
+                  alt={experience.company}
+                  className="w-12 h-12 rounded-2xl object-cover border border-[#E2E8F0] dark:border-[#1E293B]"
+                />
               ) : (
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-                  <Building2 size={22} style={{ color: "var(--accent)" }} />
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6] shrink-0">
+                  <Building2 size={22} />
                 </div>
               )}
               <div>
-                <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>{experience.company}</h2>
-                <p className="text-sm" style={{ color: "var(--accent)" }}>{experience.position}</p>
+                <h3 className="text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                  {experience.company}
+                </h3>
+                <p className="text-sm font-semibold text-[#2563EB] dark:text-[#3B82F6]">
+                  {experience.position}
+                </p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition">
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-xl text-[#475569] hover:text-[#0F172A] dark:text-[#94A3B8] dark:hover:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
+              aria-label="Close dialog"
+            >
               <X size={18} />
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-3 mb-5 text-xs" style={{ color: "var(--text-muted)" }}>
+          {/* Meta */}
+          <div className="flex flex-wrap gap-2 mb-5 text-xs text-[#475569] dark:text-[#94A3B8]">
             {startDate && (
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-                <Calendar size={12} /> {startDate} – {endDate}
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] font-semibold">
+                <Calendar size={12} className="text-[#2563EB] dark:text-[#3B82F6]" /> {startDate} – {endDate}
               </span>
             )}
             {experience.employmentType && (
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-                <Briefcase size={12} /> {experience.employmentType}
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] font-semibold">
+                <Briefcase size={12} className="text-[#2563EB] dark:text-[#3B82F6]" /> {experience.employmentType}
               </span>
             )}
             {experience.location && (
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-                <MapPin size={12} /> {experience.location}
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] font-semibold">
+                <MapPin size={12} className="text-[#2563EB] dark:text-[#3B82F6]" /> {experience.location}
               </span>
             )}
           </div>
 
-          <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>{experience.description}</p>
+          <p className="text-sm leading-relaxed text-[#475569] dark:text-[#94A3B8] mb-5 font-normal">
+            {experience.description}
+          </p>
 
+          {/* Responsibilities */}
           {responsibilities.length > 0 && (
-            <div className="mb-5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Responsibilities</h4>
-              <ul className="space-y-1.5">
-                {responsibilities.map((r, i) => (
-                  <li key={i} className="text-sm flex items-start gap-2" style={{ color: "var(--text-secondary)" }}>
-                    <span className="mt-1" style={{ color: "var(--accent)" }}>&#x2022;</span>{r}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {achievements.length > 0 && (
-            <div className="mb-5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: "var(--text-muted)" }}>
-                <Award size={12} /> Achievements
+            <div className="mb-5 pt-4 border-t border-[#E2E8F0]/70 dark:border-[#1E293B]">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#3B82F6] mb-3">
+                Key Responsibilities
               </h4>
-              <ul className="space-y-1.5">
-                {achievements.map((a, i) => (
-                  <li key={i} className="text-sm flex items-start gap-2" style={{ color: "var(--text-secondary)" }}>
-                    <span className="text-amber-400 mt-1">&#x2605;</span>{a}
+              <ul className="space-y-2">
+                {responsibilities.map((resp, i) => (
+                  <li key={i} className="text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] flex items-start gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#3B82F6] flex items-center justify-center shrink-0 mt-0.5">
+                      <Check size={11} strokeWidth={3} />
+                    </span>
+                    <span>{resp}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
+          {/* Achievements */}
+          {achievements.length > 0 && (
+            <div className="mb-5 pt-4 border-t border-[#E2E8F0]/70 dark:border-[#1E293B]">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#3B82F6] mb-3">
+                Key Accomplishments
+              </h4>
+              <ul className="space-y-2">
+                {achievements.map((ach, i) => (
+                  <li key={i} className="text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] flex items-start gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#3B82F6] flex items-center justify-center shrink-0 mt-0.5">
+                      <Check size={11} strokeWidth={3} />
+                    </span>
+                    <span>{ach}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Technologies */}
           {technologies.length > 0 && (
-            <div className="mb-5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Technologies</h4>
-              <div className="flex flex-wrap gap-2">
-                {technologies.map((t, i) => (
-                  <span key={i} className="px-3 py-1 text-xs font-medium rounded-lg" style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-                    {t}
+            <div className="pt-4 border-t border-[#E2E8F0]/70 dark:border-[#1E293B]">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#3B82F6] mb-2.5">
+                Technologies Used
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {technologies.map((tech, i) => (
+                  <span
+                    key={i}
+                    className="text-xs px-2.5 py-1 rounded-lg bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-[#F8FAFC] border border-[#E2E8F0] dark:border-[#1E293B] font-semibold"
+                  >
+                    {tech}
                   </span>
                 ))}
               </div>
             </div>
           )}
 
-          {gallery.length > 0 && (
-            <div className="mb-5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Gallery</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {gallery.slice(0, 4).map((img, i) => (
-                  <img key={i} src={img} alt="" className="w-full h-24 object-cover rounded-lg" style={{ border: "1px solid var(--border)" }} />
-                ))}
-              </div>
+          {/* Company Link */}
+          {experience.companyUrl && (
+            <div className="mt-6 pt-4 border-t border-[#E2E8F0]/70 dark:border-[#1E293B]">
+              <a
+                href={experience.companyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2563EB] dark:text-[#3B82F6] hover:text-[#1D4ED8] dark:hover:text-[#60A5FA] transition-colors"
+              >
+                <ExternalLink size={13} />
+                <span>Visit {experience.company}</span>
+              </a>
             </div>
           )}
-
-          <div className="flex gap-2 flex-wrap mt-5">
-            {experience.companyUrl && (
-              <a href={experience.companyUrl} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
-                <ExternalLink size={14} /> Visit Company
-              </a>
-            )}
-            <button onClick={onClose}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg hover:opacity-80 transition"
-              style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-              Close
-            </button>
-          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
 function ExperienceCard({ experience, index, onOpen }) {
-  const technologies = parseJSON(experience.technologies).slice(0, 4);
-  const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "";
-  const endDate = experience.isCurrent ? "Present" : experience.endDate ? new Date(experience.endDate).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "";
+  const technologies = parseJSON(experience.technologies);
+  const startDate = experience.startDate
+    ? new Date(experience.startDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "";
+  const endDate = experience.isCurrent
+    ? "Present"
+    : experience.endDate
+    ? new Date(experience.endDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "";
 
   return (
     <div
-      className="group flex-shrink-0 w-[300px] sm:w-[340px] rounded-2xl overflow-hidden transition-all duration-300 ease-out cursor-default"
+      className="group relative rounded-3xl p-6 bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-xs hover:border-[#2563EB]/50 hover:shadow-soft transition-all flex flex-col justify-between shrink-0"
       style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        boxShadow: "0 4px 24px var(--shadow)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
-        e.currentTarget.style.boxShadow = "0 12px 40px rgba(37,99,235,0.12), 0 4px 12px var(--shadow)";
-        e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 25%, transparent)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0) scale(1)";
-        e.currentTarget.style.boxShadow = "0 4px 24px var(--shadow)";
-        e.currentTarget.style.borderColor = "var(--border)";
+        width: "min(340px, calc(100vw - 48px))",
+        minHeight: 270,
       }}
     >
-      <div className="p-6 flex flex-col h-full">
-        <div className="flex items-start gap-4 mb-4">
+      <div>
+        <div className="flex items-center gap-3.5 mb-4">
           {experience.logo ? (
-            <img src={resolveUrl(experience.logo)} alt={experience.company} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" style={{ border: "1px solid var(--border)" }} />
+            <img
+              src={resolveUrl(experience.logo)}
+              alt={experience.company}
+              className="w-10 h-10 rounded-2xl object-cover border border-[#E2E8F0] dark:border-[#1E293B]"
+            />
           ) : (
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-              <Building2 size={20} style={{ color: "var(--accent)" }} />
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6]">
+              <Building2 size={20} />
             </div>
           )}
           <div className="min-w-0">
-            <h3 className="font-bold text-base leading-tight truncate" style={{ color: "var(--text-primary)" }}>{experience.position || "Role"}</h3>
-            <p className="text-sm font-medium truncate" style={{ color: "var(--accent)" }}>{experience.company || "Company"}</p>
+            <h3 className="font-bold text-base text-[#0F172A] dark:text-[#F8FAFC] truncate">
+              {experience.company}
+            </h3>
+            <p className="text-xs font-semibold text-[#2563EB] dark:text-[#3B82F6] truncate">
+              {experience.position}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "var(--text-muted)" }}>
-          {startDate && (
-            <span className="flex items-center gap-1">
-              <Calendar size={11} />
-              {startDate} – {endDate}
-            </span>
-          )}
+        <div className="flex items-center gap-2 mb-3 text-xs text-[#475569] dark:text-[#94A3B8]">
+          <Calendar size={12} className="text-[#2563EB] dark:text-[#3B82F6]" />
+          <span>
+            {startDate} – {endDate}
+          </span>
           {experience.location && (
             <>
-              <span style={{ color: "var(--border)" }}>|</span>
-              <span className="flex items-center gap-1">
-                <MapPin size={11} />
-                {experience.location}
-              </span>
+              <span>•</span>
+              <span className="truncate">{experience.location}</span>
             </>
           )}
         </div>
 
-        {experience.description && (
-          <p className="text-sm leading-relaxed mb-4 line-clamp-2" style={{ color: "var(--text-muted)" }}>
-            {experience.description}
-          </p>
-        )}
+        <p className="text-xs text-[#475569] dark:text-[#94A3B8] line-clamp-3 mb-4 leading-relaxed font-normal">
+          {experience.description}
+        </p>
+      </div>
 
+      <div>
         {technologies.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {technologies.map((t, i) => (
-              <span key={i} className="px-2 py-0.5 text-[11px] font-medium rounded-md" style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)" }}>
-                {t}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {technologies.slice(0, 3).map((tech, i) => (
+              <span
+                key={i}
+                className="text-[10px] px-2.5 py-0.5 rounded-lg bg-[#F8FAFC] dark:bg-[#111827] text-[#475569] dark:text-[#94A3B8] border border-[#E2E8F0] dark:border-[#1E293B] font-semibold"
+              >
+                {tech}
               </span>
             ))}
-            {parseJSON(experience.technologies).length > 4 && (
-              <span className="px-2 py-0.5 text-[11px] font-medium rounded-md" style={{ color: "var(--text-muted)", background: "var(--bg-secondary)", border: "1px solid var(--border)" }}>
-                +{parseJSON(experience.technologies).length - 4}
+            {technologies.length > 3 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded text-[#2563EB] dark:text-[#3B82F6] font-bold">
+                +{technologies.length - 3}
               </span>
             )}
           </div>
         )}
 
-        <div className="mt-auto">
-          <button
-            onClick={() => onOpen(index)}
-            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors duration-200"
-          >
-            Open Details
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => onOpen(index)}
+          className="w-full py-2.5 rounded-2xl text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EFF6FF] dark:bg-[#111827] dark:hover:bg-[#161F30] text-[#1E293B] dark:text-[#F8FAFC] border border-[#E2E8F0] dark:border-[#1E293B] transition-colors flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+        >
+          View Details
+        </button>
       </div>
     </div>
   );
 }
 
+const defaultExperiences = [
+  {
+    id: "exp-1",
+    company: "Freelance & Independent Software Projects",
+    position: "Full-Stack Developer",
+    description: "Developing modern, responsive, and accessible web applications and robust REST APIs for clients and personal initiatives. Focused on clean code, performance, database architecture, and exploring AI applications.",
+    startDate: "2023-01-01",
+    endDate: null,
+    isCurrent: true,
+    employmentType: "Self-Employed",
+    location: "Remote",
+    technologies: JSON.stringify(["React", "JavaScript", "Node.js", "Express", "PostgreSQL", "MongoDB", "Tailwind CSS"]),
+    responsibilities: JSON.stringify([
+      "Architect and build responsive frontends using React and modern CSS frameworks",
+      "Develop secure Node.js and Express REST APIs with data validation and authentication",
+      "Design and maintain PostgreSQL and MongoDB schemas with optimized queries",
+      "Collaborate with clients to define product specifications and deliver milestones on schedule",
+    ]),
+  },
+];
+
 export default function Experience() {
   const { experiences } = usePortfolio();
-  const experienceList = experiences || [];
+  const experienceList = experiences && experiences.length > 0 ? experiences : defaultExperiences;
   const [activeIndex, setActiveIndex] = useState(-1);
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -285,54 +350,70 @@ export default function Experience() {
   const activeExperience = activeIndex >= 0 ? experienceList[activeIndex] : null;
 
   return (
-    <section id="experience" className="py-16 relative" style={{ background: "var(--section-experience)" }}>
-      <div className="px-4 sm:px-8 mb-10">
-        <p className="text-center text-sm font-medium tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>Where I&apos;ve Worked</p>
-        <h2 className="text-center text-4xl font-bold" style={{ color: "var(--text-primary)" }}>Work <span style={{ color: "var(--accent)" }}>Experience</span></h2>
-        <div className="w-16 h-1 rounded-full mx-auto mt-4" style={{ background: "var(--accent)" }} />
-      </div>
+    <section
+      id="experience"
+      className="py-6 sm:py-8 relative transition-colors scroll-mt-16"
+      style={{ background: "var(--section-experience)" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" ref={sectionRef}>
+        {/* Header */}
+        <div className="mb-4 sm:mb-5">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-4 h-0.5 bg-[#246BFD] dark:bg-[#3B82F6]" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#246BFD] dark:text-[#3B82F6]">
+              Track Record
+            </h2>
+          </div>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#14213D] dark:text-[#F8FAFC] tracking-tight">
+            Work Experience
+          </p>
+        </div>
 
-      <div className="relative group/scroll">
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll(-1)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover/scroll:opacity-100"
-            style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll(1)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover/scroll:opacity-100"
-            style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
-          >
-            <ChevronRight size={20} />
-          </button>
-        )}
+        {/* Carousel Container */}
+        <div className="relative group/scroll">
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll(-1)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-sm flex items-center justify-center text-[#1E293B] dark:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          )}
+          {canScrollRight && (
+            <button
+              onClick={() => scroll(1)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-sm flex items-center justify-center text-[#1E293B] dark:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
+              aria-label="Scroll right"
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
 
-        <div
-          ref={scrollRef}
-          className="flex gap-6 overflow-x-auto px-4 sm:px-8 pb-4 scrollbar-hide"
-          style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          {experienceList.map((exp, i) => (
-            <div key={exp.id || i} style={{ scrollSnapAlign: "start" }}>
-              <ExperienceCard experience={exp} index={i} onOpen={handleOpen} />
-            </div>
-          ))}
+          <div
+            ref={scrollRef}
+            className={`flex gap-5 overflow-x-auto pb-4 scrollbar-hide ${
+              experienceList.length === 1 ? "justify-center" : "px-1"
+            }`}
+            style={{
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {experienceList.map((exp, i) => (
+              <div key={exp.id || i} style={{ scrollSnapAlign: "start" }}>
+                <ExperienceCard experience={exp} index={i} onOpen={handleOpen} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {activeExperience && (
         <DetailModal experience={activeExperience} onClose={handleClose} />
       )}
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </section>
   );
 }

@@ -31,8 +31,6 @@ function AnimatedNumber({ target, suffix = "+", duration = 2000 }) {
   return <span ref={ref}>{value}{suffix}</span>;
 }
 
-const accentColors = ["text-accent-blue", "text-accent-green", "text-accent-amber", "text-accent-indigo"];
-
 const statsConfig = [
   { key: "projects", label: "Projects Completed", target: 50 },
   { key: "clients", label: "Happy Clients", target: 30 },
@@ -57,17 +55,17 @@ export default function StatsCard({ statistics }) {
       {items.map((item, i) => (
         <motion.div
           key={item.key}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: i * 0.1, duration: 0.4 }}
-          whileHover={{ y: -6, transition: { duration: 0.2 } }}
-          className="group card-ceramic p-5"
+          transition={{ delay: i * 0.08, duration: 0.35 }}
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+          className="bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-5 shadow-soft-xs hover:border-[#78649D]/50 hover:shadow-soft transition-all text-center sm:text-left"
         >
-          <p className={`text-3xl font-bold ${accentColors[i]} mb-1 font-mono`}>
+          <p className="text-3xl font-bold text-[#78649D] dark:text-[#B9A4DF] mb-1 font-mono">
             <AnimatedNumber target={item.target} />
           </p>
-          <p className="text-xs text-gray-500 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-[#625D66] dark:text-[#C4BCCB] uppercase tracking-wider">
             {item.label}
           </p>
         </motion.div>

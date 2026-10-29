@@ -9,12 +9,12 @@ export default function AboutCard({
 }) {
   return (
     <Tag
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay }}
-      whileHover={hover ? { y: -4, transition: { duration: 0.2 } } : undefined}
-      className={`bg-white border border-gray-200 rounded-2xl shadow-sm ${className}`}
+      transition={{ duration: 0.35, delay }}
+      whileHover={hover ? { y: -3, transition: { duration: 0.2 } } : undefined}
+      className={`bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-3xl shadow-soft-xs ${className}`}
     >
       {children}
     </Tag>

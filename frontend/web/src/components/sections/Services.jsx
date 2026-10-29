@@ -1,207 +1,217 @@
-import { Suspense, useEffect, useRef, useCallback, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, useInView } from "framer-motion";
+import { Code2, Server, Layout, Database, Check, ArrowRight, ExternalLink, MessageSquare } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
-import { ServiceViewerProvider, useServiceViewer } from "../../context/ServiceViewerContext";
-import { resolveUrl } from "../../utils/resolveUrl";
-import ServicePrism from "../three/ServicePrism";
-import { X, ExternalLink, Github, MessageSquare } from "lucide-react";
 
-function ServiceCard({ service, onClose }) {
-  const safeParse = (val) => {
-    if (!val) return [];
-    if (Array.isArray(val)) return val;
-    if (typeof val === "string") { try { const p = JSON.parse(val); return Array.isArray(p) ? p : []; } catch { return []; } }
-    return [];
-  };
-  const features = safeParse(service.features);
-  const technologies = safeParse(service.technologies);
-  const gallery = safeParse(service.galleryImages);
+const serviceIcons = {
+  web: Code2,
+  api: Server,
+  ui: Layout,
+  db: Database,
+  fullstack: Code2,
+};
 
-  return (
-    <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
-      <div
-        className="pointer-events-auto w-full max-w-xl mx-4 rounded-2xl border overflow-hidden shadow-2xl"
-        style={{
-          background: "var(--bg-card)",
-          borderColor: "var(--border)",
-          maxHeight: "80vh",
-          animation: "slideFromLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: "80vh" }}>
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>{service.title}</h2>
-              <p className="text-sm mt-1" style={{ color: "var(--accent)" }}>{service.shortDescription}</p>
-            </div>
-            <button onClick={onClose} className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition">
-              <X size={18} />
-            </button>
-          </div>
+const defaultServices = [
+  {
+    id: "srv-1",
+    title: "Full Stack Web Applications",
+    shortDescription: "End-to-end modern web applications built for speed, responsiveness, and scale.",
+    description: "Architecting complete web solutions from relational/NoSQL databases to dynamic, component-driven user interfaces. Specializing in React, Node.js, Express, and PostgreSQL with clean code and high performance.",
+    features: JSON.stringify([
+      "Custom responsive frontend architecture",
+      "Secure Node.js & Express REST APIs",
+      "Database schema modeling with PostgreSQL/MongoDB",
+      "SEO, accessibility & mobile optimization",
+    ]),
+    technologies: JSON.stringify(["React", "Node.js", "Express", "PostgreSQL", "Tailwind CSS"]),
+    iconType: "fullstack",
+  },
+  {
+    id: "srv-2",
+    title: "REST APIs & Backend Systems",
+    shortDescription: "Reliable, high-throughput backend services and secure microservices.",
+    description: "Designing robust server-side architectures featuring role-based authentication, request validation, rate limiting, connection pooling, and thorough error handling.",
+    features: JSON.stringify([
+      "Scalable RESTful endpoint design",
+      "JWT authentication & session security",
+      "Query optimization & database connection pooling",
+      "Third-party API integrations & webhooks",
+    ]),
+    technologies: JSON.stringify(["Node.js", "Express", "PostgreSQL", "MongoDB", "Prisma"]),
+    iconType: "api",
+  },
+  {
+    id: "srv-3",
+    title: "Frontend Engineering & UI/UX",
+    shortDescription: "Soft, accessible, and high-performance user interfaces.",
+    description: "Developing modern, clean user experiences with strict adherence to typography, contrast, keyboard accessibility, smooth transitions, and responsive mobile-first layouts.",
+    features: JSON.stringify([
+      "Reusable component design systems",
+      "Cross-browser and responsive testing",
+      "Light and dark theme persistence",
+      "Fast rendering with minimal bundle overhead",
+    ]),
+    technologies: JSON.stringify(["React", "JavaScript (ES6+)", "HTML5", "CSS3", "Tailwind CSS"]),
+    iconType: "ui",
+  },
+  {
+    id: "srv-4",
+    title: "Database Modeling & Optimization",
+    shortDescription: "Structured database schemas, migrations, and efficient queries.",
+    description: "Structuring relational and document data stores with proper indexing, data integrity rules, ORM mappings, and performance optimization.",
+    features: JSON.stringify([
+      "PostgreSQL relational schema modeling",
+      "MongoDB document architecture",
+      "Prisma ORM integration & migrations",
+      "Query tuning & connection management",
+    ]),
+    technologies: JSON.stringify(["PostgreSQL", "MongoDB", "Prisma", "SQL"]),
+    iconType: "db",
+  },
+];
 
-          {service.heroImage && (
-            <img src={resolveUrl(service.heroImage)} alt={service.title} className="w-full h-40 object-cover rounded-xl mb-4" style={{ border: "1px solid var(--border)" }} />
-          )}
-
-          <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--text-secondary)" }}>{service.fullDescription || service.description}</p>
-
-          {technologies.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Technologies</h4>
-              <div className="flex flex-wrap gap-2">
-                {technologies.map((t, i) => (
-                  <span key={i} className="px-3 py-1 text-xs font-medium rounded-lg" style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {features.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Features</h4>
-              <ul className="space-y-1">
-                {features.map((f, i) => (
-                  <li key={i} className="text-sm flex items-start gap-2" style={{ color: "var(--text-secondary)" }}>
-                    <span className="mt-1" style={{ color: "var(--accent)" }}>&bull;</span>{f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {gallery.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Gallery</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {gallery.slice(0, 4).map((img, i) => (
-                  <img key={i} src={img} alt="" className="w-full h-24 object-cover rounded-lg" style={{ border: "1px solid var(--border)" }} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2 flex-wrap mt-4">
-            {service.liveUrl && (
-              <a href={service.liveUrl} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
-                <ExternalLink size={14} /> Live Demo
-              </a>
-            )}
-            {service.githubUrl && (
-              <a href={service.githubUrl} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg hover:opacity-80 transition"
-                style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}>
-                <Github size={14} /> GitHub
-              </a>
-            )}
-<button onClick={() => {
-                onClose();
-                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg hover:opacity-80 transition"
-              style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)"}}>
-              <MessageSquare size={14} /> Contact
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes slideFromLeft {
-          from { transform: translateX(-100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function ServicesContent() {
-  const { services } = usePortfolio();
-  const { setServices, doorOpen, activeIndex, closeDoor, animationDone } = useServiceViewer();
-  const serviceList = (services || []).slice(0, 4);
-  const serviceListRef = useRef(serviceList);
-  serviceListRef.current = serviceList;
-  const canvasContainerRef = useRef(null);
-  const [showCard, setShowCard] = useState(false);
-
-  useEffect(() => {
-    setServices(serviceListRef.current);
-  }, [services, setServices]);
-
-  useEffect(() => {
-    if (doorOpen && activeIndex >= 0) {
-      const timer = setTimeout(() => setShowCard(true), 700);
-      return () => clearTimeout(timer);
-    } else {
-      setShowCard(false);
+function safeParse(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") {
+    try {
+      const parsed = JSON.parse(val);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
     }
-  }, [doorOpen, activeIndex]);
-
-  const handleClose = useCallback(() => {
-    setShowCard(false);
-    setTimeout(() => {
-      closeDoor();
-      setTimeout(animationDone, 800);
-    }, 300);
-  }, [closeDoor, animationDone]);
-
-  const handlePointerMove = useCallback((e) => {
-    if (doorOpen) return;
-    const container = canvasContainerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
-    const maxDist = Math.min(rect.width, rect.height) * 0.35;
-    container.style.pointerEvents = dist < maxDist ? "auto" : "none";
-  }, [doorOpen]);
-
-  const activeService = doorOpen && activeIndex >= 0 ? serviceList[activeIndex] : null;
-
-  return (
-    <section id="services" className="py-4 relative" style={{ background: "var(--section-services)" }}>
-      {!doorOpen && (
-        <div className="px-4 sm:px-8 relative mb-4">
-          <p className="text-center text-sm font-medium tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>What I Do</p>
-          <h2 className="text-center text-4xl font-bold" style={{ color: "var(--text-primary)" }}>Services <span style={{ color: "var(--accent)" }}>I Offer</span></h2>
-          <div className="w-16 h-1 rounded-full mx-auto mt-4" style={{ background: "var(--accent)" }} />
-        </div>
-      )}
-
-      <div
-        ref={canvasContainerRef}
-        className="relative w-full"
-        style={{ height: "min(90vh, 850px)", pointerEvents: doorOpen ? "none" : "none" }}
-        onPointerMove={handlePointerMove}
-      >
-        <Suspense fallback={
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-10 h-10 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
-          </div>
-        }>
-          <Canvas camera={{ position: [0, 0, 12], fov: 50 }} dpr={[1, 1.2]} gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }} style={{ background: "transparent" }}>
-            <ServicePrism services={serviceList} />
-          </Canvas>
-        </Suspense>
-
-        {showCard && activeService && (
-          <ServiceCard service={activeService} onClose={handleClose} />
-        )}
-      </div>
-    </section>
-  );
+  }
+  return [];
 }
 
 export default function Services() {
+  const { services } = usePortfolio();
+  const navigate = useNavigate();
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
+
+  const serviceList = services && services.length > 0 ? services : defaultServices;
+
+  const handleInquire = (serviceTitle) => {
+    navigate("/contact", { state: { subject: `Inquiry: ${serviceTitle}` } });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <ServiceViewerProvider>
-      <ServicesContent />
-    </ServiceViewerProvider>
+    <section
+      id="services"
+      className="py-6 sm:py-8 relative transition-colors scroll-mt-16"
+      style={{ background: "var(--section-services)" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" ref={sectionRef}>
+        {/* Header */}
+        <div className="mb-4 sm:mb-5">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-4 h-0.5 bg-[#246BFD] dark:bg-[#3B82F6]" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#246BFD] dark:text-[#3B82F6]">
+              Engineering Solutions
+            </h2>
+          </div>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#14213D] dark:text-[#F8FAFC] tracking-tight">
+            Services &amp; Capabilities
+          </p>
+        </div>
+
+        {/* Services Grid */}
+        <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
+          {serviceList.map((service, index) => {
+            const features = safeParse(service.features);
+            const technologies = safeParse(service.technologies);
+            const Icon =
+              serviceIcons[service.iconType] ||
+              (index === 0 ? Code2 : index === 1 ? Server : index === 2 ? Layout : Database);
+
+            return (
+              <motion.div
+                key={service.id || index}
+                className="bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] rounded-2xl p-5 sm:p-6 shadow-soft-xs hover:border-[#2563EB]/50 hover:shadow-soft transition-all duration-200 flex flex-col justify-between"
+                initial={{ opacity: 0, y: 12 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                transition={{ duration: 0.25, delay: Math.min(index * 0.05, 0.25) }}
+              >
+                <div>
+                  {/* Top Bar with Icon */}
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6] shrink-0">
+                      <Icon size={20} />
+                    </div>
+                    {service.liveUrl && (
+                      <a
+                        href={service.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#475569] hover:text-[#2563EB] dark:text-[#94A3B8] dark:hover:text-[#3B82F6] transition-colors"
+                      >
+                        <span>Demo</span>
+                        <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Title & Description */}
+                  <h3 className="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC] tracking-tight mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-[#475569] dark:text-[#94A3B8] mb-5 font-normal">
+                    {service.description || service.shortDescription}
+                  </p>
+
+                  {/* Features list */}
+                  {features.length > 0 && (
+                    <div className="mb-5 pt-3.5 border-t border-[#E2E8F0]/70 dark:border-[#1E293B]">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#3B82F6] mb-2.5">
+                        Key Deliverables
+                      </h4>
+                      <ul className="space-y-1.5">
+                        {features.map((item, fIdx) => (
+                          <li key={fIdx} className="text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] flex items-start gap-2">
+                            <span className="w-4 h-4 rounded-full bg-[#EFF6FF] dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#3B82F6] flex items-center justify-center shrink-0 mt-0.5">
+                              <Check size={11} strokeWidth={3} />
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer: Tech badges + Inquire CTA */}
+                <div className="pt-4 border-t border-[#E2E8F0]/70 dark:border-[#1E293B]">
+                  {technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {technologies.map((t, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#F8FAFC] dark:bg-[#111827] text-[#475569] dark:text-[#94A3B8] border border-[#E2E8F0] dark:border-[#1E293B]"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => handleInquire(service.title)}
+                    className="w-full py-2.5 rounded-2xl bg-[#F8FAFC] hover:bg-[#EFF6FF] dark:bg-[#111827] dark:hover:bg-[#161F30] text-[#1E293B] dark:text-[#F8FAFC] border border-[#E2E8F0] dark:border-[#1E293B] text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+                  >
+                    <MessageSquare size={14} className="text-[#2563EB] dark:text-[#3B82F6]" />
+                    <span>Inquire About {service.title.split(" ")[0]}</span>
+                    <ArrowRight size={13} className="text-[#475569] dark:text-[#94A3B8] group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }

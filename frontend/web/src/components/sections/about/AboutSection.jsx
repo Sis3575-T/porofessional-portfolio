@@ -1,202 +1,336 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import {
+  User,
+  Phone,
+  Mail,
+  Linkedin,
+  Github,
+  ChevronRight,
+  ExternalLink,
+  ArrowRight,
+  Eye,
+  Download,
+} from "lucide-react";
+import TelegramIcon from "../../TelegramIcon";
 import { usePortfolio } from "../../../context/PortfolioContext";
 import { useProfile } from "../../../context/ProfileContext";
-import { AnimatedSection } from "../../AnimatedSection";
-import { User, MapPin, Mail, Clock, Code2, Globe, Coffee, Award } from "lucide-react";
-import ButtonGroup from "./ButtonGroup";
-
-const fadeSlideUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
-
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1 } },
-};
-
-const infoItems = [
-  { key: "name", icon: User, label: "Name", color: "icon-github", textColor: "text-accent-blue" },
-  { key: "location", icon: MapPin, label: "Location", color: "icon-location", textColor: "text-accent-blue" },
-  { key: "email", icon: Mail, label: "Email", color: "icon-email", textColor: "text-accent-blue" },
-  { key: "availability", icon: Clock, label: "Availability", color: "icon-phone", textColor: "text-accent-blue" },
-];
-
-const defaultStatItems = [
-  { icon: Code2, value: "20+", label: "Projects Completed", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
-  { icon: Globe, value: "15+", label: "Happy Clients", iconClass: "icon-linkedin", accent: "text-accent-blue", border: "border-accent-blue" },
-  { icon: Coffee, value: "1000+", label: "Hours of Coding", iconClass: "icon-email", accent: "text-accent-gray", border: "border-accent-gray" },
-  { icon: Award, value: "3+", label: "Years of Learning", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
-];
+import { useTheme } from "../../../context/ThemeContext";
+import { resolveUrl } from "../../../utils/resolveUrl";
 
 export default function AboutSection() {
-  const { about, loading } = usePortfolio();
-  const { name: profileName, email: profileEmail, initials } = useProfile();
+  const { about, settings } = usePortfolio();
+  const { name: profileName } = useProfile();
+  const { dark } = useTheme();
 
-  if (loading) {
-    return (
-      <section id="about" className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="animate-pulse h-64 bg-gray-100 rounded-3xl" />
-        </div>
-      </section>
-    );
-  }
+  // Social & contact links
+  const phone = settings?.contactPhone || about?.phone || "0935756054";
+  const email = about?.email || settings?.contactEmail || "sisay3575@gmail.com";
 
-  const name = about?.name || profileName || "Developer";
-  const location = about?.location || "Remote";
-  const email = about?.email || profileEmail || "";
-  const availability = about?.availability || "Open for opportunities";
-  const biography =
-    about?.biography ||
-    "I'm a 3rd year Computer Science student at Bahir Dar University. Passionate about building scalable web apps and exploring AI technologies. I love turning ideas into real-world solutions.";
-  const profileImage = about?.profileImage || "/about-profile.png";
-
-  const statItems = (() => {
+  const socialLinks = (() => {
     try {
-      if (about?.statistics) {
-        const s = typeof about.statistics === "string" ? JSON.parse(about.statistics) : about.statistics;
-        return [
-          { icon: Code2, value: `${s.projects || s.projectsCount || 20}+`, label: "Projects Completed", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
-          { icon: Globe, value: `${s.clients || s.clientsCount || 15}+`, label: "Happy Clients", iconClass: "icon-linkedin", accent: "text-accent-blue", border: "border-accent-blue" },
-          { icon: Coffee, value: `${s.technologies || s.technologiesCount || 20}+`, label: "Technologies", iconClass: "icon-email", accent: "text-accent-gray", border: "border-accent-gray" },
-          { icon: Award, value: `${s.yearsExp || s.yearsOfExperience || 3}+`, label: "Years of Learning", iconClass: "icon-projects", accent: "text-accent-blue", border: "border-accent-blue" },
-        ];
-      }
-    } catch {}
-    return defaultStatItems;
+      const raw = settings?.socialLinks;
+      if (!raw) return {};
+      return typeof raw === "string" ? JSON.parse(raw) : raw;
+    } catch {
+      return {};
+    }
   })();
 
-  const getValue = (key) => {
-    if (key === "name") return name;
-    if (key === "location") return location;
-    if (key === "email") return email;
-    if (key === "availability") return availability;
-    return "";
+  const linkedinUrl =
+    socialLinks.linkedin ||
+    "https://www.linkedin.com/in/sisay-temesgen-412290447/";
+  const telegramUrl =
+    socialLinks.telegram ||
+    "https://t.me/sisaytem";
+  const githubUrl =
+    socialLinks.github ||
+    "https://github.com/Sis3575-T";
+
+  // CV URL (prefers dynamic admin upload, fallback to local verified CV asset)
+  const rawCvUrl = about?.downloadCVUrl;
+  const cvUrl = rawCvUrl ? resolveUrl(rawCvUrl) : "/Sisay_Temesgen_CV.pdf";
+
+  const handleDownloadCV = async (e) => {
+    if (e) e.preventDefault();
+    try {
+      const downloadTarget = cvUrl.includes("?")
+        ? `${cvUrl}&download=true`
+        : `${cvUrl}?download=true`;
+      const res = await fetch(downloadTarget);
+      if (!res.ok) throw new Error("Network response not ok");
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "Sisay_Temesgen_CV.pdf";
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(link);
+    } catch {
+      const fallbackUrl = cvUrl.includes("?") ? `${cvUrl}&download=true` : `${cvUrl}?download=true`;
+      window.location.href = fallbackUrl;
+    }
   };
 
+  // Two concise, reference-matched paragraphs
+  const paragraph1 =
+    about?.biographyParagraph1 ||
+    (about?.biography && about.biography.includes("\n")
+      ? about.biography.split("\n")[0]
+      : "I'm a 4th-year Computer Science student at Bahir Dar University. I specialize in modern web technologies and I'm passionate about solving real-world challenges with technology.");
+
+  const paragraph2 =
+    about?.biographyParagraph2 ||
+    (about?.biography && about.biography.includes("\n")
+      ? about.biography.split("\n").slice(1).join(" ")
+      : "I enjoy building full-stack applications, exploring AI, and continuously learning new tools and technologies to create useful and impactful solutions.");
+
+  // Image source: 3D developer illustration with clean studio white background, or custom admin uploaded illustration
+  const illustrationSrc =
+    about?.profileImage &&
+    !about.profileImage.includes("sisay-portrait") &&
+    !about.profileImage.includes("about-profile")
+      ? resolveUrl(about.profileImage)
+      : "/developer-3d-illustration.png";
+
   return (
-    <AnimatedSection id="about" theme="about" className="py-4 pb-8" aria-label="About section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <motion.p
-          className="text-center text-sm font-medium text-accent-blue tracking-widest uppercase mb-3"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          About
-        </motion.p>
-        <motion.h2
-          className="text-center text-gray-900 text-4xl font-bold mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          About <span className="text-accent-blue">Me</span>
-        </motion.h2>
-
-        <motion.div
-          className="bg-white border border-gray-200 rounded-3xl overflow-hidden"
-          style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-        >
-          <div className="flex flex-col lg:flex-row">
-            {/* LEFT: Info */}
-            <div className="flex-1 p-8 xl:p-10 lg:border-r border-gray-100">
-              <div className="flex items-center gap-2.5 mb-6">
-                <span className="w-2 h-2 rounded-full bg-accent-blue" />
-                <h3 className="text-xl font-bold text-gray-900">About Me</h3>
-              </div>
-              <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-lg">
-                {biography}
-              </p>
-              <ButtonGroup downloadCVUrl={about?.downloadCVUrl} onContact={() => {
-                const contactSection = document.getElementById("contact");
-                if (contactSection) {
-                  contactSection.scrollIntoView({ behavior: "smooth" });
-                }
-              }} />
-              <div className="space-y-3">
-                {infoItems.map((item, i) => {
-                  const val = getValue(item.key);
-                  const isEmail = item.key === "email";
-                  const content = (
-                    <motion.div
-                      key={item.key}
-                      initial={{ opacity: 0, x: -12 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.06, duration: 0.3 }}
-                      className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-                    >
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
-                        <item.icon size={16} />
-                      </div>
-                      <div className="min-w-0 flex items-baseline gap-1.5 flex-wrap">
-                        <span className="text-[11px] text-gray-400 uppercase tracking-wider shrink-0">{item.label}:</span>
-                        <span className={`text-sm font-semibold ${item.textColor} truncate`}>{val}</span>
-                      </div>
-                    </motion.div>
-                  );
-                  if (isEmail) {
-                    return <a key={item.key} href={`mailto:${val}`} className="block">{content}</a>;
-                  }
-                  return content;
-                })}
-              </div>
+    <section
+      id="about"
+      className="py-8 sm:py-12 lg:py-14 relative transition-colors scroll-mt-14"
+      style={{ background: "var(--section-about)" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* LEFT COLUMN: Badge, Heading, Bio, Button & Restructured Quick Facts (~48% width: 6 cols) */}
+          <div className="lg:col-span-6 flex flex-col justify-center">
+            {/* Small elegant 3D About Badge matching reference */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E7F0FF] dark:bg-[#246BFD]/15 text-[#246BFD] dark:text-[#3B82F6] text-xs font-semibold mb-3 border border-[#D8E5F8] dark:border-[#246BFD]/30 w-fit shadow-soft-xs">
+              <User size={13} className="text-[#246BFD] dark:text-[#3B82F6]" />
+              <span>About</span>
             </div>
 
-            {/* CENTER: Photo */}
-            <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 flex items-stretch p-8 lg:p-6 bg-gray-50">
-              <div className="w-full rounded-2xl overflow-hidden border-2 border-gray-200 shadow-md">
-                {profileImage ? (
-                  <img
-                    src={profileImage}
-                    alt={`${name} - Full Stack Developer`}
-                    className="w-full h-full object-cover object-top"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-gray-100">
-                    <span className="text-5xl font-bold text-gray-300">{initials}</span>
-                  </div>
-                )}
-              </div>
+            {/* Heading matching reference: "About Me" */}
+            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold tracking-tight mb-3 text-[#14213D] dark:text-[#F8FAFC] leading-tight">
+              About <span className="text-[#246BFD] dark:text-[#3B82F6]">Me</span>
+            </h2>
+
+            {/* Concise Biography (Paragraph 1) */}
+            <p className="text-xs sm:text-sm text-[#52607A] dark:text-[#94A3B8] leading-relaxed mb-3 max-w-xl font-normal">
+              {paragraph1}
+            </p>
+
+            {/* Concise Biography (Paragraph 2) */}
+            <p className="text-xs sm:text-sm text-[#52607A] dark:text-[#94A3B8] leading-relaxed mb-5 max-w-xl font-normal">
+              {paragraph2}
+            </p>
+
+            {/* "Explore My Background" Tactile 3D Action Button */}
+            <div className="mb-6">
+              <Link
+                to="/experience"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#246BFD] hover:bg-[#1858DF] active:translate-y-0.5 text-white text-xs sm:text-sm font-semibold transition-all shadow-btn-3d hover:shadow-soft-3d-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD]"
+              >
+                <span>Explore My Background</span>
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-0.5 transition-transform"
+                />
+              </Link>
             </div>
 
-            {/* RIGHT: Stats */}
-            <div className="flex-1 p-8 xl:p-10 lg:border-l border-gray-100">
-              <div className="flex items-center gap-2.5 mb-6">
-                <span className="w-2 h-2 rounded-full bg-accent-blue" />
-                <h3 className="text-xl font-bold text-gray-900">Statistics</h3>
+            {/* Restructured Quick Facts Card with 3D Depth */}
+            <div className="rounded-2xl bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] p-4 sm:p-5 shadow-soft-3d max-w-lg transition-all">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D8E5F8]/60 dark:border-[#1E293B]">
+                <h3 className="text-xs font-bold text-[#14213D] dark:text-[#F8FAFC] uppercase tracking-wider">
+                  Quick Facts
+                </h3>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ECFDF5] dark:bg-[#10B981]/15 text-[#059669] dark:text-[#34D399] text-[10px] font-bold border border-[#A7F3D0]/60 dark:border-[#10B981]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                  Available
+                </span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                {statItems.map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-200"
-                    style={{ borderLeftWidth: 3, borderLeftColor: "inherit" }}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
-                    whileHover={{ y: -4 }}
-                  >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${stat.iconClass}`}>
-                      <stat.icon size={18} />
+
+              <div className="space-y-2 text-xs">
+                {/* Phone */}
+                <div className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-[#F0F5FC]/80 dark:hover:bg-[#111827]/80 transition-colors group">
+                  <div className="flex items-center gap-2.5 text-[#52607A] dark:text-[#94A3B8] min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#246BFD]/20 dark:to-[#246BFD]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25 shadow-2xs">
+                      <Phone size={13} aria-hidden="true" />
                     </div>
-                    <p className={`text-3xl font-bold ${stat.accent} font-mono leading-none mb-1`}>{stat.value}</p>
-                    <p className="text-xs text-gray-400 leading-snug">{stat.label}</p>
-                  </motion.div>
-                ))}
+                    <span className="text-[11px] font-semibold text-[#14213D] dark:text-[#F8FAFC]">
+                      Phone
+                    </span>
+                  </div>
+                  <a
+                    href={`tel:${phone.replace(/\s+/g, "")}`}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#246BFD] dark:text-[#3B82F6] hover:text-[#1858DF] px-2 py-0.5 rounded-lg hover:bg-white dark:hover:bg-[#161F30] hover:shadow-2xs transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#246BFD]"
+                    title="Call Sisay Temesgen"
+                  >
+                    <ChevronRight size={13} className="shrink-0 text-[#246BFD] dark:text-[#3B82F6] group-hover:translate-x-0.5 transition-transform" />
+                    <span>{phone}</span>
+                  </a>
+                </div>
+
+                {/* Email */}
+                <div className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-[#F0F5FC]/80 dark:hover:bg-[#111827]/80 transition-colors group">
+                  <div className="flex items-center gap-2.5 text-[#52607A] dark:text-[#94A3B8] min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#246BFD]/20 dark:to-[#246BFD]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25 shadow-2xs">
+                      <Mail size={13} aria-hidden="true" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#14213D] dark:text-[#F8FAFC]">
+                      Email
+                    </span>
+                  </div>
+                  <a
+                    href={`mailto:${email}`}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#246BFD] dark:text-[#3B82F6] hover:text-[#1858DF] px-2 py-0.5 rounded-lg hover:bg-white dark:hover:bg-[#161F30] hover:shadow-2xs transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#246BFD] truncate"
+                    title="Send email to Sisay Temesgen"
+                  >
+                    <ChevronRight size={13} className="shrink-0 text-[#246BFD] dark:text-[#3B82F6] group-hover:translate-x-0.5 transition-transform" />
+                    <span className="truncate">{email}</span>
+                  </a>
+                </div>
+
+                {/* LinkedIn */}
+                <div className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-[#F0F5FC]/80 dark:hover:bg-[#111827]/80 transition-colors group">
+                  <div className="flex items-center gap-2.5 text-[#52607A] dark:text-[#94A3B8] min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#246BFD]/20 dark:to-[#246BFD]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25 shadow-2xs">
+                      <Linkedin size={13} aria-hidden="true" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#14213D] dark:text-[#F8FAFC]">
+                      LinkedIn
+                    </span>
+                  </div>
+                  <a
+                    href={linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#246BFD] dark:text-[#3B82F6] hover:text-[#1858DF] px-2 py-0.5 rounded-lg hover:bg-white dark:hover:bg-[#161F30] hover:shadow-2xs transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#246BFD]"
+                    title="Open LinkedIn Profile"
+                  >
+                    <ChevronRight size={13} className="shrink-0 text-[#246BFD] dark:text-[#3B82F6] group-hover:translate-x-0.5 transition-transform" />
+                    <span>View LinkedIn Profile</span>
+                    <ExternalLink size={10} className="shrink-0 ml-0.5 opacity-75" />
+                  </a>
+                </div>
+
+                {/* Telegram */}
+                <div className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-[#F0F5FC]/80 dark:hover:bg-[#111827]/80 transition-colors group">
+                  <div className="flex items-center gap-2.5 text-[#52607A] dark:text-[#94A3B8] min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#246BFD]/20 dark:to-[#246BFD]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25 shadow-2xs">
+                      <TelegramIcon size={13} className="text-[#246BFD] dark:text-[#3B82F6]" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#14213D] dark:text-[#F8FAFC]">
+                      Telegram
+                    </span>
+                  </div>
+                  <a
+                    href={telegramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#246BFD] dark:text-[#3B82F6] hover:text-[#1858DF] px-2 py-0.5 rounded-lg hover:bg-white dark:hover:bg-[#161F30] hover:shadow-2xs transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#246BFD]"
+                    title="Open Telegram @sisaytem"
+                  >
+                    <ChevronRight size={13} className="shrink-0 text-[#246BFD] dark:text-[#3B82F6] group-hover:translate-x-0.5 transition-transform" />
+                    <span>@sisaytem</span>
+                  </a>
+                </div>
+
+                {/* GitHub */}
+                <div className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-[#F0F5FC]/80 dark:hover:bg-[#111827]/80 transition-colors group">
+                  <div className="flex items-center gap-2.5 text-[#52607A] dark:text-[#94A3B8] min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#246BFD]/20 dark:to-[#246BFD]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25 shadow-2xs">
+                      <Github size={13} aria-hidden="true" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#14213D] dark:text-[#F8FAFC]">
+                      GitHub
+                    </span>
+                  </div>
+                  <a
+                    href={githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#246BFD] dark:text-[#3B82F6] hover:text-[#1858DF] px-2 py-0.5 rounded-lg hover:bg-white dark:hover:bg-[#161F30] hover:shadow-2xs transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#246BFD]"
+                    title="Open GitHub Profile"
+                  >
+                    <ChevronRight size={13} className="shrink-0 text-[#246BFD] dark:text-[#3B82F6] group-hover:translate-x-0.5 transition-transform" />
+                    <span>View GitHub Profile</span>
+                    <ExternalLink size={10} className="shrink-0 ml-0.5 opacity-75" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
+
+          {/* RIGHT COLUMN: 3D Developer Artwork & Underneath CV Buttons (~52% width: 6 cols) */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center relative mt-6 lg:mt-0">
+            {/* Soft 3D Ambient Radial Glow */}
+            <div
+              className="absolute w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-[#246BFD]/12 via-[#60A5FA]/10 to-transparent blur-3xl pointer-events-none -z-10"
+              aria-hidden="true"
+            />
+
+            <motion.div
+              className="relative w-full max-w-[500px] flex items-center justify-center rounded-[24px] sm:rounded-[28px] bg-white shadow-soft-3d overflow-hidden"
+              initial={{ opacity: 0, scale: 0.96 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+            >
+              <img
+                src={illustrationSrc}
+                alt="3D illustration of a developer working at a laptop"
+                width={480}
+                height={390}
+                loading="eager"
+                decoding="async"
+                className="w-full h-auto object-contain select-none transition-transform duration-300 hover:scale-[1.01] bg-white"
+                onError={(e) => {
+                  if (e.currentTarget.src !== "/developer-3d-illustration.png") {
+                    e.currentTarget.src = "/developer-3d-illustration.png";
+                  }
+                }}
+              />
+            </motion.div>
+
+            {/* View CV & Download CV Action Buttons Directly Below the 3D Illustration */}
+            <motion.div
+              className="mt-3 sm:mt-3.5 flex flex-wrap items-center justify-center gap-3 w-full max-w-[480px] z-10 px-2"
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: 0.08 }}
+            >
+              {/* Primary "View CV" button */}
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#246BFD] hover:bg-[#1858DF] active:translate-y-0.5 text-white font-semibold text-xs sm:text-sm transition-all shadow-btn-3d hover:shadow-soft-3d-hover cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD] min-w-[140px]"
+                aria-label="View CV in new tab"
+                title="View CV in new tab"
+              >
+                <Eye size={15} className="shrink-0" />
+                <span>View CV</span>
+              </a>
+
+              {/* Secondary "Download CV" button */}
+              <button
+                type="button"
+                onClick={handleDownloadCV}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-[#161F30] text-[#14213D] dark:text-[#F8FAFC] border border-[#D8E5F8] dark:border-[#1E293B] hover:bg-[#EDF4FD] dark:hover:bg-[#111827] hover:border-[#246BFD] font-semibold text-xs sm:text-sm transition-all shadow-soft-xs hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD] min-w-[140px]"
+                aria-label="Download Sisay Temesgen CV PDF"
+                title="Download CV"
+              >
+                <Download size={15} className="shrink-0 text-[#246BFD] dark:text-[#3B82F6]" />
+                <span>Download CV</span>
+              </button>
+            </motion.div>
+          </div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }

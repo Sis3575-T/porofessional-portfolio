@@ -35,22 +35,18 @@ export default function FeatureCard({ cards: cardsJson }) {
         return (
           <motion.div
             key={card.title + i}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 + i * 0.1, duration: 0.4 }}
-            whileHover={{
-              y: -6,
-              borderColor: "rgba(0, 0, 0, 0.12)",
-              transition: { duration: 0.2 },
-            }}
-            className="group bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-lg hover:shadow-gray-200/50 transition-all"
+            transition={{ delay: 0.15 + i * 0.08, duration: 0.35 }}
+            whileHover={{ y: -4 }}
+            className="group bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-5 shadow-soft-xs hover:border-[#78649D]/50 hover:shadow-soft transition-all"
           >
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4 group-hover:bg-gray-200 transition-colors">
-              <IconComp size={20} className="text-gray-600" />
+            <div className="w-10 h-10 rounded-xl bg-[#EAE3F3] dark:bg-[#B9A4DF]/15 text-[#78649D] dark:text-[#B9A4DF] border border-[#DED7E2] dark:border-[#403846] flex items-center justify-center mb-4">
+              <IconComp size={18} />
             </div>
-            <h4 className="text-base font-semibold text-gray-900 mb-2">{card.title}</h4>
-            <p className="text-sm text-gray-500 leading-relaxed">{card.description}</p>
+            <h4 className="text-base font-bold text-[#29262D] dark:text-[#F6F2F8] mb-2">{card.title}</h4>
+            <p className="text-sm text-[#625D66] dark:text-[#C4BCCB] leading-relaxed font-normal">{card.description}</p>
           </motion.div>
         );
       })}
