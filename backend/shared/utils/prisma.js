@@ -1,10 +1,23 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+
+class SafeWebSocket extends ws {
+  constructor(address, protocols, options) {
+    super(address, protocols, {
+      ...options,
+      rejectUnauthorized: process.env.NODE_ENV === "production",
+    });
+  }
+}
+
+neonConfig.webSocketConstructor = SafeWebSocket;
 
 const globalForPrisma = globalThis;
 
 const MAX_RETRIES = 2;
 const RETRY_DELAY = 3000;
-const wrappedModels = new Map();
 
 function isConnectionError(error) {
   const msg = error?.message?.toLowerCase() || "";
@@ -59,15 +72,26 @@ let _prisma = null;
 function createPrismaClient() {
   if (_prisma) return _prisma;
 
-  _prisma = globalForPrisma.prisma ??
-    new PrismaClient({
-      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  const url = process.env.DATABASE_URL || "";
+  const isNeon = url.includes("neon.tech");
+  const logConfig = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
+
+  if (globalForPrisma.prisma) {
+    _prisma = globalForPrisma.prisma;
+  } else if (isNeon) {
+    const pool = new Pool({ connectionString: url });
+    const adapter = new PrismaNeon(pool);
+    _prisma = new PrismaClient({ adapter, log: logConfig });
+  } else {
+    _prisma = new PrismaClient({
+      log: logConfig,
       datasources: {
         db: {
-          url: process.env.DATABASE_URL,
+          url,
         },
       },
     });
+  }
 
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = _prisma;
 

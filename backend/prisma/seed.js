@@ -1,19 +1,12 @@
-import { PrismaClient, UserRole, SkillCategory } from "@prisma/client";
+import { UserRole, SkillCategory } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { prisma } from "../shared/utils/prisma.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../.env") });
-
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-});
 
 async function seedIfEmpty(model, name, dataFn) {
   const count = await model.count();
@@ -26,21 +19,28 @@ async function seedIfEmpty(model, name, dataFn) {
 }
 
 async function main() {
-  const adminPassword = process.env.ADMIN_PASSWORD || "AdminPassword123!";
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@portfolio.dev";
+  const adminPassword = process.env.ADMIN_PASSWORD || "Sis3575@";
+  const adminEmail = (process.env.ADMIN_EMAIL || "sisay3575@gmail.com").trim().toLowerCase();
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-  await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: { password: hashedPassword },
-    create: {
-      email: adminEmail,
-      password: hashedPassword,
-      role: UserRole.ADMIN,
-      isActive: true,
-    },
-  });
-  console.log("Admin user ensured:", adminEmail);
+  const emailsToEnsure = Array.from(new Set([adminEmail, "sisay3575@gmail.com", "sisay@example.com"]));
+  for (const email of emailsToEnsure) {
+    await prisma.user.upsert({
+      where: { email },
+      update: {
+        password: hashedPassword,
+        role: UserRole.ADMIN,
+        isActive: true,
+      },
+      create: {
+        email,
+        password: hashedPassword,
+        role: UserRole.ADMIN,
+        isActive: true,
+      },
+    });
+  }
+  console.log("Admin user(s) ensured:", emailsToEnsure.join(", "));
 
   await prisma.hero.upsert({
     where: { id: "hero-1" },
@@ -49,8 +49,8 @@ async function main() {
       id: "hero-1",
       greeting: "Hello, I'm",
       name: "Sisay Temesgen",
-      title: "Full Stack Developer & UI Designer",
-      description: "I build beautiful, responsive web applications with modern technologies. Passionate about clean code and user experience.",
+      title: "Full-Stack Developer and AI Learner",
+      description: "I build responsive, high-performance web applications with JavaScript, React, Node.js, Express, MongoDB, and PostgreSQL, while exploring AI workflows and modern architectures.",
       primaryCTA: "View My Work",
       secondaryCTA: "Get In Touch",
     },
@@ -62,9 +62,9 @@ async function main() {
     update: {},
     create: {
       id: "about-1",
-      biography: "I'm a full-stack developer with 5+ years of experience building web applications. I love solving complex problems and creating intuitive user interfaces.",
-      summary: "Specialized in React, Node.js, and modern web technologies. Always learning and exploring new tools.",
-      yearsOfExperience: 5,
+      biography: "I am a dedicated full-stack developer and AI learner focused on building fast, accessible, and resilient web applications. With hands-on expertise across JavaScript, React, Node.js, Express, MongoDB, and PostgreSQL, I engineer clean APIs, intuitive interfaces, and efficient databases.",
+      summary: "Specialized in JavaScript, React, Node.js, Express, MongoDB, and PostgreSQL. Passionate about AI integration and scalable software architectures.",
+      yearsOfExperience: 3,
       email: "sisay@example.com",
       location: "Addis Ababa, Ethiopia",
       nationality: "Ethiopian",
@@ -191,7 +191,7 @@ async function main() {
         lessonsLearned: "Learned the importance of early performance planning and thorough testing.",
         featured: true,
         liveUrl: "https://example-ecommerce.com",
-        githubUrl: "https://github.com/user/ecommerce",
+        githubUrl: "https://github.com/Sis3575-T",
       },
       {
         title: "Task Management App",
@@ -205,7 +205,7 @@ async function main() {
         lessonsLearned: "Understanding websocket connections and managing real-time data flow.",
         featured: true,
         liveUrl: "https://example-pm-tool.com",
-        githubUrl: "https://github.com/user/pm-tool",
+        githubUrl: "https://github.com/Sis3575-T",
       },
       {
         title: "Portfolio Website",
@@ -219,7 +219,7 @@ async function main() {
         lessonsLearned: "Optimizing 3D rendering for different hardware configurations.",
         featured: false,
         liveUrl: "https://example-portfolio.com",
-        githubUrl: "https://github.com/user/portfolio",
+        githubUrl: "https://github.com/Sis3575-T",
       },
     ];
     for (let i = 0; i < projects.length; i++) {
@@ -267,15 +267,15 @@ async function main() {
       siteTitle: "Sisay Temesgen - Full Stack Developer",
       siteDescription: "Professional portfolio showcasing full-stack development projects and expertise in modern web technologies.",
       siteUrl: "https://sisaytemesgen.dev",
-      contactEmail: "sisay@example.com",
-      contactPhone: "+251 911 234 567",
+      contactEmail: "sisay3575@gmail.com",
+      contactPhone: "0935756054",
       address: "Addis Ababa, Ethiopia",
-      metaKeywords: "developer, portfolio, fullstack, react, node.js, ethiopia",
-      metaDescription: "Professional portfolio of Sisay Temesgen, a full-stack developer specializing in modern web applications.",
+      metaKeywords: "developer, portfolio, fullstack, react, node.js, ethiopia, ai",
+      metaDescription: "Professional portfolio of Sisay Temesgen, a full-stack developer and AI learner specializing in modern web applications.",
       socialLinks: JSON.stringify({
-        github: "https://github.com/sisay",
-        linkedin: "https://linkedin.com/in/sisay",
-        twitter: "https://twitter.com/sisay",
+        github: "https://github.com/Sis3575-T",
+        linkedin: "https://www.linkedin.com/in/sisay-temesgen-412290447/",
+        telegram: "https://t.me/sisaytem",
       }),
       sectionVisibility: JSON.stringify({
         hero: true, about: true, skills: true, services: true,
@@ -309,4 +309,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    process.exit(0);
   });
