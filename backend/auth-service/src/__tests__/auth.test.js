@@ -10,7 +10,7 @@ function waitForServer(app) {
     server = createServer(app);
     server.listen(0, () => {
       const { port } = server.address();
-      baseUrl = `http://localhost:${port}`;
+      baseUrl = `http://127.0.0.1:${port}`;
       resolve();
     });
   });
@@ -34,5 +34,33 @@ describe("Auth Service", () => {
     assert.equal(res.status, 200);
     assert.equal(body.status, "ok");
     assert.equal(body.service, "auth-service");
+  });
+
+  it("POST /api/v1/auth/login requires email and password", async () => {
+    const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const body = await res.json();
+    assert.equal(res.status, 400);
+    assert.equal(body.success, false);
+  });
+
+  it("POST /api/v1/auth/login authenticates admin credentials", async () => {
+    const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "sisay3575@gmail.com",
+        password: "Sis3575@",
+      }),
+    });
+    const body = await res.json();
+    assert.equal(res.status, 200);
+    assert.equal(body.success, true);
+    assert.ok(body.token, "Must return JWT token");
+    assert.equal(body.user.email, "sisay3575@gmail.com");
+    assert.equal(body.user.role, "ADMIN");
   });
 });

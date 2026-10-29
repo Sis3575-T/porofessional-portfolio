@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import dotenv from "dotenv";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -10,6 +11,7 @@ import { requestLogger, errorHandler, rateLimiter, authenticateToken, requireAdm
 import { setupSocketIO } from "shared/services/socketService";
 
 import authRoutes from "../auth-service/src/routes/auth.js";
+import portfolioRoutes from "../portfolio-service/src/routes/portfolio.js";
 import heroRoutes from "../portfolio-service/src/routes/hero.js";
 import aboutRoutes from "../portfolio-service/src/routes/about.js";
 import skillsRoutes from "../portfolio-service/src/routes/skills.js";
@@ -26,10 +28,13 @@ import uploadRoutes from "../media-service/src/routes/upload.js";
 import mediaRoutes from "../media-service/src/routes/media.js";
 import dashboardRoutes from "../dashboard-service/src/routes/dashboard.js";
 import activitiesRoutes from "../dashboard-service/src/routes/activities.js";
+import { invalidatePortfolioCache } from "../portfolio-service/src/services/portfolioCache.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config({ path: path.join(__dirname, "../.env") });
+dotenv.config({ path: path.join(__dirname, "../../.env") });
+dotenv.config({ path: path.join(__dirname, "../../.env.local") });
 
 const app = express();
 
@@ -49,10 +54,12 @@ app.use(helmet({
 }));
 
 const allowedOrigins = [
-  "http://localhost:5175",
+  "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:5175",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  "http://127.0.0.1:5175",
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
@@ -99,33 +106,47 @@ app.use((req, res, next) => {
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 
   if (req.method === "GET") {
-    if (req.path.startsWith("/uploads/") || req.path.startsWith("/api/v1/hero") || req.path.startsWith("/api/v1/about")) {
+    if (req.path.startsWith("/uploads/")) {
       res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600");
+    } else if (req.path === "/api/v1/portfolio" || req.path.startsWith("/api/v1/hero") || req.path.startsWith("/api/v1/about")) {
+      res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
     } else if (req.path.startsWith("/api/v1/skills") || req.path.startsWith("/api/v1/services") ||
                req.path.startsWith("/api/v1/experience") || req.path.startsWith("/api/v1/education") ||
                req.path.startsWith("/api/v1/projects") || req.path.startsWith("/api/v1/testimonials") ||
                req.path.startsWith("/api/v1/settings")) {
-      res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
-    } else if (req.path.startsWith("/api/v1/")) {
-      res.setHeader("Cache-Control", "private, no-cache, must-revalidate");
-    }
-  }
-
-  if (req.method === "GET" && req.path.startsWith("/api/v1/")) {
-    const etag = `W/"${Date.now()}"`;
-    res.setHeader("ETag", etag);
-    if (req.headers["if-none-match"] === etag) {
-      res.status(304).end();
-      return;
+      res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+    } else if (req.path.startsWith("/api/v1/admin") || req.path.startsWith("/api/v1/auth")) {
+      res.setHeader("Cache-Control", "private, no-cache, no-store, must-revalidate");
     }
   }
 
   next();
 });
 
+// Auto-invalidate consolidated portfolio cache on any mutation to portfolio content
+const PORTFOLIO_MUTATION_PATHS = [
+  "/api/v1/hero", "/api/v1/about", "/api/v1/skills",
+  "/api/v1/services", "/api/v1/experience", "/api/v1/education",
+  "/api/v1/projects", "/api/v1/testimonials", "/api/v1/settings",
+];
+
+app.use((req, res, next) => {
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+    if (PORTFOLIO_MUTATION_PATHS.some((p) => req.path.startsWith(p))) {
+      res.on("finish", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          invalidatePortfolioCache();
+        }
+      });
+    }
+  }
+  next();
+});
+
 app.use(rateLimiter());
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/portfolio", portfolioRoutes);
 app.use("/api/v1/hero", heroRoutes);
 app.use("/api/v1/about", aboutRoutes);
 app.use("/api/v1/skills", skillsRoutes);
@@ -143,6 +164,44 @@ app.use("/api/v1/media", mediaRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/activities", activitiesRoutes);
 
+const uploadsDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use("/uploads", express.static(uploadsDir));
+
+function sendCVFile(req, res) {
+  const isDownload = req.query.download === "true" || req.query.dl === "1";
+  const cvPath = path.join(uploadsDir, "Sisay_Temesgen_CV.pdf");
+  const fallbackPath = path.join(__dirname, "../../frontend/web/public/Sisay_Temesgen_CV.pdf");
+
+  let targetPath = null;
+  if (fs.existsSync(cvPath)) {
+    targetPath = cvPath;
+  } else if (fs.existsSync(fallbackPath)) {
+    targetPath = fallbackPath;
+  } else {
+    try {
+      const files = fs.readdirSync(uploadsDir).filter((f) => f.startsWith("cv_") && f.endsWith(".pdf"));
+      if (files.length > 0) targetPath = path.join(uploadsDir, files[0]);
+    } catch {}
+  }
+
+  if (targetPath) {
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      isDownload ? 'attachment; filename="Sisay_Temesgen_CV.pdf"' : 'inline; filename="Sisay_Temesgen_CV.pdf"'
+    );
+    return res.sendFile(targetPath);
+  }
+
+  return res.status(404).json({ success: false, message: "CV document not found" });
+}
+
+app.get("/Sisay_Temesgen_CV.pdf", sendCVFile);
+app.get("/api/v1/about/cv", sendCVFile);
+
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -150,6 +209,7 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       health: "/health",
+      portfolio: "/api/v1/portfolio",
       api: "/api/v1/*",
     },
     timestamp: new Date().toISOString(),
