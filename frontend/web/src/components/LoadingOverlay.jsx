@@ -35,7 +35,7 @@ export default function LoadingOverlay() {
                 <circle
                   cx="40" cy="40" r="34"
                   fill="none"
-                  stroke="#2563EB"
+                  stroke="#78649D"
                   strokeWidth="5"
                   strokeLinecap="round"
                   strokeDasharray={`${2 * Math.PI * 34}`}

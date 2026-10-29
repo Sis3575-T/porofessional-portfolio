@@ -31,13 +31,14 @@ export default function ScreenshotButton({ canvasRef }) {
 
   return (
     <motion.button
+      type="button"
       onClick={takeScreenshot}
-      className="fixed right-6 bottom-56 z-50 flex items-center gap-2 rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-xl px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-[0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.1)]"
+      className="fixed right-6 bottom-56 z-50 flex items-center gap-2 rounded-2xl border border-[#DED7E2] dark:border-[#403846] bg-white/95 dark:bg-[#27232D]/95 backdrop-blur-xl px-4 py-2.5 text-sm font-semibold text-[#51416F] dark:text-[#F6F2F8] shadow-soft-sm cursor-pointer"
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.97 }}
     >
-      <Camera size={16} className="text-accent-blue" />
-      Screenshot
+      <Camera size={16} className="text-[#78649D] dark:text-[#B9A4DF]" />
+      <span>Screenshot</span>
     </motion.button>
   );
 }

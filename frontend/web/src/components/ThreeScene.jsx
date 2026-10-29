@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect, lazy, Suspense, useCallback } from "react";
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useDeviceDetect } from "../hooks/useDeviceDetect";
+import { useTheme } from "../context/ThemeContext";
 
 const OfficeScene = lazy(() => import("./three/office/OfficeScene"));
 
@@ -31,12 +32,14 @@ function PauseableCanvas({ children, isPaused }) {
 
 export default function ThreeScene({ profileImage, config: userConfig = {} }) {
   const { isLowEnd, prefersReducedMotion } = useDeviceDetect();
+  const { dark } = useTheme();
   const mouse = useRef({ x: 0, y: 0 });
   const containerRef = useRef();
   const [loaded, setLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
 
   const config = { ...DEFAULT_CONFIG, ...userConfig };
+  const bgColor = dark ? "#211E26" : "#F1EDE8";
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -70,20 +73,38 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
 
   if (prefersReducedMotion) {
     return profileImage ? (
-      <div className="w-full h-full flex items-center justify-center p-8">
+      <div
+        className="w-full h-full flex items-center justify-center p-8 transition-colors duration-200"
+        style={{ background: bgColor }}
+      >
         <img
           src={profileImage}
-          alt="Profile"
-          className="w-48 h-56 object-cover rounded-2xl border border-slate-700 shadow-lg"
-          loading="lazy"
-          decoding="async"
+          alt="Sisay Temesgen"
+          className="w-48 h-56 object-cover rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+          width={192}
+          height={224}
         />
       </div>
     ) : null;
   }
 
   return (
-    <div ref={containerRef} className="w-full h-full">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative overflow-hidden transition-colors duration-200"
+      style={{ background: bgColor }}
+    >
+      {!loaded && profileImage && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <img
+            src={profileImage}
+            alt="Preview"
+            className="w-40 h-48 object-cover rounded-2xl opacity-40 shadow-sm"
+            width={160}
+            height={192}
+          />
+        </div>
+      )}
       <Canvas
         camera={{
           position: [1.8, 1.35, 1.8],
@@ -99,7 +120,11 @@ export default function ThreeScene({ profileImage, config: userConfig = {} }) {
           toneMappingExposure: 1.1,
           powerPreference: "high-performance",
         }}
-        style={{ background: "#e8e0d4" }}
+        style={{
+          background: bgColor,
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.4s ease-in-out, background 0.2s ease",
+        }}
         shadows={!isLowEnd}
         onCreated={() => setLoaded(true)}
         frameloop={isVisible ? "always" : "never"}

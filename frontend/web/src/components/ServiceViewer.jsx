@@ -13,17 +13,18 @@ function Lightbox({ src, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#19171D]/80 backdrop-blur-sm" onClick={onClose} />
       <motion.img
         src={src}
-        className="relative z-10 max-w-[90vw] max-h-[85vh] object-contain rounded-xl"
+        className="relative z-10 max-w-[90vw] max-h-[85vh] object-contain rounded-2xl border border-[#DED7E2] dark:border-[#403846]"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
       />
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/20 transition"
+        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition cursor-pointer"
+        aria-label="Close image viewer"
       >
         <X size={20} />
       </button>
@@ -65,38 +66,51 @@ export default function ServiceViewer() {
     setTimeout(animationDone, 600);
   };
 
+  const handleContact = () => {
+    handleClose();
+    setTimeout(() => {
+      const contactEl = document.getElementById("contact");
+      if (contactEl) {
+        contactEl.scrollIntoView({ behavior: "smooth" });
+        const subjectInput = document.getElementById("ct-subject");
+        if (subjectInput) {
+          subjectInput.value = `Inquiry: ${service.title}`;
+          subjectInput.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
+    }, 400);
+  };
+
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-50 overflow-y-auto"
-        style={{ background: "var(--bg-primary)" }}
+        className="fixed inset-0 z-50 overflow-y-auto bg-[#FAF8F5] dark:bg-[#19171D] text-[#29262D] dark:text-[#F6F2F8]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.3 }}
       >
         {/* Close button */}
         <motion.button
           onClick={handleClose}
-          className="fixed top-6 right-6 z-50 w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center transition shadow-sm"
-          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
+          className="fixed top-6 right-6 z-50 w-11 h-11 rounded-2xl bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] text-[#51416F] dark:text-[#F6F2F8] hover:border-[#78649D]/50 flex items-center justify-center transition shadow-soft-sm cursor-pointer"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          aria-label="Close service modal"
         >
           <X size={18} />
         </motion.button>
 
         {/* Hero section */}
-        <div className="max-w-5xl mx-auto px-6 pt-20 pb-12">
+        <div className="max-w-5xl mx-auto px-6 pt-20 pb-16">
           <motion.div variants={stagger} initial="initial" animate="animate">
             {/* Back link */}
             <motion.button
               onClick={handleClose}
-              className="flex items-center gap-2 text-sm hover:opacity-80 mb-8 transition"
-              style={{ color: "var(--accent)" }}
+              className="flex items-center gap-2 text-sm font-semibold text-[#78649D] dark:text-[#B9A4DF] hover:underline mb-8 transition cursor-pointer"
               variants={fadeUp}
             >
               <ArrowRight size={14} className="rotate-180" /> Back to services
@@ -104,8 +118,7 @@ export default function ServiceViewer() {
 
             {/* Title */}
             <motion.h1
-              className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
-              style={{ color: "var(--text-primary)" }}
+              className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-[#29262D] dark:text-[#F6F2F8] tracking-tight"
               variants={fadeUp}
             >
               {service.title}
@@ -113,8 +126,7 @@ export default function ServiceViewer() {
 
             {/* Short description */}
             <motion.p
-              className="text-lg mb-8 max-w-2xl"
-              style={{ color: "var(--text-secondary)" }}
+              className="text-base sm:text-lg mb-8 max-w-2xl text-[#625D66] dark:text-[#C4BCCB] leading-relaxed"
               variants={fadeUp}
             >
               {service.shortDescription || service.description}
@@ -127,7 +139,7 @@ export default function ServiceViewer() {
                   href={service.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-500 transition"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#78649D] hover:bg-[#655184] text-white text-sm font-semibold rounded-2xl shadow-soft-xs transition"
                 >
                   <ExternalLink size={16} /> {service.buttonText || "Live Demo"}
                 </a>
@@ -137,14 +149,16 @@ export default function ServiceViewer() {
                   href={service.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl hover:opacity-80 transition"
-                  style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-2xl bg-white dark:bg-[#27232D] text-[#51416F] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846] hover:border-[#78649D]/50 transition shadow-soft-xs"
                 >
-                  <Github size={16} /> GitHub
+                  <Github size={16} /> Source Code
                 </a>
               )}
-              <button className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl hover:opacity-80 transition"
-                style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
+              <button
+                type="button"
+                onClick={handleContact}
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-2xl bg-[#EAE3F3] dark:bg-[#B9A4DF]/15 text-[#51416F] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846] hover:border-[#78649D]/50 transition shadow-soft-xs cursor-pointer"
+              >
                 <MessageSquare size={16} /> Contact Me
               </button>
             </motion.div>
@@ -152,8 +166,7 @@ export default function ServiceViewer() {
             {/* Hero image */}
             {service.heroImage && (
               <motion.div
-                className="rounded-2xl overflow-hidden mb-12"
-                style={{ border: "1px solid var(--border)", boxShadow: "0 4px 20px var(--shadow)" }}
+                className="rounded-3xl overflow-hidden mb-12 border border-[#DED7E2] dark:border-[#403846] shadow-soft-sm"
                 variants={fadeUp}
               >
                 <img
@@ -166,8 +179,10 @@ export default function ServiceViewer() {
 
             {/* Full description */}
             <motion.div className="mb-12" variants={fadeUp}>
-              <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>About this project</h2>
-              <div className="leading-relaxed whitespace-pre-line text-base" style={{ color: "var(--text-secondary)" }}>
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-[#29262D] dark:text-[#F6F2F8]">
+                About this service
+              </h2>
+              <div className="leading-relaxed whitespace-pre-line text-sm sm:text-base text-[#625D66] dark:text-[#C4BCCB]">
                 {service.fullDescription || service.description}
               </div>
             </motion.div>
@@ -175,13 +190,14 @@ export default function ServiceViewer() {
             {/* Technologies */}
             {technologies.length > 0 && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Technologies</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-[#78649D] dark:text-[#B9A4DF]">
+                  Technologies Used
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {technologies.map((tech, i) => (
                     <span
                       key={i}
-                      className="px-4 py-2 text-sm font-medium rounded-xl"
-                      style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
+                      className="px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl bg-white dark:bg-[#27232D] text-[#29262D] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846]"
                     >
                       {typeof tech === "string" ? tech : tech.name}
                     </span>
@@ -193,19 +209,22 @@ export default function ServiceViewer() {
             {/* Features */}
             {features.length > 0 && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Features</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-[#78649D] dark:text-[#B9A4DF]">
+                  Key Deliverables
+                </h2>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {features.map((feature, i) => (
                     <motion.div
                       key={i}
-                      className="flex items-start gap-3 p-4 rounded-xl"
-                      style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
+                      className="flex items-start gap-3 p-4 rounded-2xl bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846]"
                       variants={fadeUp}
                     >
-                      <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check size={12} className="text-white" />
+                      <div className="w-5 h-5 rounded-full bg-[#EAE3F3] dark:bg-[#B9A4DF]/20 text-[#78649D] dark:text-[#B9A4DF] flex items-center justify-center shrink-0 mt-0.5">
+                        <Check size={12} strokeWidth={3} />
                       </div>
-                      <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{typeof feature === "string" ? feature : feature.name}</span>
+                      <span className="text-xs sm:text-sm text-[#29262D] dark:text-[#F6F2F8] font-medium">
+                        {typeof feature === "string" ? feature : feature.name}
+                      </span>
                     </motion.div>
                   ))}
                 </div>
@@ -215,24 +234,11 @@ export default function ServiceViewer() {
             {/* Development Process */}
             {service.process && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Development Process</h2>
-                <div className="leading-relaxed whitespace-pre-line text-base" style={{ color: "var(--text-secondary)" }}>
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-[#78649D] dark:text-[#B9A4DF]">
+                  Engineering Process
+                </h2>
+                <div className="leading-relaxed whitespace-pre-line text-sm sm:text-base text-[#625D66] dark:text-[#C4BCCB]">
                   {service.process}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Tools */}
-            {service.tools && (
-              <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Tools Used</h2>
-                <div className="flex flex-wrap gap-2">
-                  {(typeof service.tools === "string" ? JSON.parse(service.tools) : service.tools || []).map((tool, i) => (
-                    <span key={i} className="px-3 py-1.5 text-xs font-medium rounded-lg"
-                      style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}>
-                      {typeof tool === "string" ? tool : tool.name}
-                    </span>
-                  ))}
                 </div>
               </motion.div>
             )}
@@ -240,13 +246,14 @@ export default function ServiceViewer() {
             {/* Gallery */}
             {gallery.length > 0 && (
               <motion.div className="mb-12" variants={fadeUp}>
-                <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>Gallery</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-[#78649D] dark:text-[#B9A4DF]">
+                  Visual Gallery
+                </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {gallery.map((img, i) => (
                     <motion.div
                       key={i}
-                      className="rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition"
-                      style={{ border: "1px solid var(--border)" }}
+                      className="rounded-2xl overflow-hidden cursor-pointer hover:opacity-90 transition border border-[#DED7E2] dark:border-[#403846]"
                       onClick={() => setLightbox(img)}
                       whileHover={{ scale: 1.02 }}
                     >

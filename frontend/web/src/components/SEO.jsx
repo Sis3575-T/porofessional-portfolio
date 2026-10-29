@@ -5,7 +5,7 @@ import { resolveUrl } from "../utils/resolveUrl";
 
 function generateInitialsFavicon(initials, size = 64) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <rect width="${size}" height="${size}" rx="${size * 0.2}" fill="#2563eb"/>
+    <rect width="${size}" height="${size}" rx="${size * 0.2}" fill="#78649D"/>
     <text x="50%" y="50%" dy=".1em" fill="white" font-family="Inter,sans-serif" font-weight="700" font-size="${size * 0.45}" text-anchor="middle" dominant-baseline="central">${initials}</text>
   </svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
@@ -16,9 +16,13 @@ export default function SEO({ title, description }) {
   const { initials } = useProfile();
 
   useEffect(() => {
-    const siteTitle = settings?.siteTitle || "Portfolio";
-    const siteDesc = description || settings?.metaDescription || settings?.siteDescription || "Professional Portfolio";
-    const siteUrl = settings?.siteUrl || window.location.origin;
+    const siteTitle = settings?.siteTitle || "Sisay Temesgen - Full-Stack Developer and AI Learner";
+    const siteDesc =
+      description ||
+      settings?.metaDescription ||
+      settings?.siteDescription ||
+      "Professional portfolio of Sisay Temesgen, a full-stack developer and AI learner specializing in modern web applications with React, Node.js, Express, PostgreSQL, and REST APIs.";
+    const siteUrl = settings?.siteUrl || "https://sisay-temesgen.vercel.app";
 
     document.title = title ? `${title} | ${siteTitle}` : siteTitle;
 
@@ -34,7 +38,7 @@ export default function SEO({ title, description }) {
     };
 
     setMeta("description", siteDesc);
-    setMeta("keywords", settings?.metaKeywords || "");
+    setMeta("keywords", settings?.metaKeywords || "developer, portfolio, fullstack, react, nodejs, postgresql, ai learner, ethiopia");
     setMeta("og:title", title || siteTitle);
     setMeta("og:description", siteDesc);
     setMeta("og:url", siteUrl);
@@ -49,12 +53,8 @@ export default function SEO({ title, description }) {
       link.rel = "icon";
       document.head.appendChild(link);
     }
-
-    if (settings?.favicon) {
-      link.href = resolveUrl(settings.favicon);
-    } else if (initials) {
-      link.href = generateInitialsFavicon(initials);
-    }
+    const faviconUrl = settings?.favicon ? resolveUrl(settings.favicon) : generateInitialsFavicon(initials || "ST");
+    link.href = faviconUrl;
   }, [title, description, settings, initials]);
 
   return null;

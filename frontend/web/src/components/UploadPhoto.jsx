@@ -56,14 +56,15 @@ export default function UploadPhoto() {
       />
 
       <motion.button
+        type="button"
         onClick={() => inputRef.current?.click()}
         disabled={processing}
-        className="fixed right-6 bottom-24 z-50 flex items-center gap-2.5 rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-xl px-5 py-3 text-sm font-semibold text-gray-900 shadow-[0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.6)] transition-all hover:shadow-[0_6px_16px_rgba(37,99,235,0.15),0_16px_40px_rgba(0,0,0,0.12)] hover:border-blue-300/60 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="fixed right-6 bottom-24 z-50 flex items-center gap-2.5 rounded-2xl border border-[#DED7E2] dark:border-[#403846] bg-white/95 dark:bg-[#27232D]/95 backdrop-blur-xl px-5 py-3 text-sm font-semibold text-[#51416F] dark:text-[#F6F2F8] shadow-soft-sm hover:border-[#78649D]/50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.97 }}
       >
-        <Upload size={18} className="text-accent-blue" />
-        {textureUrl ? "Replace Photo" : "Upload Your Photo"}
+        <Upload size={18} className="text-[#78649D] dark:text-[#B9A4DF]" />
+        <span>{textureUrl ? "Replace Photo" : "Upload Your Photo"}</span>
       </motion.button>
     </>
   );
