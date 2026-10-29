@@ -170,6 +170,11 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use("/uploads", express.static(uploadsDir));
 
+const webPublicDir = path.join(__dirname, "../../frontend/web/public");
+if (fs.existsSync(webPublicDir)) {
+  app.use(express.static(webPublicDir));
+}
+
 function sendCVFile(req, res) {
   const isDownload = req.query.download === "true" || req.query.dl === "1";
   const cvPath = path.join(uploadsDir, "Sisay_Temesgen_CV.pdf");

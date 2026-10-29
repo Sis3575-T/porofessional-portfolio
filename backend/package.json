@@ -19,7 +19,7 @@
     "prisma": "^5.22.0"
   },
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "dev": "node --use-system-ca --watch src/server.js",
+    "start": "node --use-system-ca src/server.js"
   }
 }

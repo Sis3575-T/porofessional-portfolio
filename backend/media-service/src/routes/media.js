@@ -3,13 +3,13 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
-import { authenticateToken } from "shared";
+import { authenticateToken, prisma } from "shared";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, "../../../uploads");
 
 function configureCloudinary() {
-  if (!cloudinary.config().cloud_name) {
+  if (process.env.CLOUDINARY_CLOUD_NAME && !cloudinary.config().cloud_name) {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
@@ -22,6 +22,29 @@ const router = express.Router();
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
+    const assetsMap = new Map();
+
+    // 1. Fetch persistent records from database
+    try {
+      const dbAssets = await prisma.mediaAsset.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+      for (const asset of dbAssets) {
+        assetsMap.set(asset.url, {
+          id: asset.id,
+          filename: asset.filename,
+          url: asset.url,
+          size: asset.size || 0,
+          mimetype: asset.mimeType || "",
+          createdAt: asset.createdAt,
+          storage: asset.url.startsWith("http") ? "cloudinary" : "local",
+        });
+      }
+    } catch (dbErr) {
+      console.warn("[MEDIA] DB fetch warning:", dbErr.message);
+    }
+
+    // 2. Add Cloudinary assets if configured
     if (process.env.CLOUDINARY_CLOUD_NAME) {
       try {
         configureCloudinary();
@@ -31,48 +54,50 @@ router.get("/", authenticateToken, async (req, res) => {
           max_results: 100,
         });
 
-        const files = result.resources.map((r) => ({
-          id: r.public_id,
-          filename: r.public_id.split("/").pop(),
-          url: r.secure_url,
-          size: r.bytes,
-          mimetype: r.format,
-          createdAt: r.created_at,
-          storage: "cloudinary",
-        }));
-
-        return res.json({ success: true, data: files });
+        for (const r of result.resources) {
+          if (!assetsMap.has(r.secure_url)) {
+            assetsMap.set(r.secure_url, {
+              id: r.public_id,
+              filename: r.public_id.split("/").pop(),
+              url: r.secure_url,
+              size: r.bytes,
+              mimetype: r.format,
+              createdAt: r.created_at,
+              storage: "cloudinary",
+            });
+          }
+        }
       } catch (cloudErr) {
-        console.warn("[MEDIA] Cloudinary fetch error, checking local uploads:", cloudErr.message);
+        console.warn("[MEDIA] Cloudinary fetch error:", cloudErr.message);
       }
     }
 
-    // Local uploads listing
-    if (!fs.existsSync(uploadsDir)) {
-      return res.json({ success: true, data: [] });
+    // 3. Add local disk files
+    if (fs.existsSync(uploadsDir)) {
+      try {
+        const fileNames = await fs.promises.readdir(uploadsDir);
+        for (const name of fileNames) {
+          const fileUrl = `/uploads/${name}`;
+          if (!assetsMap.has(fileUrl)) {
+            try {
+              const stat = await fs.promises.stat(path.join(uploadsDir, name));
+              assetsMap.set(fileUrl, {
+                id: name,
+                filename: name,
+                url: fileUrl,
+                size: stat.size,
+                mimetype: name.split(".").pop(),
+                createdAt: stat.birthtime,
+                storage: "local",
+              });
+            } catch {}
+          }
+        }
+      } catch {}
     }
 
-    const fileNames = await fs.promises.readdir(uploadsDir);
-    const files = await Promise.all(
-      fileNames.map(async (name) => {
-        try {
-          const stat = await fs.promises.stat(path.join(uploadsDir, name));
-          return {
-            id: name,
-            filename: name,
-            url: `/uploads/${name}`,
-            size: stat.size,
-            mimetype: name.split(".").pop(),
-            createdAt: stat.birthtime,
-            storage: "local",
-          };
-        } catch {
-          return null;
-        }
-      })
-    );
-
-    res.json({ success: true, data: files.filter(Boolean) });
+    const files = Array.from(assetsMap.values());
+    res.json({ success: true, data: files });
   } catch (error) {
     console.error("Media error:", error);
     res.status(500).json({ success: false, message: "Failed to list media" });
@@ -83,6 +108,23 @@ router.delete("/:filename", authenticateToken, async (req, res) => {
   try {
     const { filename } = req.params;
 
+    // 1. Delete from database if exists by id, filename, or url ending
+    try {
+      await prisma.mediaAsset.deleteMany({
+        where: {
+          OR: [
+            { id: filename },
+            { filename: filename },
+            { url: { endsWith: filename } },
+            { publicId: filename },
+          ],
+        },
+      });
+    } catch (dbErr) {
+      console.warn("[MEDIA] DB delete warning:", dbErr.message);
+    }
+
+    // 2. Cloudinary deletion if applicable
     if (process.env.CLOUDINARY_CLOUD_NAME) {
       try {
         configureCloudinary();
@@ -105,14 +147,14 @@ router.delete("/:filename", authenticateToken, async (req, res) => {
       }
     }
 
-    // Check local file
+    // 3. Check local file
     const localPath = path.join(uploadsDir, filename);
     if (fs.existsSync(localPath)) {
       await fs.promises.unlink(localPath);
       return res.json({ success: true, message: "File deleted successfully from local storage" });
     }
 
-    return res.status(404).json({ success: false, message: "File not found" });
+    return res.json({ success: true, message: "Asset removed" });
   } catch (error) {
     console.error("Media delete error:", error);
     res.status(500).json({ success: false, message: "Failed to delete file" });

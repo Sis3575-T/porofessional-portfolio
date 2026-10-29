@@ -12,12 +12,13 @@
     "backend/*"
   ],
   "scripts": {
-    "dev": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
-    "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
-    "dev:backend": "node --watch backend/src/server.js",
+    "dev": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
+    "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
+    "dev:backend": "node --use-system-ca --watch backend/src/server.js",
     "dev:web": "npm --workspace frontend/web run dev",
     "dev:admin": "npm --workspace frontend/admin run dev",
-    "start": "node backend/src/server.js"
+    "start": "node --use-system-ca backend/src/server.js",
+    "test:persistence": "node --use-system-ca scripts/verify-full-persistence.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.3",

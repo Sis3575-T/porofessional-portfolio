@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { cloudinary, configureCloudinary } from "../config/cloudinary.js";
-import { authenticateToken } from "shared";
+import { authenticateToken, prisma } from "shared";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, "../../../uploads");
@@ -62,6 +62,23 @@ router.post("/", authenticateToken, imageUpload.single("image"), async (req, res
           resource_type: "auto",
         });
 
+        // Save durable reference to database
+        try {
+          await prisma.mediaAsset.create({
+            data: {
+              filename: req.file.originalname,
+              url: result.secure_url,
+              publicId: result.public_id,
+              mimeType: req.file.mimetype,
+              size: req.file.size,
+              width: result.width || null,
+              height: result.height || null,
+            },
+          });
+        } catch (dbErr) {
+          console.warn("[UPLOAD] DB save warning:", dbErr.message);
+        }
+
         return res.json({
           success: true,
           data: {
@@ -82,11 +99,25 @@ router.post("/", authenticateToken, imageUpload.single("image"), async (req, res
     const filename = `media_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
     const filepath = path.join(uploadsDir, filename);
     await fs.promises.writeFile(filepath, req.file.buffer);
+    const fileUrl = `/uploads/${filename}`;
+
+    try {
+      await prisma.mediaAsset.create({
+        data: {
+          filename: req.file.originalname,
+          url: fileUrl,
+          mimeType: req.file.mimetype,
+          size: req.file.size,
+        },
+      });
+    } catch (dbErr) {
+      console.warn("[UPLOAD] DB save warning:", dbErr.message);
+    }
 
     return res.json({
       success: true,
       data: {
-        url: `/uploads/${filename}`,
+        url: fileUrl,
         filename,
         size: req.file.size,
         mimetype: req.file.mimetype,
@@ -117,6 +148,20 @@ router.post("/cv", authenticateToken, cvUpload.single("cv"), async (req, res) =>
           format: req.file.originalname.split(".").pop(),
         });
 
+        try {
+          await prisma.mediaAsset.create({
+            data: {
+              filename: req.file.originalname,
+              url: result.secure_url,
+              publicId: result.public_id,
+              mimeType: req.file.mimetype,
+              size: req.file.size,
+            },
+          });
+        } catch (dbErr) {
+          console.warn("[UPLOAD] DB save warning:", dbErr.message);
+        }
+
         return res.json({
           success: true,
           data: {
@@ -138,11 +183,25 @@ router.post("/cv", authenticateToken, cvUpload.single("cv"), async (req, res) =>
     const filename = `cv_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
     const filepath = path.join(uploadsDir, filename);
     await fs.promises.writeFile(filepath, req.file.buffer);
+    const fileUrl = `/uploads/${filename}`;
+
+    try {
+      await prisma.mediaAsset.create({
+        data: {
+          filename: req.file.originalname,
+          url: fileUrl,
+          mimeType: req.file.mimetype,
+          size: req.file.size,
+        },
+      });
+    } catch (dbErr) {
+      console.warn("[UPLOAD] DB save warning:", dbErr.message);
+    }
 
     return res.json({
       success: true,
       data: {
-        url: `/uploads/${filename}`,
+        url: fileUrl,
         filename,
         size: req.file.size,
         mimetype: req.file.mimetype,

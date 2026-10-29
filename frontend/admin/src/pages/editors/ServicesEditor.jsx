@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { servicesAPI } from '../../services/api';
+import { servicesAPI, api } from '../../services/api';
 import { resolveUrl } from '../../utils/resolveUrl';
 import {
   Plus, Save, Trash2, Pencil, GripVertical,
@@ -29,8 +29,8 @@ function ImageUpload({ value, onChange, label, aspect = "w-16 h-16" }) {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const res = await fetch(`${API_URL}/api/v1/upload`, { method: 'POST', body: formData });
-      const data = await res.json();
+      const res = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const data = res.data;
       if (data.data?.url) { onChange(data.data.url); toast.success('Uploaded'); }
       else { toast.error('Upload failed'); }
     } catch { toast.error('Upload failed'); }

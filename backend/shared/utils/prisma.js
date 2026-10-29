@@ -2,12 +2,23 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, "../../../backend/.env") });
+dotenv.config({ path: path.join(__dirname, "../../../.env") });
+
+if (process.env.NODE_ENV !== "production" && !process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 class SafeWebSocket extends ws {
   constructor(address, protocols, options) {
     super(address, protocols, {
       ...options,
-      rejectUnauthorized: process.env.NODE_ENV === "production",
+      rejectUnauthorized: false,
     });
   }
 }
@@ -79,7 +90,8 @@ function createPrismaClient() {
   if (globalForPrisma.prisma) {
     _prisma = globalForPrisma.prisma;
   } else if (isNeon) {
-    const pool = new Pool({ connectionString: url });
+    const wsUrl = url.replace("-pooler", "");
+    const pool = new Pool({ connectionString: wsUrl });
     const adapter = new PrismaNeon(pool);
     _prisma = new PrismaClient({ adapter, log: logConfig });
   } else {

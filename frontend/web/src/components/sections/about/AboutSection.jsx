@@ -75,23 +75,22 @@ export default function AboutSection() {
   };
 
   // Two concise, reference-matched paragraphs
+  const bioLines = about?.biography ? about.biography.split("\n").filter((l) => l.trim().length > 0) : [];
   const paragraph1 =
     about?.biographyParagraph1 ||
-    (about?.biography && about.biography.includes("\n")
-      ? about.biography.split("\n")[0]
+    (bioLines.length > 0
+      ? bioLines[0]
       : "I'm a 4th-year Computer Science student at Bahir Dar University. I specialize in modern web technologies and I'm passionate about solving real-world challenges with technology.");
 
   const paragraph2 =
     about?.biographyParagraph2 ||
-    (about?.biography && about.biography.includes("\n")
-      ? about.biography.split("\n").slice(1).join(" ")
-      : "I enjoy building full-stack applications, exploring AI, and continuously learning new tools and technologies to create useful and impactful solutions.");
+    (bioLines.length > 1
+      ? bioLines.slice(1).join(" ")
+      : (about?.biography ? "" : "I enjoy building full-stack applications, exploring AI, and continuously learning new tools and technologies to create useful and impactful solutions."));
 
   // Image source: 3D developer illustration with clean studio white background, or custom admin uploaded illustration
   const illustrationSrc =
-    about?.profileImage &&
-    !about.profileImage.includes("sisay-portrait") &&
-    !about.profileImage.includes("about-profile")
+    about?.profileImage && !about.profileImage.includes("sisay-portrait")
       ? resolveUrl(about.profileImage)
       : "/developer-3d-illustration.png";
 

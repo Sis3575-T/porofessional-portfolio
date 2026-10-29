@@ -304,7 +304,7 @@ const defaultExperiences = [
 
 export default function Experience() {
   const { experiences } = usePortfolio();
-  const experienceList = experiences && experiences.length > 0 ? experiences : defaultExperiences;
+  const experienceList = Array.isArray(experiences) ? experiences : [];
   const [activeIndex, setActiveIndex] = useState(-1);
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -369,46 +369,57 @@ export default function Experience() {
           </p>
         </div>
 
-        {/* Carousel Container */}
-        <div className="relative group/scroll">
-          {canScrollLeft && (
-            <button
-              onClick={() => scroll(-1)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-sm flex items-center justify-center text-[#1E293B] dark:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft size={18} />
-            </button>
-          )}
-          {canScrollRight && (
-            <button
-              onClick={() => scroll(1)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-sm flex items-center justify-center text-[#1E293B] dark:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
-              aria-label="Scroll right"
-            >
-              <ChevronRight size={18} />
-            </button>
-          )}
-
-          <div
-            ref={scrollRef}
-            className={`flex gap-5 overflow-x-auto pb-4 scrollbar-hide ${
-              experienceList.length === 1 ? "justify-center" : "px-1"
-            }`}
-            style={{
-              scrollSnapType: "x mandatory",
-              WebkitOverflowScrolling: "touch",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            {experienceList.map((exp, i) => (
-              <div key={exp.id || i} style={{ scrollSnapAlign: "start" }}>
-                <ExperienceCard experience={exp} index={i} onOpen={handleOpen} />
-              </div>
-            ))}
+        {experienceList.length === 0 ? (
+          <div className="py-12 text-center rounded-2xl bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] p-8 max-w-xl mx-auto shadow-soft-xs">
+            <Building2 className="w-10 h-10 mx-auto text-[#94A3B8] mb-3 opacity-60" />
+            <h3 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC] mb-1">
+              No Experience Found
+            </h3>
+            <p className="text-xs text-[#64748B] dark:text-[#94A3B8]">
+              Experience records added in the admin dashboard will appear here.
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="relative group/scroll">
+            {canScrollLeft && (
+              <button
+                onClick={() => scroll(-1)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-sm flex items-center justify-center text-[#1E293B] dark:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            )}
+            {canScrollRight && (
+              <button
+                onClick={() => scroll(1)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-sm flex items-center justify-center text-[#1E293B] dark:text-[#F8FAFC] hover:bg-[#F8FAFC] dark:hover:bg-[#111827] transition cursor-pointer"
+                aria-label="Scroll right"
+              >
+                <ChevronRight size={18} />
+              </button>
+            )}
+
+            <div
+              ref={scrollRef}
+              className={`flex gap-5 overflow-x-auto pb-4 scrollbar-hide ${
+                experienceList.length === 1 ? "justify-center" : "px-1"
+              }`}
+              style={{
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              {experienceList.map((exp, i) => (
+                <div key={exp.id || i} style={{ scrollSnapAlign: "start" }}>
+                  <ExperienceCard experience={exp} index={i} onOpen={handleOpen} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {activeExperience && (

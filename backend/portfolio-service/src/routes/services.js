@@ -1,7 +1,26 @@
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
+import { invalidatePortfolioCache } from "../services/portfolioCache.js";
 
 const router = express.Router();
+
+function formatJsonArray(val) {
+  if (val === undefined || val === null || val === "") return null;
+  if (Array.isArray(val)) return JSON.stringify(val);
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    if (!trimmed) return null;
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) return JSON.stringify(parsed);
+      return JSON.stringify([parsed]);
+    } catch {
+      const items = trimmed.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      return JSON.stringify(items);
+    }
+  }
+  return null;
+}
 
 // GET /api/v1/services (public - enabled only)
 router.get("/", async (req, res) => {
@@ -11,11 +30,11 @@ router.get("/", async (req, res) => {
       orderBy: { order: "asc" },
       select: {
         id: true, slug: true, title: true, shortDescription: true,
-        description: true, icon: true, iconUrl: true, heroImage: true,
-        technologies: true, features: true, process: true,
-        liveUrl: true, githubUrl: true, docsUrl: true,
+        description: true, fullDescription: true, icon: true, iconUrl: true, heroImage: true,
+        technologies: true, features: true, tools: true, process: true,
+        liveUrl: true, githubUrl: true, docsUrl: true, caseStudyUrl: true,
         buttonText: true, buttonColor: true, accentColor: true,
-        order: true,
+        order: true, enabled: true,
       },
     });
     res.json({ success: true, data: services });
@@ -40,32 +59,51 @@ router.get("/all", authenticateToken, requireAdmin, async (req, res) => {
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const data = req.body;
+    if (!data.title) {
+      return res.status(400).json({ success: false, message: "Title is required" });
+    }
+
+    let baseSlug = (data.slug || data.title)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    if (!baseSlug) baseSlug = `service-${Date.now()}`;
+
+    let uniqueSlug = baseSlug;
+    let counter = 1;
+    while (await prisma.service.findFirst({ where: { slug: uniqueSlug } })) {
+      uniqueSlug = `${baseSlug}-${counter++}`;
+    }
+
     const service = await prisma.service.create({
       data: {
-        slug: data.slug || data.title?.toLowerCase().replace(/\s+/g, "-"),
-        title: data.title,
-        shortDescription: data.shortDescription,
+        slug: uniqueSlug,
+        title: data.title.trim(),
+        shortDescription: data.shortDescription || null,
         description: data.description || "",
-        fullDescription: data.fullDescription,
-        icon: data.icon,
-        iconUrl: data.iconUrl,
-        heroImage: data.heroImage,
-        galleryImages: data.galleryImages ? (typeof data.galleryImages === "string" ? data.galleryImages : JSON.stringify(data.galleryImages)) : undefined,
-        technologies: data.technologies ? (typeof data.technologies === "string" ? data.technologies : JSON.stringify(data.technologies)) : undefined,
-        features: data.features ? (typeof data.features === "string" ? data.features : JSON.stringify(data.features)) : undefined,
-        tools: data.tools ? (typeof data.tools === "string" ? data.tools : JSON.stringify(data.tools)) : undefined,
-        process: data.process,
-        liveUrl: data.liveUrl,
-        githubUrl: data.githubUrl,
-        docsUrl: data.docsUrl,
-        caseStudyUrl: data.caseStudyUrl,
-        buttonText: data.buttonText,
-        buttonColor: data.buttonColor,
-        accentColor: data.accentColor,
+        fullDescription: data.fullDescription || null,
+        icon: data.icon || null,
+        iconUrl: data.iconUrl || null,
+        heroImage: data.heroImage || null,
+        galleryImages: formatJsonArray(data.galleryImages),
+        technologies: formatJsonArray(data.technologies),
+        features: formatJsonArray(data.features),
+        tools: formatJsonArray(data.tools),
+        process: data.process || null,
+        liveUrl: data.liveUrl || null,
+        githubUrl: data.githubUrl || null,
+        docsUrl: data.docsUrl || null,
+        caseStudyUrl: data.caseStudyUrl || null,
+        buttonText: data.buttonText || "Live Demo",
+        buttonColor: data.buttonColor || "#111111",
+        accentColor: data.accentColor || "#111111",
         enabled: data.enabled !== false,
-        order: data.order ?? 0,
+        order: Number.isInteger(Number(data.order)) ? parseInt(data.order, 10) : 0,
       },
     });
+
+    invalidatePortfolioCache();
     res.status(201).json({ success: true, data: service });
   } catch (error) {
     console.error("Create service error:", error);
@@ -79,29 +117,58 @@ router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
     const { id } = req.params;
     const data = req.body;
 
+    const existing = await prisma.service.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
     const updateData = {};
-    const fields = [
-      "slug", "title", "shortDescription", "description", "fullDescription",
+    const stringFields = [
+      "title", "shortDescription", "description", "fullDescription",
       "icon", "iconUrl", "heroImage", "process", "liveUrl", "githubUrl",
       "docsUrl", "caseStudyUrl", "buttonText", "buttonColor", "accentColor",
-      "enabled", "order",
     ];
 
-    for (const field of fields) {
-      if (data[field] !== undefined) updateData[field] = data[field];
+    for (const field of stringFields) {
+      if (data[field] !== undefined) {
+        updateData[field] = data[field] === "" ? null : data[field];
+      }
+    }
+
+    if (data.title && !data.description && existing.description) {
+      // preserve description if not provided
+    }
+
+    if (data.slug !== undefined) {
+      let slug = data.slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (slug && slug !== existing.slug) {
+        let uniqueSlug = slug;
+        let counter = 1;
+        while (await prisma.service.findFirst({ where: { slug: uniqueSlug, NOT: { id } } })) {
+          uniqueSlug = `${slug}-${counter++}`;
+        }
+        updateData.slug = uniqueSlug;
+      }
     }
 
     const jsonFields = ["galleryImages", "technologies", "features", "tools"];
     for (const field of jsonFields) {
       if (data[field] !== undefined) {
-        updateData[field] = typeof data[field] === "string" ? data[field] : JSON.stringify(data[field]);
+        updateData[field] = formatJsonArray(data[field]);
       }
+    }
+
+    if (data.enabled !== undefined) updateData.enabled = Boolean(data.enabled);
+    if (data.order !== undefined) {
+      updateData.order = Number.isInteger(Number(data.order)) ? parseInt(data.order, 10) : existing.order;
     }
 
     const service = await prisma.service.update({
       where: { id },
       data: updateData,
     });
+
+    invalidatePortfolioCache();
     res.json({ success: true, data: service });
   } catch (error) {
     console.error("Update service error:", error);
@@ -114,8 +181,10 @@ router.delete("/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     await prisma.service.delete({ where: { id } });
+    invalidatePortfolioCache();
     res.json({ success: true, message: "Service deleted" });
   } catch (error) {
+    console.error("Delete service error:", error);
     res.status(500).json({ success: false, message: "Failed to delete service" });
   }
 });
@@ -132,6 +201,7 @@ router.put("/reorder/batch", authenticateToken, requireAdmin, async (req, res) =
         prisma.service.update({ where: { id }, data: { order: index } })
       )
     );
+    invalidatePortfolioCache();
     res.json({ success: true, message: "Services reordered" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to reorder" });
