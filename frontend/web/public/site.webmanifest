@@ -1,7 +1,7 @@
 {
-  "name": "Sisay Temesgen - Full Stack Developer",
-  "short_name": "Portfolio",
-  "description": "Professional portfolio of Sisay Temesgen, a full-stack developer specializing in modern web applications.",
+  "name": "Sisay Temesgen - Full-Stack Developer & AI Learner",
+  "short_name": "Sisay T.",
+  "description": "Professional portfolio of Sisay Temesgen, a full-stack developer and AI learner specializing in modern web applications with React, Node.js, Express, PostgreSQL, and REST APIs.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

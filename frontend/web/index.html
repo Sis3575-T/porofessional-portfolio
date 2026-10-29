@@ -3,10 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sisay Temesgen - Full Stack Developer</title>
-    <meta name="description" content="Professional portfolio of Sisay Temesgen, a full-stack developer specializing in modern web applications." />
-    <meta name="theme-color" content="#00f0ff" />
+    <title>Sisay Temesgen - Full-Stack Developer &amp; AI Learner</title>
+    <meta name="description" content="Professional portfolio of Sisay Temesgen, a full-stack developer and AI learner specializing in modern web applications with React, Node.js, Express, PostgreSQL, and REST APIs." />
+    <meta name="theme-color" content="#F7FAFE" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B0F17" media="(prefers-color-scheme: dark)" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="canonical" href="https://sisay-temesgen.vercel.app/" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -14,21 +17,35 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- Anti-FOUC Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          const stored = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (stored === 'dark' || (!stored && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
         rel="stylesheet"
       />
     </noscript>
@@ -40,8 +57,12 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background: #FFFFFF;
-        color: #111827;
+        background: #FAF9F7;
+        color: #26252B;
+      }
+      .dark body {
+        background: #18171E;
+        color: #F6F4FA;
       }
       #root {
         min-height: 100vh;
