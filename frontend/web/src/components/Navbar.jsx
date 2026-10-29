@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -35,10 +35,25 @@ export const NAV_SECTIONS = [
 
 export default function Navbar() {
   const { dark, toggle } = useTheme();
-  const { siteTitle } = useProfile();
+  const { siteTitle, name: profileName, hero } = useProfile();
   const { settings } = usePortfolio();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { brandName, brandSubtitle } = useMemo(() => {
+    const raw = siteTitle || "";
+    if (raw.includes(" - ")) {
+      const parts = raw.split(" - ");
+      return { brandName: parts[0].trim(), brandSubtitle: parts.slice(1).join(" - ").trim() };
+    }
+    if (raw.includes(" | ")) {
+      const parts = raw.split(" | ");
+      return { brandName: parts[0].trim(), brandSubtitle: parts.slice(1).join(" | ").trim() };
+    }
+    const name = profileName || raw || "Sisay Temesgen";
+    const work = hero?.title || "Full-Stack Developer & AI Learner";
+    return { brandName: name, brandSubtitle: work };
+  }, [siteTitle, profileName, hero]);
 
   const [activeSection, setActiveSection] = useState("hero");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -214,12 +229,17 @@ export default function Navbar() {
                 to="/"
                 onClick={(e) => handleNavClick(e, { id: "hero", path: "/" })}
                 className="flex items-center gap-2.5 sm:gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD] rounded-xl"
-                aria-label="Sisay Temesgen - Portfolio Home"
+                aria-label={`${brandName} - ${brandSubtitle}`}
               >
                 <Logo size={36} />
-                <span className="font-bold text-sm sm:text-base tracking-tight text-[#14213D] dark:text-[#F8FAFC] group-hover:text-[#246BFD] dark:group-hover:text-[#3B82F6] transition-colors">
-                  {siteTitle || "Sisay Temesgen"}
-                </span>
+                <div className="flex flex-col text-left">
+                  <span className="font-bold text-sm sm:text-base tracking-tight text-[#14213D] dark:text-[#F8FAFC] group-hover:text-[#246BFD] dark:group-hover:text-[#3B82F6] transition-colors leading-tight">
+                    {brandName}
+                  </span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-[#246BFD] dark:text-[#3B82F6] tracking-tight leading-tight">
+                    {brandSubtitle}
+                  </span>
+                </div>
               </Link>
             </div>
 
@@ -407,11 +427,16 @@ export default function Navbar() {
               transition={{ type: "spring", damping: 30, stiffness: 320 }}
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0] dark:border-[#1E293B]">
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <Logo size={32} />
-                  <span className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC] truncate">
-                    {siteTitle || "Sisay Temesgen"}
-                  </span>
+                  <div className="flex flex-col text-left min-w-0">
+                    <span className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC] truncate leading-tight">
+                      {brandName}
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#246BFD] dark:text-[#3B82F6] truncate leading-tight">
+                      {brandSubtitle}
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"

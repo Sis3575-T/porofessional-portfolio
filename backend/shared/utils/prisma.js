@@ -46,7 +46,7 @@ function isConnectionError(error) {
 
 function wrapWithRetry(model) {
   const methods = {};
-  for (const method of ["findUnique", "findFirst", "findMany", "create", "update", "upsert", "delete", "count", "aggregate", "groupBy"]) {
+  for (const method of ["findUnique", "findFirst", "findMany", "create", "update", "updateMany", "upsert", "delete", "deleteMany", "count", "aggregate", "groupBy"]) {
     if (typeof model[method] === "function") {
       methods[method] = (...args) => {
         const call = () => model[method](...args);
