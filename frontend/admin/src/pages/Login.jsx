@@ -28,7 +28,7 @@ export default function Login({ setIsAuthenticated }) {
       } else if (err.code === "ECONNABORTED" || err.message?.toLowerCase().includes("timeout")) {
         setError("The server is waking up from cold sleep. Please wait 10 seconds and click Sign In again.");
       } else if (err.message?.toLowerCase().includes("network")) {
-        setError("Network error connecting to backend API. Please wait a moment while the server connects.");
+        setError("Unable to reach backend API. If running locally, ensure backend is running. If on the deployed website, the server may be waking up from cold sleep—please click Sign In again in a few moments.");
       } else {
         setError(err.message || "Login failed. Please try again.");
       }

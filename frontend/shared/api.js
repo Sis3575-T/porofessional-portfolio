@@ -13,7 +13,7 @@ export const API_URL = (() => {
 const api = axios.create({
   baseURL: `${API_URL}/api/v1`,
   headers: { "Content-Type": "application/json" },
-  timeout: 45000,
+  timeout: 90000,
 });
 
 api.interceptors.request.use((config) => {

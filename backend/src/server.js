@@ -51,6 +51,42 @@ function ensureConnectTimeout(url) {
   return `${url}${sep}connect_timeout=60`;
 }
 
+async function ensureAdminUser() {
+  const { prisma } = await import("shared");
+  const bcrypt = (await import("bcryptjs")).default;
+  const adminEmail = (process.env.ADMIN_EMAIL || "sisay3575@gmail.com").trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || "Sis3575@";
+  try {
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    const emailsToEnsure = Array.from(new Set([adminEmail, "sisay3575@gmail.com"]));
+    for (const email of emailsToEnsure) {
+      await prisma.user.upsert({
+        where: { email },
+        update: { password: hashedPassword, role: "ADMIN", isActive: true },
+        create: { email, password: hashedPassword, role: "ADMIN", isActive: true },
+      });
+      console.log(`[AUTH] Admin user verified/updated: ${email}`);
+    }
+    const setting = await prisma.setting.findFirst();
+    if (setting) {
+      let social = {};
+      try { social = JSON.parse(setting.socialLinks || "{}"); } catch {}
+      if (!social.github || social.github.includes("/user/") || social.github.includes("/sisay")) {
+        social.github = "https://github.com/Sis3575-T";
+        social.linkedin = "https://www.linkedin.com/in/sisay-temesgen-412290447/";
+        social.telegram = "https://t.me/sisaytem";
+        await prisma.setting.update({
+          where: { id: setting.id },
+          data: { socialLinks: JSON.stringify(social) },
+        });
+        console.log(`[SETTINGS] Verified socialLinks with https://github.com/Sis3575-T`);
+      }
+    }
+  } catch (err) {
+    console.warn(`[AUTH] Could not auto-ensure admin user at startup:`, err.message);
+  }
+}
+
 async function autoInitDatabase() {
   const { prisma } = await import("shared");
   const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
@@ -63,7 +99,7 @@ async function autoInitDatabase() {
     try {
       await prisma.$queryRaw`SELECT 1`;
       const rawTables = await prisma.$queryRaw`
-        SELECT table_name 
+        SELECT table_name::text as table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
       `;

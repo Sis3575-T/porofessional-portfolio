@@ -241,7 +241,7 @@ app.get("/health", async (req, res) => {
 
     try {
       const rawTables = await prisma.$queryRaw`
-        SELECT table_name 
+        SELECT table_name::text as table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
         ORDER BY table_name ASC
