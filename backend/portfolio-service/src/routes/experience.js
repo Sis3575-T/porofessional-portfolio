@@ -48,8 +48,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/v1/experience/admin (admin - all)
-router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+// GET /api/v1/experience/admin or /api/v1/experience/all (admin - all)
+const fetchAllExperience = async (req, res) => {
   try {
     const experiences = await prisma.experience.findMany({
       orderBy: { order: "asc" },
@@ -58,7 +58,10 @@ router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch experiences" });
   }
-});
+};
+
+router.get("/admin", authenticateToken, requireAdmin, fetchAllExperience);
+router.get("/all", authenticateToken, requireAdmin, fetchAllExperience);
 
 // POST /api/v1/experience (admin)
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {

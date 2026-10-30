@@ -84,7 +84,11 @@ export default function AboutEditor() {
           return;
         }
       }
-      await aboutAPI.update(payload);
+      const res = await aboutAPI.update(payload);
+      if (res.data?.data) {
+        const s = res.data.data;
+        setForm((prev) => ({ ...prev, ...s }));
+      }
       toast.success('About section updated');
       window.dispatchEvent(new Event('profile-updated'));
     } catch (err) {

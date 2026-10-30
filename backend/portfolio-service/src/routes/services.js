@@ -43,8 +43,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/v1/services/all (admin - all)
-router.get("/all", authenticateToken, requireAdmin, async (req, res) => {
+// GET /api/v1/services/all or /api/v1/services/admin (admin - all)
+const fetchAllServices = async (req, res) => {
   try {
     const services = await prisma.service.findMany({
       orderBy: { order: "asc" },
@@ -53,7 +53,10 @@ router.get("/all", authenticateToken, requireAdmin, async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch services" });
   }
-});
+};
+
+router.get("/all", authenticateToken, requireAdmin, fetchAllServices);
+router.get("/admin", authenticateToken, requireAdmin, fetchAllServices);
 
 // POST /api/v1/services (admin)
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {

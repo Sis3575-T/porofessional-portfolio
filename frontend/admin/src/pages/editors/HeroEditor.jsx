@@ -59,7 +59,21 @@ export default function HeroEditor() {
       try { JSON.parse(socialLinks); } catch { toast.error('Invalid JSON in Social Links'); setSaving(false); return; }
       try { JSON.parse(stats); } catch { toast.error('Invalid JSON in Stats'); setSaving(false); return; }
       try { JSON.parse(buttonConfig); } catch { toast.error('Invalid JSON in Button Config'); setSaving(false); return; }
-      await heroAPI.update({ ...form, socialLinks, stats, buttonConfig });
+      const res = await heroAPI.update({ ...form, socialLinks, stats, buttonConfig });
+      if (res.data?.data) {
+        const data = res.data.data;
+        setForm((prev) => ({
+          ...prev,
+          greeting: data.greeting || '',
+          name: data.name || '',
+          title: data.title || '',
+          description: data.description || '',
+          primaryCTA: data.primaryCTA || '',
+          secondaryCTA: data.secondaryCTA || '',
+          profileImage: data.profileImage || '',
+          backgroundImage: data.backgroundImage || '',
+        }));
+      }
       toast.success('Hero section updated successfully');
       window.dispatchEvent(new Event('profile-updated'));
     } catch (err) {

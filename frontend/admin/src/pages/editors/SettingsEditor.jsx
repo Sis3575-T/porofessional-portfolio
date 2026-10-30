@@ -114,7 +114,7 @@ export default function SettingsEditor() {
       let socialLinks = {};
       try { socialLinks = JSON.parse(form.socialLinks); }
       catch { toast.error('Invalid JSON in social links'); setSaving(false); return; }
-      await settingsAPI.update({
+      const res = await settingsAPI.update({
         ...form,
         favicon: favicon || null,
         logo: logo || null,
@@ -124,6 +124,18 @@ export default function SettingsEditor() {
         uiConfig: JSON.stringify(uiConfig),
         sectionVisibility: JSON.stringify(sectionVisibility),
       });
+      if (res.data?.data) {
+        const s = res.data.data;
+        setForm((prev) => ({
+          ...prev,
+          siteTitle: s.siteTitle || '',
+          siteDescription: s.siteDescription || '',
+          siteUrl: s.siteUrl || '',
+          contactEmail: s.contactEmail || '',
+          contactPhone: s.contactPhone || '',
+          address: s.address || '',
+        }));
+      }
       toast.success('Settings updated');
       window.dispatchEvent(new Event('profile-updated'));
     } catch (err) { toast.error('Failed to update'); }

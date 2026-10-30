@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
+const fetchAllSkills = async (req, res) => {
   try {
     const skills = await prisma.skill.findMany({
       orderBy: { order: "asc" },
@@ -36,7 +36,10 @@ router.get("/admin", authenticateToken, requireAdmin, async (req, res) => {
     console.error("Fetch skills admin error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch skills" });
   }
-});
+};
+
+router.get("/admin", authenticateToken, requireAdmin, fetchAllSkills);
+router.get("/all", authenticateToken, requireAdmin, fetchAllSkills);
 
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {
   try {

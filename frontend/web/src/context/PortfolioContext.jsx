@@ -219,27 +219,30 @@ export function PortfolioProvider({ children }) {
 
     // Try consolidated endpoint first in 1 single network request
     try {
-      const res = await portfolioAPI.get({ headers: { "Cache-Control": "no-cache" } });
+      const res = await portfolioAPI.get({
+        params: { t: Date.now() },
+        headers: { "Cache-Control": "no-cache, no-store" },
+      });
       if (res.data?.success && res.data?.data) {
         const d = res.data.data;
         if (d.hero) setHero(d.hero);
         if (d.about) setAbout(d.about);
-        if (Array.isArray(d.skills) && d.skills.length > 0) setSkills(d.skills);
-        if (Array.isArray(d.services) && d.services.length > 0) setServices(d.services);
-        if (Array.isArray(d.experiences) && d.experiences.length > 0) setExperiences(d.experiences);
-        if (Array.isArray(d.education) && d.education.length > 0) setEducation(d.education);
-        if (Array.isArray(d.projects) && d.projects.length > 0) setProjects(d.projects);
+        if (Array.isArray(d.skills)) setSkills(d.skills);
+        if (Array.isArray(d.services)) setServices(d.services);
+        if (Array.isArray(d.experiences)) setExperiences(d.experiences);
+        if (Array.isArray(d.education)) setEducation(d.education);
+        if (Array.isArray(d.projects)) setProjects(d.projects);
         if (Array.isArray(d.testimonials)) setTestimonials(d.testimonials);
         if (d.settings) setSettings(d.settings);
 
         saveCache({
           hero: d.hero || defaultHero,
           about: d.about || defaultAbout,
-          skills: (Array.isArray(d.skills) && d.skills.length > 0) ? d.skills : defaultSkills,
-          services: (Array.isArray(d.services) && d.services.length > 0) ? d.services : defaultServices,
-          experiences: (Array.isArray(d.experiences) && d.experiences.length > 0) ? d.experiences : defaultExperiences,
-          education: (Array.isArray(d.education) && d.education.length > 0) ? d.education : defaultEducation,
-          projects: (Array.isArray(d.projects) && d.projects.length > 0) ? d.projects : defaultProjects,
+          skills: Array.isArray(d.skills) ? d.skills : defaultSkills,
+          services: Array.isArray(d.services) ? d.services : defaultServices,
+          experiences: Array.isArray(d.experiences) ? d.experiences : defaultExperiences,
+          education: Array.isArray(d.education) ? d.education : defaultEducation,
+          projects: Array.isArray(d.projects) ? d.projects : defaultProjects,
           testimonials: d.testimonials || [],
           settings: d.settings || defaultSettings,
         });
@@ -254,16 +257,18 @@ export function PortfolioProvider({ children }) {
 
     // Fallback: Individual endpoint requests
     try {
+      const timestamp = Date.now();
+      const noCacheConfig = { params: { t: timestamp }, headers: { "Cache-Control": "no-cache, no-store" } };
       const results = await Promise.allSettled([
-        heroAPI.get(),
-        aboutAPI.get(),
-        skillsAPI.getAll(),
-        servicesAPI.getAll(),
-        experienceAPI.getAll(),
-        educationAPI.getAll(),
-        projectsAPI.getAll({ limit: 50 }),
-        testimonialsAPI.getAll(),
-        settingsAPI.get(),
+        heroAPI.get(noCacheConfig),
+        aboutAPI.get(noCacheConfig),
+        skillsAPI.getAll(noCacheConfig),
+        servicesAPI.getAll(noCacheConfig),
+        experienceAPI.getAll(noCacheConfig),
+        educationAPI.getAll(noCacheConfig),
+        projectsAPI.getAll({ limit: 50, ...noCacheConfig.params }),
+        testimonialsAPI.getAll(noCacheConfig),
+        settingsAPI.get(noCacheConfig),
       ]);
 
       const [heroRes, aboutRes, skillsRes, servicesRes, expRes, eduRes, projRes, testRes, settingsRes] = results;
@@ -281,27 +286,27 @@ export function PortfolioProvider({ children }) {
         data.about = aboutRes.value.data.data;
         hasSuccessfulData = true;
       }
-      if (skillsRes.status === "fulfilled" && Array.isArray(skillsRes.value.data?.data) && skillsRes.value.data.data.length > 0) {
+      if (skillsRes.status === "fulfilled" && Array.isArray(skillsRes.value.data?.data)) {
         setSkills(skillsRes.value.data.data);
         data.skills = skillsRes.value.data.data;
         hasSuccessfulData = true;
       }
-      if (servicesRes.status === "fulfilled" && Array.isArray(servicesRes.value.data?.data) && servicesRes.value.data.data.length > 0) {
+      if (servicesRes.status === "fulfilled" && Array.isArray(servicesRes.value.data?.data)) {
         setServices(servicesRes.value.data.data);
         data.services = servicesRes.value.data.data;
         hasSuccessfulData = true;
       }
-      if (expRes.status === "fulfilled" && Array.isArray(expRes.value.data?.data) && expRes.value.data.data.length > 0) {
+      if (expRes.status === "fulfilled" && Array.isArray(expRes.value.data?.data)) {
         setExperiences(expRes.value.data.data);
         data.experiences = expRes.value.data.data;
         hasSuccessfulData = true;
       }
-      if (eduRes.status === "fulfilled" && Array.isArray(eduRes.value.data?.data) && eduRes.value.data.data.length > 0) {
+      if (eduRes.status === "fulfilled" && Array.isArray(eduRes.value.data?.data)) {
         setEducation(eduRes.value.data.data);
         data.education = eduRes.value.data.data;
         hasSuccessfulData = true;
       }
-      if (projRes.status === "fulfilled" && Array.isArray(projRes.value.data?.data) && projRes.value.data.data.length > 0) {
+      if (projRes.status === "fulfilled" && Array.isArray(projRes.value.data?.data)) {
         setProjects(projRes.value.data.data);
         data.projects = projRes.value.data.data;
         hasSuccessfulData = true;

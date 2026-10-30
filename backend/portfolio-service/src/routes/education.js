@@ -48,8 +48,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/v1/education/all (admin - all)
-router.get("/all", authenticateToken, requireAdmin, async (req, res) => {
+// GET /api/v1/education/all or /api/v1/education/admin (admin - all)
+const fetchAllEducation = async (req, res) => {
   try {
     const education = await prisma.education.findMany({
       orderBy: { order: "asc" },
@@ -58,7 +58,10 @@ router.get("/all", authenticateToken, requireAdmin, async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch education" });
   }
-});
+};
+
+router.get("/all", authenticateToken, requireAdmin, fetchAllEducation);
+router.get("/admin", authenticateToken, requireAdmin, fetchAllEducation);
 
 // POST /api/v1/education (admin)
 router.post("/", authenticateToken, requireAdmin, async (req, res) => {

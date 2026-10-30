@@ -4,7 +4,7 @@ import { invalidatePortfolioCache } from "../services/portfolioCache.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+const fetchSettings = async (req, res) => {
   try {
     const settings = await prisma.setting.findFirst({
       select: {
@@ -21,7 +21,10 @@ router.get("/", async (req, res) => {
     console.error("Fetch settings error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch settings" });
   }
-});
+};
+
+router.get("/", fetchSettings);
+router.get("/admin", authenticateToken, requireAdmin, fetchSettings);
 
 router.put("/", authenticateToken, requireAdmin, async (req, res) => {
   try {
