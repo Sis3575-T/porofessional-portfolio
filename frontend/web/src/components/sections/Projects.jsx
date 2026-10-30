@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Github, X, Layers, ArrowRight } from "lucide-react";
 import { usePortfolio } from "../../context/PortfolioContext";
-import { resolveUrl } from "../../utils/resolveUrl";
+import { resolveUrl, API_URL } from "../../utils/resolveUrl";
 
 function parseTech(tech) {
   if (!tech) return [];
@@ -137,6 +137,14 @@ export default function Projects() {
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
+                        onError={(e) => {
+                          if (API_URL && !e.currentTarget.src.startsWith(API_URL)) {
+                            const clean = project.thumbnail.startsWith("/") ? project.thumbnail : `/${project.thumbnail}`;
+                            e.currentTarget.src = `${API_URL}${clean}`;
+                          } else {
+                            e.currentTarget.style.display = "none";
+                          }
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-[#475569] dark:text-[#94A3B8] bg-gradient-to-br from-[#F8FAFC] to-[#F0F4F8] dark:from-[#0B0F17] dark:to-[#111827]">

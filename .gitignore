@@ -14,10 +14,7 @@ next-env.d.ts
 *.log
 .DS_Store
 Thumbs.db
-/public/uploads/*
-!/public/uploads/.gitkeep
-/backend/uploads/*
-!/backend/uploads/.gitkeep
+# Media uploads are tracked so they are available in deployments
 /_legacy_archive/
 
 # Legacy Next.js starter files (repository uses Vite React SPAs under frontend/web & frontend/admin)

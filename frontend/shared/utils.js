@@ -6,12 +6,14 @@ export function resolveUrl(url) {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) {
     if (LOCALHOST_PATTERN.test(url)) {
-      const path = url.replace(/^https?:\/\/localhost:\d+/, "");
-      return `${API_URL}${path}`;
+      return url.replace(/^https?:\/\/localhost:\d+/, "");
     }
     return url;
   }
-  return `${API_URL}${url}`;
+  if (url.startsWith("/")) {
+    return url;
+  }
+  return `/${url}`;
 }
 
 export function formatDate(date) {
@@ -46,3 +48,5 @@ export function parseJSON(str, fallback) {
     return fallback;
   }
 }
+
+export { API_URL };

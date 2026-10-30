@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, Calendar, Eye, Layers } from "lucide-react";
 import { projectsAPI } from "../services/api";
-import { resolveUrl } from "../utils/resolveUrl";
+import { resolveUrl, API_URL } from "../utils/resolveUrl";
 import { useAnalytics } from "../hooks/useAnalytics";
 import SEO from "./SEO";
 
@@ -105,6 +105,12 @@ export default function ProjectDetails() {
                   alt={project.title}
                   loading="lazy"
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    if (API_URL && !e.currentTarget.src.startsWith(API_URL)) {
+                      const clean = project.thumbnail.startsWith("/") ? project.thumbnail : `/${project.thumbnail}`;
+                      e.currentTarget.src = `${API_URL}${clean}`;
+                    }
+                  }}
                 />
               ) : (
                 <div className="text-center p-6 text-[#475569] dark:text-[#94A3B8]">
