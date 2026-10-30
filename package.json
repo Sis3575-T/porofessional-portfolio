@@ -12,6 +12,8 @@
     "backend/*"
   ],
   "scripts": {
+    "build": "npm --workspace backend run build",
+    "postinstall": "npm --workspace backend run postinstall",
     "dev": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:backend": "node --use-system-ca --watch backend/src/server.js",

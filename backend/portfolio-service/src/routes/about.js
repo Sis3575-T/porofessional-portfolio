@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     res.json({ success: true, data: about });
   } catch (error) {
     console.error("Fetch about error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch about" });
+    res.status(500).json({ success: false, message: "Failed to fetch about", error: error.message });
   }
 });
 

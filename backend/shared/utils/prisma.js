@@ -63,6 +63,7 @@ function isConnectionError(error) {
 
 let _prisma = null;
 let _pool = null;
+let _useNativeDriver = false;
 
 function callWithRetry(operation, attempt = 1) {
   return operation().catch((error) => {
@@ -80,6 +81,12 @@ function callWithRetry(operation, attempt = 1) {
       }
       if (globalForPrisma.prisma) globalForPrisma.prisma = null;
 
+      // On attempt 3+, alternate between WebSocket adapter and direct native TCP
+      if (attempt >= 3) {
+        _useNativeDriver = !_useNativeDriver;
+        console.warn(`[PRISMA] Switching driver adapter mode: native=${_useNativeDriver}`);
+      }
+
       return new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt)).then(() =>
         callWithRetry(operation, attempt + 1)
       );
@@ -92,7 +99,7 @@ function createPrismaClient() {
   if (_prisma) return _prisma;
 
   const url = process.env.DATABASE_URL || "";
-  const isNeon = url.includes("neon.tech");
+  const isNeon = url.includes("neon.tech") && !_useNativeDriver;
   const logConfig = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
 
   if (isNeon) {

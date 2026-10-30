@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
     res.json({ success: true, data: hero });
   } catch (error) {
     console.error("Fetch hero error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch hero" });
+    res.status(500).json({ success: false, message: "Failed to fetch hero", error: error.message });
   }
 });
 

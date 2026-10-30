@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
     res.json({ success: true, data: skills });
   } catch (error) {
     console.error("Fetch skills error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch skills" });
+    res.status(500).json({ success: false, message: "Failed to fetch skills", error: error.message });
   }
 });
 

@@ -51,82 +51,69 @@ function ensureConnectTimeout(url) {
   return `${url}${sep}connect_timeout=60`;
 }
 
-async function syncDatabase() {
-  if (process.env.AUTO_DB_PUSH !== "true") {
-    console.log("[DB] Schema push skipped (AUTO_DB_PUSH is not 'true').");
-    return;
-  }
+async function autoInitDatabase() {
+  const { prisma } = await import("shared");
   const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
   const prismaBin = findPrismaBin();
-  console.log("[DB] Syncing database schema from:", schemaPath);
 
   process.env.DATABASE_URL = ensureConnectTimeout(process.env.DATABASE_URL);
 
-  await runWithRetry(
-    `${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`,
-    "Schema push"
-  );
-}
-
-async function testDbConnection(attempts = 3) {
-  const { prisma } = await import("shared");
-  for (let attempt = 1; attempt <= attempts; attempt++) {
+  let tables = [];
+  for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       await prisma.$queryRaw`SELECT 1`;
-      console.log(`[DB] Database connection successful`);
-      return true;
-    } catch (error) {
-      if (attempt < attempts) {
-        console.warn(`[DB] Database connection attempt ${attempt}/${attempts} failed (${error.message}), retrying in 2s...`);
-        await sleep(2000);
-      } else {
-        console.error(`[DB] Database connection FAILED after ${attempts} attempts:`, error.message);
-        return false;
-      }
+      const rawTables = await prisma.$queryRaw`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public'
+      `;
+      tables = rawTables.map((t) => t.table_name);
+      console.log(`[DB] Database connected. Public tables detected (${tables.length}):`, tables.join(", "));
+      break;
+    } catch (err) {
+      console.warn(`[DB] Connection attempt ${attempt}/3 failed (${err.message}), retrying in 2s...`);
+      if (attempt < 3) await sleep(2000);
     }
   }
-}
 
-async function ensureAdminUser() {
-  const { prisma } = await import("shared");
-  const bcrypt = (await import("bcryptjs")).default;
-  const adminEmail = (process.env.ADMIN_EMAIL || "sisay3575@gmail.com").trim().toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || "Sis3575@";
+  // If essential tables are missing or AUTO_DB_PUSH=true, run prisma db push
+  const essentialTables = ["users", "projects", "hero", "about", "skills", "settings"];
+  const missingTables = essentialTables.filter((t) => !tables.includes(t));
+
+  if (process.env.AUTO_DB_PUSH === "true" || missingTables.length > 0) {
+    console.warn(`[DB] Syncing schema (missing tables: [${missingTables.join(", ")}])...`);
+    await runWithRetry(
+      `${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`,
+      "Database schema push"
+    );
+  }
+
+  // Check if initial portfolio data exists; if empty, run seed.js
+  let shouldSeed = false;
   try {
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    const emailsToEnsure = Array.from(new Set([adminEmail, "sisay3575@gmail.com"]));
-    for (const email of emailsToEnsure) {
-      await prisma.user.upsert({
-        where: { email },
-        update: { password: hashedPassword, role: "ADMIN", isActive: true },
-        create: { email, password: hashedPassword, role: "ADMIN", isActive: true },
-      });
-      console.log(`[AUTH] Admin user verified/updated: ${email}`);
-    }
-    const setting = await prisma.setting.findFirst();
-    if (setting) {
-      let social = {};
-      try { social = JSON.parse(setting.socialLinks || "{}"); } catch {}
-      if (!social.github || social.github.includes("/user/") || social.github.includes("/sisay")) {
-        social.github = "https://github.com/Sis3575-T";
-        social.linkedin = "https://www.linkedin.com/in/sisay-temesgen-412290447/";
-        social.telegram = "https://t.me/sisaytem";
-        await prisma.setting.update({
-          where: { id: setting.id },
-          data: { socialLinks: JSON.stringify(social) },
-        });
-        console.log(`[SETTINGS] Verified socialLinks with https://github.com/Sis3575-T`);
-      }
+    const userCount = await prisma.user.count();
+    const projectCount = await prisma.project.count();
+    console.log(`[DB] Records: users=${userCount}, projects=${projectCount}`);
+    if (userCount === 0 || projectCount === 0) {
+      shouldSeed = true;
     }
   } catch (err) {
-    console.warn(`[AUTH] Could not auto-ensure admin user at startup:`, err.message);
+    console.warn("[DB] Could not count records, running seed to ensure integrity:", err.message);
+    shouldSeed = true;
   }
+
+  if (shouldSeed) {
+    console.log("[DB] Seeding essential database content from seed.js...");
+    const seedScript = path.join(__dirname, "../prisma/seed.js");
+    await runWithRetry(`node "${seedScript}"`, "Database seeding");
+  }
+
+  // Always verify admin credentials and vital settings
+  await ensureAdminUser();
 }
 
 app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-  await syncDatabase();
-  await testDbConnection();
-  await ensureAdminUser();
+  await autoInitDatabase();
 });

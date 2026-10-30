@@ -219,9 +219,55 @@ app.get("/", (req, res) => {
 app.get("/health", async (req, res) => {
   let dbOk = false;
   let dbError = null;
+  let tables = [];
+  let counts = {};
+  let dbHost = null;
+
+  try {
+    const rawUrl = process.env.DATABASE_URL || "";
+    if (rawUrl) {
+      try {
+        const u = new URL(rawUrl.replace("postgresql://", "http://").replace("postgres://", "http://"));
+        dbHost = u.host;
+      } catch {
+        dbHost = "unparseable";
+      }
+    }
+  } catch {}
+
   try {
     await prisma.$queryRaw`SELECT 1`;
     dbOk = true;
+
+    try {
+      const rawTables = await prisma.$queryRaw`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public'
+        ORDER BY table_name ASC
+      `;
+      tables = rawTables.map((t) => t.table_name);
+    } catch (tErr) {
+      dbError = `Failed listing tables: ${tErr.message}`;
+    }
+
+    try {
+      counts.users = await prisma.user.count();
+    } catch (uErr) {
+      counts.usersError = uErr.message;
+    }
+
+    try {
+      counts.projects = await prisma.project.count();
+    } catch (pErr) {
+      counts.projectsError = pErr.message;
+    }
+
+    try {
+      counts.skills = await prisma.skill.count();
+    } catch (sErr) {
+      counts.skillsError = sErr.message;
+    }
   } catch (e) {
     dbError = e.message;
   }
@@ -230,6 +276,9 @@ app.get("/health", async (req, res) => {
     status: "ok",
     service: "portfolio-backend",
     database: dbOk ? "connected" : "disconnected",
+    dbHost,
+    tables,
+    counts,
     dbError,
     timestamp: new Date().toISOString(),
   });

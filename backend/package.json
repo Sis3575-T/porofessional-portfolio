@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
@@ -17,6 +21,8 @@
     "shared": "file:./shared"
   },
   "scripts": {
+    "build": "prisma generate",
+    "postinstall": "prisma generate",
     "dev": "node --use-system-ca --watch src/server.js",
     "start": "node --use-system-ca src/server.js",
     "db:seed": "node prisma/seed.js",

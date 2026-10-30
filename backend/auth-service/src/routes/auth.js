@@ -63,6 +63,7 @@ router.post("/login", async (req, res) => {
       return res.status(500).json({
         success: false,
         message: "Database connection failed. Please try again later.",
+        error: dbError.message,
       });
     }
 
