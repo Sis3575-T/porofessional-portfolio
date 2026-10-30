@@ -20,12 +20,6 @@ import HomeContactStrip from "./components/HomeContactStrip";
 
 import Hero from "./components/sections/Hero";
 import About from "./components/sections/About";
-import Projects from "./components/sections/Projects";
-import Skills from "./components/sections/Skills";
-import Services from "./components/sections/Services";
-import Experience from "./components/sections/Experience";
-import Education from "./components/sections/Education";
-import Testimonials from "./components/sections/Testimonials";
 import NotFoundPage from "./components/NotFoundPage";
 
 // Dedicated Route Pages
@@ -62,12 +56,6 @@ function AnimatedPage({ children }) {
 const defaultVisibility = {
   hero: true,
   about: true,
-  projects: true,
-  skills: true,
-  services: true,
-  experience: true,
-  education: true,
-  testimonials: true,
   footer: true,
 };
 
@@ -122,12 +110,6 @@ function HomePage() {
       <SEO />
       {show("hero") && <Hero />}
       {show("about") && <About />}
-      {show("projects") && <Projects />}
-      {show("skills") && <Skills />}
-      {show("services") && <Services />}
-      {show("experience") && <Experience />}
-      {show("education") && <Education />}
-      {show("testimonials") && <Testimonials />}
       <HomeContactStrip />
     </AnimatedPage>
   );
