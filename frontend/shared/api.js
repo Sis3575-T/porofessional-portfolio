@@ -1,11 +1,19 @@
 import axios from "axios";
 
-export const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:10000").replace(/\/+$/, "");
+export const API_URL = (() => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined" && window.location.hostname && !["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    return "https://portfolio-ss.onrender.com";
+  }
+  return "http://localhost:10000";
+})();
 
 const api = axios.create({
   baseURL: `${API_URL}/api/v1`,
   headers: { "Content-Type": "application/json" },
-  timeout: 15000,
+  timeout: 45000,
 });
 
 api.interceptors.request.use((config) => {

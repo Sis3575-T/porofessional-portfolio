@@ -22,7 +22,16 @@ export default function Login({ setIsAuthenticated }) {
       setIsAuthenticated(true);
       navigate('/admin');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const msg = err.response?.data?.message;
+      if (msg) {
+        setError(msg);
+      } else if (err.code === "ECONNABORTED" || err.message?.toLowerCase().includes("timeout")) {
+        setError("The server is waking up from cold sleep. Please wait 10 seconds and click Sign In again.");
+      } else if (err.message?.toLowerCase().includes("network")) {
+        setError("Network error connecting to backend API. Please wait a moment while the server connects.");
+      } else {
+        setError(err.message || "Login failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

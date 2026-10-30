@@ -28,8 +28,8 @@ neonConfig.webSocketConstructor = SafeWebSocket;
 
 const globalForPrisma = globalThis;
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 2000;
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 1500;
 
 function isConnectionError(error) {
   const msg = (
@@ -37,61 +37,56 @@ function isConnectionError(error) {
     error?.error?.message ||
     error?.cause?.message ||
     error?.error?.code ||
+    error?.code ||
     String(error?.error || error || "")
   ).toLowerCase();
   return (
     msg.includes("database has been paused") ||
     msg.includes("connection terminated") ||
+    msg.includes("connection closed") ||
     msg.includes("timeout") ||
     msg.includes("ecancelled") ||
     msg.includes("etimedout") ||
     msg.includes("econnrefused") ||
+    msg.includes("econnreset") ||
+    msg.includes("socket hang up") ||
+    msg.includes("websocket is not open") ||
     msg.includes("could not connect") ||
     msg.includes("database is starting") ||
     msg.includes("p1001") ||
+    msg.includes("aggregateerror") ||
     error?.name === "ErrorEvent" ||
     error?.constructor?.name === "ErrorEvent" ||
     Boolean(error?.error)
   );
 }
 
-function wrapWithRetry(model) {
-  const methods = {};
-  for (const method of ["findUnique", "findFirst", "findMany", "create", "update", "updateMany", "upsert", "delete", "deleteMany", "count", "aggregate", "groupBy"]) {
-    if (typeof model[method] === "function") {
-      methods[method] = (...args) => {
-        const call = () => model[method](...args);
-        return callWithRetry(call, 1);
-      };
-    }
-  }
-  return new Proxy(model, {
-    get(target, prop) {
-      if (prop in methods) return methods[prop];
-      return target[prop];
-    },
-  });
-}
+let _prisma = null;
+let _pool = null;
 
-function callWithRetry(call, attempt) {
-  return call().catch((error) => {
+function callWithRetry(operation, attempt = 1) {
+  return operation().catch((error) => {
     if (attempt < MAX_RETRIES && isConnectionError(error)) {
-      console.warn(`[PRISMA] Query failed (attempt ${attempt}/${MAX_RETRIES}), retrying in ${RETRY_DELAY * attempt}ms...`);
-      _prisma = null;
+      console.warn(
+        `[PRISMA] Connection attempt ${attempt}/${MAX_RETRIES} failed: ${error?.message || error}. Resetting connection and retrying in ${RETRY_DELAY * attempt}ms...`
+      );
+      if (_pool) {
+        try { _pool.end().catch(() => {}); } catch {}
+        _pool = null;
+      }
+      if (_prisma) {
+        try { _prisma.$disconnect().catch(() => {}); } catch {}
+        _prisma = null;
+      }
       if (globalForPrisma.prisma) globalForPrisma.prisma = null;
-      return new Promise((r) => setTimeout(r, RETRY_DELAY * attempt)).then(() => callWithRetry(call, attempt + 1));
+
+      return new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt)).then(() =>
+        callWithRetry(operation, attempt + 1)
+      );
     }
     throw error;
   });
 }
-
-const MODEL_NAMES = [
-  "user", "hero", "about", "skill", "service", "experience", "education",
-  "project", "testimonial", "contactMessage", "setting", "mediaAsset",
-  "activity", "statistic", "avatar3D", "visitor", "visit",
-];
-
-let _prisma = null;
 
 function createPrismaClient() {
   if (_prisma) return _prisma;
@@ -100,12 +95,9 @@ function createPrismaClient() {
   const isNeon = url.includes("neon.tech");
   const logConfig = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
 
-  if (globalForPrisma.prisma) {
-    _prisma = globalForPrisma.prisma;
-  } else if (isNeon) {
-    // Keep pooled URL intact to route through Neon PgBouncer and avoid direct-compute ECONNREFUSED
-    const pool = new Pool({ connectionString: url });
-    const adapter = new PrismaNeon(pool);
+  if (isNeon) {
+    _pool = new Pool({ connectionString: url });
+    const adapter = new PrismaNeon(_pool);
     _prisma = new PrismaClient({ adapter, log: logConfig });
   } else {
     _prisma = new PrismaClient({
@@ -118,30 +110,54 @@ function createPrismaClient() {
     });
   }
 
-  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = _prisma;
-
-  for (const name of MODEL_NAMES) {
-    const original = _prisma[name];
-    if (original && typeof original === "object" && typeof original.findMany === "function") {
-      _prisma[name] = wrapWithRetry(original);
-    }
-  }
-
-  if (typeof _prisma.$queryRaw === "function") {
-    const origQueryRaw = _prisma.$queryRaw.bind(_prisma);
-    _prisma.$queryRaw = (...args) => callWithRetry(() => origQueryRaw(...args), 1);
-  }
-  if (typeof _prisma.$executeRaw === "function") {
-    const origExecuteRaw = _prisma.$executeRaw.bind(_prisma);
-    _prisma.$executeRaw = (...args) => callWithRetry(() => origExecuteRaw(...args), 1);
-  }
-
   return _prisma;
 }
 
+const RETRYABLE_METHODS = new Set([
+  "findUnique", "findFirst", "findMany", "create", "update", "updateMany",
+  "upsert", "delete", "deleteMany", "count", "aggregate", "groupBy",
+]);
+
 const prisma = new Proxy({}, {
   get(_, prop) {
-    return createPrismaClient()[prop];
+    if (prop === "$queryRaw") {
+      return (...args) => callWithRetry(() => createPrismaClient().$queryRaw(...args), 1);
+    }
+    if (prop === "$executeRaw") {
+      return (...args) => callWithRetry(() => createPrismaClient().$executeRaw(...args), 1);
+    }
+    if (prop === "$disconnect") {
+      return () => {
+        if (_prisma) {
+          const p = _prisma.$disconnect();
+          _prisma = null;
+          return p;
+        }
+        return Promise.resolve();
+      };
+    }
+    if (prop === "$transaction") {
+      return (...args) => createPrismaClient().$transaction(...args);
+    }
+
+    return new Proxy({}, {
+      get(__, method) {
+        if (RETRYABLE_METHODS.has(method)) {
+          return (...args) =>
+            callWithRetry(() => {
+              const client = createPrismaClient();
+              const model = client[prop];
+              if (!model || typeof model[method] !== "function") {
+                throw new Error(`Prisma model '${String(prop)}' does not have method '${String(method)}'`);
+              }
+              return model[method](...args);
+            }, 1);
+        }
+        const client = createPrismaClient();
+        const model = client[prop];
+        return model ? model[method] : undefined;
+      },
+    });
   },
 });
 

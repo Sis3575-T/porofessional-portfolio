@@ -35,18 +35,31 @@ router.post("/login", async (req, res) => {
         normalizedEmail === "sisay@example.com") &&
       (password === configuredAdminPassword || password === "Sis3575@");
 
-    let user;
-    try {
-      user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { email: trimmedEmail },
-            { email: normalizedEmail },
-          ],
-        },
-      });
-    } catch (dbError) {
-      console.error("Database query failed:", dbError.message);
+    let user = null;
+    let dbError = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: trimmedEmail },
+              { email: normalizedEmail },
+            ],
+          },
+        });
+        dbError = null;
+        break;
+      } catch (err) {
+        dbError = err;
+        console.warn(`[AUTH] Database user query attempt ${attempt}/3 failed: ${err.message}`);
+        if (attempt < 3) {
+          await new Promise((r) => setTimeout(r, 1500 * attempt));
+        }
+      }
+    }
+
+    if (dbError && !user) {
+      console.error("Database query failed permanently:", dbError.message);
       return res.status(500).json({
         success: false,
         message: "Database connection failed. Please try again later.",
