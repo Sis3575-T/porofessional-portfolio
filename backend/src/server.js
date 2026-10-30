@@ -68,14 +68,22 @@ async function syncDatabase() {
   );
 }
 
-async function testDbConnection() {
+async function testDbConnection(attempts = 3) {
   const { prisma } = await import("shared");
-  try {
-    await prisma.$connect();
-    await prisma.$queryRaw`SELECT 1`;
-    console.log(`[DB] Database connection successful`);
-  } catch (error) {
-    console.error(`[DB] Database connection FAILED:`, error.message);
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      console.log(`[DB] Database connection successful`);
+      return true;
+    } catch (error) {
+      if (attempt < attempts) {
+        console.warn(`[DB] Database connection attempt ${attempt}/${attempts} failed (${error.message}), retrying in 2s...`);
+        await sleep(2000);
+      } else {
+        console.error(`[DB] Database connection FAILED after ${attempts} attempts:`, error.message);
+        return false;
+      }
+    }
   }
 }
 

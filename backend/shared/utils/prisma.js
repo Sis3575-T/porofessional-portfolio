@@ -103,8 +103,8 @@ function createPrismaClient() {
   if (globalForPrisma.prisma) {
     _prisma = globalForPrisma.prisma;
   } else if (isNeon) {
-    const wsUrl = url.replace("-pooler", "");
-    const pool = new Pool({ connectionString: wsUrl });
+    // Keep pooled URL intact to route through Neon PgBouncer and avoid direct-compute ECONNREFUSED
+    const pool = new Pool({ connectionString: url });
     const adapter = new PrismaNeon(pool);
     _prisma = new PrismaClient({ adapter, log: logConfig });
   } else {
@@ -125,6 +125,15 @@ function createPrismaClient() {
     if (original && typeof original === "object" && typeof original.findMany === "function") {
       _prisma[name] = wrapWithRetry(original);
     }
+  }
+
+  if (typeof _prisma.$queryRaw === "function") {
+    const origQueryRaw = _prisma.$queryRaw.bind(_prisma);
+    _prisma.$queryRaw = (...args) => callWithRetry(() => origQueryRaw(...args), 1);
+  }
+  if (typeof _prisma.$executeRaw === "function") {
+    const origExecuteRaw = _prisma.$executeRaw.bind(_prisma);
+    _prisma.$executeRaw = (...args) => callWithRetry(() => origExecuteRaw(...args), 1);
   }
 
   return _prisma;
