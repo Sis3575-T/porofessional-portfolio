@@ -3,11 +3,11 @@ services:
     name: portfolio-backend
     runtime: node
     plan: free
-    buildCommand: npm install && cd backend && npx prisma db push --accept-data-loss && npx prisma generate
+    buildCommand: npm install && cd backend && npx prisma generate
     startCommand: cd backend && node src/server.js
     envVars:
       - key: NODE_VERSION
-        value: "20"
+        value: "22"
       - key: PORT
         value: 5000
       - key: DATABASE_URL

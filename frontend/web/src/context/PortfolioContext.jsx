@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   portfolioAPI, heroAPI, aboutAPI, skillsAPI, servicesAPI,
   experienceAPI, educationAPI, projectsAPI, testimonialsAPI, settingsAPI
@@ -7,7 +7,7 @@ import {
 export const PortfolioContext = createContext();
 
 const CACHE_KEY = "portfolio_cache_v2";
-const CACHE_TTL = 5 * 1000; // 5 seconds
+const CACHE_TTL = 30 * 1000; // 30 seconds
 
 const defaultHero = {
   name: "Sisay Temesgen",
@@ -32,6 +32,124 @@ const defaultAbout = {
   profileImage: "/sisay-portrait.jpg",
   enabled: true,
 };
+
+const defaultProjects = [
+  {
+    id: "cmvtwnbak00028dclz6y9y0vn",
+    title: "Abay Car Rental System",
+    slug: "abay-car-rental-system",
+    description: "Abay Car Rental system is a user-friendly web application that allows customers to browse available vehicles, compare prices, and book cars online with ease. It provides secure booking management, customer accounts, and an admin dashboard for managing vehicles, reservations, payments, and customer.",
+    shortDescription: "Complete vehicle booking platform with customer accounts and admin vehicle/fleet management.",
+    thumbnail: "/uploads/media_1793299777754_y4o6uxh.png",
+    category: "FULLSTACK",
+    technologies: JSON.stringify(["React", "Node.js", "Express", "PostgreSQL", "Tailwind CSS"]),
+    features: JSON.stringify(["Vehicle Catalog", "Online Booking", "Customer Portal", "Fleet Management"]),
+    liveUrl: "https://frontend-snowy-ten-96.vercel.app/",
+    githubUrl: "https://github.com/Sis3575-T",
+    featured: true,
+    order: 0,
+    enabled: true,
+  },
+  {
+    id: "cmvtwst1600048dclp6ftw56k",
+    title: "Abay Grand Hotel",
+    slug: "abay-grand-hotel",
+    description: "Elegant hotel booking and management system with stunning design and seamless user experience. Features include room reservations, availability calendar, guest management, and online booking with real-time updates. A modern hospitality solution built for luxury accommodations.",
+    shortDescription: "Modern luxury hotel booking system with real-time room reservations and guest management.",
+    thumbnail: "/uploads/media_1793300382530_9fr1dq0.png",
+    category: "FULLSTACK",
+    technologies: JSON.stringify(["React", "Node.js", "Express", "PostgreSQL", "Tailwind CSS"]),
+    features: JSON.stringify(["Room Booking", "Availability Calendar", "Guest Management", "Online Payments"]),
+    liveUrl: "https://abay-grand-hotel-1.vercel.app/",
+    githubUrl: "https://github.com/Sis3575-T/Abay-Grand_Hotels",
+    featured: true,
+    order: 1,
+    enabled: true,
+  },
+];
+
+const defaultSkills = [
+  { id: "s-1", name: "React", category: "FRONTEND", proficiency: 95, order: 0, enabled: true },
+  { id: "s-2", name: "TypeScript", category: "LANGUAGES", proficiency: 90, order: 1, enabled: true },
+  { id: "s-3", name: "Node.js", category: "BACKEND", proficiency: 88, order: 2, enabled: true },
+  { id: "s-4", name: "PostgreSQL", category: "DATABASE", proficiency: 85, order: 3, enabled: true },
+  { id: "s-5", name: "Docker", category: "DEVOPS", proficiency: 80, order: 4, enabled: true },
+  { id: "s-6", name: "Tailwind CSS", category: "FRONTEND", proficiency: 92, order: 5, enabled: true },
+  { id: "s-7", name: "Next.js", category: "FRONTEND", proficiency: 90, order: 6, enabled: true },
+  { id: "s-8", name: "Prisma", category: "BACKEND", proficiency: 87, order: 7, enabled: true },
+  { id: "s-9", name: "Git", category: "TOOLS", proficiency: 90, order: 8, enabled: true },
+  { id: "s-10", name: "Python", category: "LANGUAGES", proficiency: 75, order: 9, enabled: true },
+  { id: "s-11", name: "MongoDB", category: "DATABASE", proficiency: 78, order: 10, enabled: true },
+  { id: "s-12", name: "AWS", category: "DEVOPS", proficiency: 72, order: 11, enabled: true },
+  { id: "s-13", name: "Communication", category: "SOFT_SKILLS", proficiency: 90, order: 12, enabled: true },
+  { id: "s-14", name: "Problem Solving", category: "SOFT_SKILLS", proficiency: 95, order: 13, enabled: true },
+];
+
+const defaultServices = [
+  {
+    id: "serv-1",
+    title: "Full Stack Web Development",
+    description: "Complete web applications from database to user interface, built with modern frameworks and best practices.",
+    features: JSON.stringify(["React/Next.js Frontend", "Node.js Backend", "PostgreSQL Database", "Responsive Design"]),
+    enabled: true,
+    order: 0,
+  },
+  {
+    id: "serv-2",
+    title: "REST & GraphQL API Development",
+    description: "Robust, secure, and scalable APIs engineered with comprehensive documentation and authentication.",
+    features: JSON.stringify(["RESTful Architecture", "Authentication & Authorization", "Database Design", "Performance Optimization"]),
+    enabled: true,
+    order: 1,
+  },
+  {
+    id: "serv-3",
+    title: "UI/UX & Frontend Engineering",
+    description: "Converting designs into responsive, accessible, pixel-perfect web interfaces with modern animations.",
+    features: JSON.stringify(["Responsive Layouts", "Tailwind CSS & Framer Motion", "Cross-browser Compatibility", "Accessibility"]),
+    enabled: true,
+    order: 2,
+  },
+  {
+    id: "serv-4",
+    title: "Cloud Deployment & DevOps",
+    description: "Seamless deployment pipelines, containerization, and reliable serverless cloud architectures.",
+    features: JSON.stringify(["Docker Containerization", "CI/CD Pipelines", "Vercel & Render Cloud Hosting", "Database Management"]),
+    enabled: true,
+    order: 3,
+  },
+];
+
+const defaultExperiences = [
+  {
+    id: "exp-1",
+    company: "Freelance & Open Source",
+    position: "Full-Stack Developer",
+    description: "Building production-grade web applications, customized client systems, and participating in modern web technology initiatives.",
+    startDate: "2023-01-01",
+    isCurrent: true,
+    technologies: JSON.stringify(["React", "Node.js", "Express", "PostgreSQL", "Docker", "Tailwind CSS"]),
+    order: 0,
+    enabled: true,
+  },
+];
+
+const defaultEducation = [
+  {
+    id: "edu-1",
+    institution: "Bahir Dar University",
+    degree: "Bachelor of Science",
+    field: "Computer Science & Engineering",
+    description: "Focused on software engineering principles, full-stack architecture, algorithms, and artificial intelligence.",
+    startDate: "2020-09-01",
+    endDate: "2024-07-01",
+    isCurrent: false,
+    location: "Bahir Dar, Ethiopia",
+    technologies: JSON.stringify(["JavaScript", "Python", "SQL", "Data Structures", "Algorithms"]),
+    order: 0,
+    enabled: true,
+  },
+];
 
 const defaultSettings = {
   siteTitle: "Sisay Temesgen | Full-Stack Developer & AI Learner",
@@ -73,18 +191,29 @@ export function PortfolioProvider({ children }) {
 
   const [hero, setHero] = useState(cached?.hero ?? defaultHero);
   const [about, setAbout] = useState(cached?.about ?? defaultAbout);
-  const [skills, setSkills] = useState(cached?.skills ?? []);
-  const [services, setServices] = useState(cached?.services ?? []);
-  const [experiences, setExperiences] = useState(cached?.experiences ?? []);
-  const [education, setEducation] = useState(cached?.education ?? []);
-  const [projects, setProjects] = useState(cached?.projects ?? []);
+  const [skills, setSkills] = useState(
+    Array.isArray(cached?.skills) && cached.skills.length > 0 ? cached.skills : defaultSkills
+  );
+  const [services, setServices] = useState(
+    Array.isArray(cached?.services) && cached.services.length > 0 ? cached.services : defaultServices
+  );
+  const [experiences, setExperiences] = useState(
+    Array.isArray(cached?.experiences) && cached.experiences.length > 0 ? cached.experiences : defaultExperiences
+  );
+  const [education, setEducation] = useState(
+    Array.isArray(cached?.education) && cached.education.length > 0 ? cached.education : defaultEducation
+  );
+  const [projects, setProjects] = useState(
+    Array.isArray(cached?.projects) && cached.projects.length > 0 ? cached.projects : defaultProjects
+  );
   const [testimonials, setTestimonials] = useState(cached?.testimonials ?? []);
   const [settings, setSettings] = useState(cached?.settings ?? defaultSettings);
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState(null);
+  const retryTimeoutRef = useRef(null);
 
-  const fetchAll = useCallback(async () => {
+  const fetchAll = useCallback(async (retryCount = 0) => {
     setIsFetching(true);
     setError(null);
 
@@ -95,22 +224,22 @@ export function PortfolioProvider({ children }) {
         const d = res.data.data;
         if (d.hero) setHero(d.hero);
         if (d.about) setAbout(d.about);
-        if (Array.isArray(d.skills)) setSkills(d.skills);
-        if (Array.isArray(d.services)) setServices(d.services);
-        if (Array.isArray(d.experiences)) setExperiences(d.experiences);
-        if (Array.isArray(d.education)) setEducation(d.education);
-        if (Array.isArray(d.projects)) setProjects(d.projects);
+        if (Array.isArray(d.skills) && d.skills.length > 0) setSkills(d.skills);
+        if (Array.isArray(d.services) && d.services.length > 0) setServices(d.services);
+        if (Array.isArray(d.experiences) && d.experiences.length > 0) setExperiences(d.experiences);
+        if (Array.isArray(d.education) && d.education.length > 0) setEducation(d.education);
+        if (Array.isArray(d.projects) && d.projects.length > 0) setProjects(d.projects);
         if (Array.isArray(d.testimonials)) setTestimonials(d.testimonials);
         if (d.settings) setSettings(d.settings);
 
         saveCache({
           hero: d.hero || defaultHero,
           about: d.about || defaultAbout,
-          skills: d.skills || [],
-          services: d.services || [],
-          experiences: d.experiences || [],
-          education: d.education || [],
-          projects: d.projects || [],
+          skills: (Array.isArray(d.skills) && d.skills.length > 0) ? d.skills : defaultSkills,
+          services: (Array.isArray(d.services) && d.services.length > 0) ? d.services : defaultServices,
+          experiences: (Array.isArray(d.experiences) && d.experiences.length > 0) ? d.experiences : defaultExperiences,
+          education: (Array.isArray(d.education) && d.education.length > 0) ? d.education : defaultEducation,
+          projects: (Array.isArray(d.projects) && d.projects.length > 0) ? d.projects : defaultProjects,
           testimonials: d.testimonials || [],
           settings: d.settings || defaultSettings,
         });
@@ -120,7 +249,7 @@ export function PortfolioProvider({ children }) {
         return;
       }
     } catch (err) {
-      console.warn("Consolidated endpoint unavailable, falling back to individual calls:", err?.message);
+      console.warn("Consolidated endpoint unavailable, trying individual calls:", err?.message);
     }
 
     // Fallback: Individual endpoint requests
@@ -140,61 +269,63 @@ export function PortfolioProvider({ children }) {
       const [heroRes, aboutRes, skillsRes, servicesRes, expRes, eduRes, projRes, testRes, settingsRes] = results;
 
       const data = {};
-      if (heroRes.status === "fulfilled" && heroRes.value.data.data) {
-        const v = heroRes.value.data.data;
-        setHero(v);
-        data.hero = v;
+      let hasSuccessfulData = false;
+
+      if (heroRes.status === "fulfilled" && heroRes.value.data?.data) {
+        setHero(heroRes.value.data.data);
+        data.hero = heroRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (aboutRes.status === "fulfilled" && aboutRes.value.data.data) {
-        const v = aboutRes.value.data.data;
-        setAbout(v);
-        data.about = v;
+      if (aboutRes.status === "fulfilled" && aboutRes.value.data?.data) {
+        setAbout(aboutRes.value.data.data);
+        data.about = aboutRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (skillsRes.status === "fulfilled") {
-        const v = Array.isArray(skillsRes.value.data.data) ? skillsRes.value.data.data : [];
-        setSkills(v);
-        data.skills = v;
+      if (skillsRes.status === "fulfilled" && Array.isArray(skillsRes.value.data?.data) && skillsRes.value.data.data.length > 0) {
+        setSkills(skillsRes.value.data.data);
+        data.skills = skillsRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (servicesRes.status === "fulfilled") {
-        const v = Array.isArray(servicesRes.value.data.data) ? servicesRes.value.data.data : [];
-        setServices(v);
-        data.services = v;
+      if (servicesRes.status === "fulfilled" && Array.isArray(servicesRes.value.data?.data) && servicesRes.value.data.data.length > 0) {
+        setServices(servicesRes.value.data.data);
+        data.services = servicesRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (expRes.status === "fulfilled") {
-        const v = Array.isArray(expRes.value.data.data) ? expRes.value.data.data : [];
-        setExperiences(v);
-        data.experiences = v;
+      if (expRes.status === "fulfilled" && Array.isArray(expRes.value.data?.data) && expRes.value.data.data.length > 0) {
+        setExperiences(expRes.value.data.data);
+        data.experiences = expRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (eduRes.status === "fulfilled") {
-        const v = Array.isArray(eduRes.value.data.data) ? eduRes.value.data.data : [];
-        setEducation(v);
-        data.education = v;
+      if (eduRes.status === "fulfilled" && Array.isArray(eduRes.value.data?.data) && eduRes.value.data.data.length > 0) {
+        setEducation(eduRes.value.data.data);
+        data.education = eduRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (projRes.status === "fulfilled") {
-        const v = Array.isArray(projRes.value.data.data) ? projRes.value.data.data : [];
-        setProjects(v);
-        data.projects = v;
+      if (projRes.status === "fulfilled" && Array.isArray(projRes.value.data?.data) && projRes.value.data.data.length > 0) {
+        setProjects(projRes.value.data.data);
+        data.projects = projRes.value.data.data;
+        hasSuccessfulData = true;
       }
-      if (testRes.status === "fulfilled") {
-        const v = Array.isArray(testRes.value.data.data) ? testRes.value.data.data : [];
-        setTestimonials(v);
-        data.testimonials = v;
+      if (testRes.status === "fulfilled" && Array.isArray(testRes.value.data?.data)) {
+        setTestimonials(testRes.value.data.data);
+        data.testimonials = testRes.value.data.data;
       }
-      if (settingsRes.status === "fulfilled" && settingsRes.value.data.data) {
-        const v = settingsRes.value.data.data;
-        setSettings(v);
-        data.settings = v;
+      if (settingsRes.status === "fulfilled" && settingsRes.value.data?.data) {
+        setSettings(settingsRes.value.data.data);
+        data.settings = settingsRes.value.data.data;
       }
 
-      saveCache(data);
-
-      const failedCount = results.filter((r) => r.status === "rejected").length;
-      if (failedCount === results.length) {
-        setError("Failed to load portfolio data");
+      if (hasSuccessfulData) {
+        saveCache(data);
+      } else if (retryCount < 2) {
+        // Render free-tier cold starts may take 20-40s; retry with backoff
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = setTimeout(() => {
+          fetchAll(retryCount + 1);
+        }, 4000 * (retryCount + 1));
       }
     } catch (err) {
-      setError("Failed to load portfolio data");
-      console.error(err);
+      console.warn("Individual API calls error:", err?.message);
     } finally {
       setIsFetching(false);
       setLoading(false);
@@ -204,7 +335,6 @@ export function PortfolioProvider({ children }) {
   useEffect(() => {
     fetchAll();
 
-    // 1. BroadcastChannel listener for real-time cross-tab updates from admin dashboard
     let channel;
     try {
       if (typeof BroadcastChannel !== "undefined") {
@@ -216,7 +346,6 @@ export function PortfolioProvider({ children }) {
       }
     } catch {}
 
-    // 2. Storage event listener (fallback for cross-tab sync)
     const handleStorage = (e) => {
       if (e.key === "portfolio_sync_trigger") {
         try { localStorage.removeItem(CACHE_KEY); } catch {}
@@ -225,7 +354,6 @@ export function PortfolioProvider({ children }) {
     };
     window.addEventListener("storage", handleStorage);
 
-    // 3. Tab visibility listener: automatically refresh when returning to tab
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
         fetchAll();
@@ -236,6 +364,7 @@ export function PortfolioProvider({ children }) {
 
     return () => {
       if (channel) channel.close();
+      clearTimeout(retryTimeoutRef.current);
       window.removeEventListener("storage", handleStorage);
       document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("focus", handleVisibility);

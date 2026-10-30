@@ -19,6 +19,7 @@ class SafeWebSocket extends ws {
     super(address, protocols, {
       ...options,
       rejectUnauthorized: false,
+      family: 4,
     });
   }
 }
@@ -27,20 +28,30 @@ neonConfig.webSocketConstructor = SafeWebSocket;
 
 const globalForPrisma = globalThis;
 
-const MAX_RETRIES = 2;
-const RETRY_DELAY = 3000;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 2000;
 
 function isConnectionError(error) {
-  const msg = error?.message?.toLowerCase() || "";
+  const msg = (
+    error?.message ||
+    error?.error?.message ||
+    error?.cause?.message ||
+    error?.error?.code ||
+    String(error?.error || error || "")
+  ).toLowerCase();
   return (
     msg.includes("database has been paused") ||
     msg.includes("connection terminated") ||
     msg.includes("timeout") ||
     msg.includes("ecancelled") ||
     msg.includes("etimedout") ||
+    msg.includes("econnrefused") ||
     msg.includes("could not connect") ||
     msg.includes("database is starting") ||
-    msg.includes("p1001")
+    msg.includes("p1001") ||
+    error?.name === "ErrorEvent" ||
+    error?.constructor?.name === "ErrorEvent" ||
+    Boolean(error?.error)
   );
 }
 
@@ -65,8 +76,10 @@ function wrapWithRetry(model) {
 function callWithRetry(call, attempt) {
   return call().catch((error) => {
     if (attempt < MAX_RETRIES && isConnectionError(error)) {
-      console.warn(`[PRISMA] Query failed (attempt ${attempt}/${MAX_RETRIES}), retrying...`);
-      return new Promise((r) => setTimeout(r, RETRY_DELAY)).then(() => callWithRetry(call, attempt + 1));
+      console.warn(`[PRISMA] Query failed (attempt ${attempt}/${MAX_RETRIES}), retrying in ${RETRY_DELAY * attempt}ms...`);
+      _prisma = null;
+      if (globalForPrisma.prisma) globalForPrisma.prisma = null;
+      return new Promise((r) => setTimeout(r, RETRY_DELAY * attempt)).then(() => callWithRetry(call, attempt + 1));
     }
     throw error;
   });
