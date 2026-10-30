@@ -18,6 +18,9 @@
   },
   "scripts": {
     "dev": "node --use-system-ca --watch src/server.js",
-    "start": "node --use-system-ca src/server.js"
+    "start": "node --use-system-ca src/server.js",
+    "db:seed": "node prisma/seed.js",
+    "db:snapshot": "node prisma/export-db-snapshot.js",
+    "db:restore": "node prisma/restore-db-snapshot.js"
   }
 }

@@ -18,6 +18,8 @@
     "dev:web": "npm --workspace frontend/web run dev",
     "dev:admin": "npm --workspace frontend/admin run dev",
     "start": "node --use-system-ca backend/src/server.js",
+    "db:snapshot": "npm --workspace backend run db:snapshot",
+    "db:restore": "npm --workspace backend run db:restore",
     "test:persistence": "node --use-system-ca scripts/verify-full-persistence.mjs"
   },
   "devDependencies": {
