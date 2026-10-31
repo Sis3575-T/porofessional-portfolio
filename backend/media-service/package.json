@@ -14,6 +14,8 @@
     "shared": "file:../shared"
   },
   "scripts": {
+    "build": "exit 0",
+    "postinstall": "exit 0",
     "dev": "node --watch src/server.js",
     "start": "node src/server.js"
   }

@@ -15,6 +15,10 @@
     "./services/fingerprintService": "./services/fingerprintService.js",
     "./services/geolocationService": "./services/geolocationService.js"
   },
+  "scripts": {
+    "build": "exit 0",
+    "postinstall": "exit 0"
+  },
   "dependencies": {
     "@fingerprintjs/fingerprintjs-pro-server-api": "^1.0.0",
     "@prisma/client": "^5.22.0",

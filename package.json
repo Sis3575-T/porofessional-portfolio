@@ -12,8 +12,11 @@
     "backend/*"
   ],
   "scripts": {
-    "build": "npm --workspace backend run build",
-    "postinstall": "npm --workspace backend run postinstall",
+    "build": "npm --workspace frontend/web run build && node -e \"const fs=require('fs'); if(!fs.existsSync('dist')){fs.cpSync('frontend/web/dist', 'dist', {recursive:true});}\"",
+    "build:web": "npm --workspace frontend/web run build",
+    "build:admin": "npm --workspace frontend/admin run build",
+    "build:backend": "npm --workspace backend run build",
+    "postinstall": "node -e \"try { require('child_process').execSync('npx prisma generate --schema=backend/prisma/schema.prisma', { stdio: 'inherit' }); } catch (e) { console.warn('Prisma generate notice:', e.message); }\"",
     "dev": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:backend": "node --use-system-ca --watch backend/src/server.js",

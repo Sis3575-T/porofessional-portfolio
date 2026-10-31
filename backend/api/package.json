@@ -11,6 +11,8 @@
     "helmet": "^7.1.0"
   },
   "scripts": {
+    "build": "exit 0",
+    "postinstall": "exit 0",
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "node --test src/__tests__/"
