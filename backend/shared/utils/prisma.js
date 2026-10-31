@@ -16,10 +16,19 @@ if (process.env.NODE_ENV !== "production" && !process.env.NODE_TLS_REJECT_UNAUTH
 
 class SafeWebSocket extends ws {
   constructor(address, protocols, options) {
-    super(address, protocols, {
-      ...options,
+    let opts = {};
+    let protos = protocols;
+    if (typeof protocols === "object" && protocols !== null && !Array.isArray(protocols)) {
+      opts = protocols;
+      protos = undefined;
+    } else if (typeof options === "object" && options !== null) {
+      opts = options;
+    }
+    super(address, protos, {
+      ...opts,
       rejectUnauthorized: false,
       family: 4,
+      handshakeTimeout: 20000,
     });
   }
 }
@@ -29,7 +38,7 @@ neonConfig.webSocketConstructor = SafeWebSocket;
 const globalForPrisma = globalThis;
 
 const MAX_RETRIES = 5;
-const RETRY_DELAY = 1500;
+const BASE_RETRY_DELAY = 800;
 
 function isConnectionError(error) {
   const msg = (
@@ -54,6 +63,8 @@ function isConnectionError(error) {
     msg.includes("could not connect") ||
     msg.includes("database is starting") ||
     msg.includes("p1001") ||
+    msg.includes("p1002") ||
+    msg.includes("p1017") ||
     msg.includes("aggregateerror") ||
     error?.name === "ErrorEvent" ||
     error?.constructor?.name === "ErrorEvent" ||
@@ -63,33 +74,46 @@ function isConnectionError(error) {
 
 let _prisma = null;
 let _pool = null;
-let _useNativeDriver = false;
+let _resetPromise = null;
 
-function callWithRetry(operation, attempt = 1) {
-  return operation().catch((error) => {
-    if (attempt < MAX_RETRIES && isConnectionError(error)) {
-      console.warn(
-        `[PRISMA] Connection attempt ${attempt}/${MAX_RETRIES} failed: ${error?.message || error}. Resetting connection and retrying in ${RETRY_DELAY * attempt}ms...`
-      );
+async function debounceReset() {
+  if (_resetPromise) return _resetPromise;
+  _resetPromise = (async () => {
+    try {
+      console.warn("[PRISMA] Recycling database connection pool after persistent connection errors...");
       if (_pool) {
-        try { _pool.end().catch(() => {}); } catch {}
+        try { await _pool.end(); } catch {}
         _pool = null;
       }
       if (_prisma) {
-        try { _prisma.$disconnect().catch(() => {}); } catch {}
+        try { await _prisma.$disconnect(); } catch {}
         _prisma = null;
       }
-      if (globalForPrisma.prisma) globalForPrisma.prisma = null;
+      globalForPrisma.prisma = null;
+    } finally {
+      await new Promise((r) => setTimeout(r, 400));
+      _resetPromise = null;
+    }
+  })();
+  return _resetPromise;
+}
 
-      // On attempt 3+, alternate between WebSocket adapter and direct native TCP
-      if (attempt >= 3) {
-        _useNativeDriver = !_useNativeDriver;
-        console.warn(`[PRISMA] Switching driver adapter mode: native=${_useNativeDriver}`);
+function callWithRetry(operation, attempt = 1) {
+  return operation().catch(async (error) => {
+    if (attempt < MAX_RETRIES && isConnectionError(error)) {
+      const jitter = Math.floor(Math.random() * 300);
+      const delay = BASE_RETRY_DELAY * attempt + jitter;
+      console.warn(
+        `[PRISMA] Connection attempt ${attempt}/${MAX_RETRIES} transient issue (${error?.message || error}). Retrying in ${delay}ms...`
+      );
+
+      // Only perform a debounced reset if multiple retries have failed
+      if (attempt === 3) {
+        await debounceReset();
       }
 
-      return new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt)).then(() =>
-        callWithRetry(operation, attempt + 1)
-      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return callWithRetry(operation, attempt + 1);
     }
     throw error;
   });
@@ -99,11 +123,21 @@ function createPrismaClient() {
   if (_prisma) return _prisma;
 
   const url = process.env.DATABASE_URL || "";
-  const isNeon = url.includes("neon.tech") && !_useNativeDriver;
+  const isNeon = url.includes("neon.tech") && process.env.PRISMA_FORCE_NATIVE !== "true";
   const logConfig = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
 
   if (isNeon) {
-    _pool = new Pool({ connectionString: url });
+    if (!_pool) {
+      _pool = new Pool({
+        connectionString: url,
+        max: 8,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 20000,
+      });
+      _pool.on("error", (err) => {
+        console.warn("[PRISMA/POOL] Idle client notice (safely discarded):", err?.message || err);
+      });
+    }
     const adapter = new PrismaNeon(_pool);
     _prisma = new PrismaClient({ adapter, log: logConfig });
   } else {
@@ -127,11 +161,8 @@ const RETRYABLE_METHODS = new Set([
 
 const prisma = new Proxy({}, {
   get(_, prop) {
-    if (prop === "$queryRaw") {
-      return (...args) => callWithRetry(() => createPrismaClient().$queryRaw(...args), 1);
-    }
-    if (prop === "$executeRaw") {
-      return (...args) => callWithRetry(() => createPrismaClient().$executeRaw(...args), 1);
+    if (prop === "$connect") {
+      return (...args) => callWithRetry(() => createPrismaClient().$connect(...args), 1);
     }
     if (prop === "$disconnect") {
       return () => {
@@ -142,6 +173,12 @@ const prisma = new Proxy({}, {
         }
         return Promise.resolve();
       };
+    }
+    if (prop === "$queryRaw" || prop === "$queryRawUnsafe") {
+      return (...args) => callWithRetry(() => createPrismaClient()[prop](...args), 1);
+    }
+    if (prop === "$executeRaw" || prop === "$executeRawUnsafe") {
+      return (...args) => callWithRetry(() => createPrismaClient()[prop](...args), 1);
     }
     if (prop === "$transaction") {
       return (...args) => createPrismaClient().$transaction(...args);

@@ -24,9 +24,7 @@ echo.
 echo [2/5] Pushing database schema to Neon...
 call npx prisma db push --schema=backend/prisma/schema.prisma
 if %errorlevel% neq 0 (
-    echo [ERROR] Prisma db push failed. Check your DATABASE_URL in .env
-    pause
-    exit /b 1
+    echo [WARNING] Prisma db push directly may be blocked if port 5432 is restricted. Continuing to server auto-init...
 )
 
 echo.
@@ -48,8 +46,8 @@ echo   Starting 3 terminals - do NOT close them
 echo ============================================
 echo.
 
-REM Start Unified Backend (port 5000)
-start "Backend - port 5000" cmd /k "cd /d %~dp0 && node --watch backend/src/server.js"
+REM Start Unified Backend (port 10000)
+start "Backend - port 10000" cmd /k "cd /d %~dp0 && node --watch backend/src/server.js"
 
 REM Start Web Frontend (port 5175)
 start "Web Frontend - port 5175" cmd /k "cd /d %~dp0\frontend\web && npm run dev"
@@ -64,8 +62,8 @@ echo ============================================
 echo.
 echo   Portfolio:   http://localhost:5175
 echo   Admin:       http://localhost:5174
-echo   Backend API: http://localhost:5000
-echo   Health:      http://localhost:5000/health
+echo   Backend API: http://localhost:10000
+echo   Health:      http://localhost:10000/health
 echo.
 echo   Admin Login:
 echo     Email:    sisay3575@gmail.com

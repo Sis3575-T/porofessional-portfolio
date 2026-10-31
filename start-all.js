@@ -9,7 +9,7 @@ const child = spawn('node', [join(__dirname, 'backend/src/server.js')], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    PORT: '5000',
+    PORT: '10000',
     NODE_ENV: 'production',
   },
 });
@@ -18,4 +18,4 @@ child.on('error', (err) => {
   console.error('[backend] Error:', err.message);
 });
 
-console.log('[backend] Started on port 5000');
+console.log('[backend] Started on port 10000');

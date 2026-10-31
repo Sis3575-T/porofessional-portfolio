@@ -5,14 +5,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const config = {
   env: process.env.NODE_ENV || "development",
-  port: parseInt(process.env.PORT) || 5000,
+  port: parseInt(process.env.PORT) || 10000,
   database: {
     url: process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/portfolio",
   },
   api: {
     version: "v1",
     prefix: "/api",
-    baseUrl: process.env.API_URL || "http://localhost:5000",
+    baseUrl: process.env.API_URL || "http://localhost:10000",
   },
   services: {
     ipinfo: {
@@ -47,8 +47,10 @@ export const config = {
     allowedOrigins: [
       "http://localhost:5173",
       "http://localhost:5174",
+      "http://localhost:5175",
       "http://127.0.0.1:5173",
       "http://127.0.0.1:5174",
+      "http://127.0.0.1:5175",
       process.env.FRONTEND_URL,
       process.env.ADMIN_URL,
     ].filter(Boolean),
