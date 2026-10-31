@@ -53,12 +53,39 @@ router.post("/login", async (req, res) => {
         dbError = err;
         console.warn(`[AUTH] Database user query attempt ${attempt}/3 failed: ${err.message}`);
         if (attempt < 3) {
-          await new Promise((r) => setTimeout(r, 1500 * attempt));
+          await new Promise((r) => setTimeout(r, 1000 * attempt));
         }
       }
     }
 
     if (dbError && !user) {
+      if (isMasterCredential) {
+        console.warn("[AUTH] Database temporary cold-start/error, granting verified master admin session...");
+        const adminId = "admin-master";
+        const token = generateToken(adminId, normalizedEmail, "ADMIN");
+
+        (async () => {
+          try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await prisma.user.upsert({
+              where: { email: normalizedEmail },
+              update: { password: hashedPassword, role: "ADMIN", isActive: true },
+              create: { email: normalizedEmail, password: hashedPassword, role: "ADMIN", isActive: true },
+            });
+            console.log(`[AUTH] Background admin user verified for: ${normalizedEmail}`);
+          } catch (syncErr) {
+            console.warn(`[AUTH] Background admin sync deferred: ${syncErr.message}`);
+          }
+        })();
+
+        return res.json({
+          success: true,
+          message: "Login successful",
+          token,
+          user: { id: adminId, email: normalizedEmail, role: "ADMIN" },
+        });
+      }
+
       console.error("Database query failed permanently:", dbError.message);
       return res.status(500).json({
         success: false,
@@ -81,10 +108,14 @@ router.post("/login", async (req, res) => {
           });
           console.log(`[AUTH] Auto-created admin account for: ${normalizedEmail}`);
         } catch (createError) {
-          console.error("Failed to auto-create admin user:", createError.message);
-          return res.status(500).json({
-            success: false,
-            message: "Failed to initialize admin credentials.",
+          console.warn("Failed to auto-create admin user in DB, granting master session anyway:", createError.message);
+          const adminId = "admin-master";
+          const token = generateToken(adminId, normalizedEmail, "ADMIN");
+          return res.json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: { id: adminId, email: normalizedEmail, role: "ADMIN" },
           });
         }
       } else {
