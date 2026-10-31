@@ -23,7 +23,7 @@
   "scripts": {
     "build": "prisma generate",
     "postinstall": "prisma generate",
-    "dev": "node --use-system-ca --watch src/server.js",
+    "dev": "node --use-system-ca --watch-path=src --watch-path=shared --watch src/server.js",
     "start": "node --use-system-ca src/server.js",
     "db:seed": "node prisma/seed.js",
     "db:snapshot": "node prisma/export-db-snapshot.js",

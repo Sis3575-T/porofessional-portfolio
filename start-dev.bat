@@ -47,7 +47,7 @@ echo ============================================
 echo.
 
 REM Start Unified Backend (port 10000)
-start "Backend - port 10000" cmd /k "cd /d %~dp0 && node --watch backend/src/server.js"
+start "Backend - port 10000" cmd /k "cd /d %~dp0 && node --watch-path=backend/src --watch-path=backend/shared --watch backend/src/server.js"
 
 REM Start Web Frontend (port 5175)
 start "Web Frontend - port 5175" cmd /k "cd /d %~dp0\frontend\web && npm run dev"

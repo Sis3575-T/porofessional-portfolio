@@ -148,8 +148,68 @@ async function autoInitDatabase() {
   await ensureAdminUser();
 }
 
-app.listen(PORT, "0.0.0.0", async () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-  await autoInitDatabase();
-});
+function killPortOwner(port) {
+  if (process.env.NODE_ENV === "production") return;
+  try {
+    if (process.platform === "win32") {
+      const output = execSync(`netstat -ano | findstr :${port} | findstr LISTENING`, { stdio: "pipe" }).toString();
+      const lines = output.trim().split("\n");
+      for (const line of lines) {
+        const parts = line.trim().split(/\s+/);
+        const pid = parseInt(parts[parts.length - 1], 10);
+        if (pid && pid !== process.pid && pid !== process.ppid) {
+          console.log(`[SERVER] Auto-freeing port ${port} occupied by lingering PID ${pid}...`);
+          try { execSync(`taskkill /F /PID ${pid}`, { stdio: "pipe" }); } catch {}
+        }
+      }
+    } else {
+      execSync(`fuser -k ${port}/tcp 2>/dev/null || true`, { stdio: "pipe" });
+    }
+  } catch {}
+}
+
+function startListening(port, maxRetries = 5) {
+  let attempt = 0;
+
+  function attemptListen() {
+    attempt++;
+    const server = app.listen(port, "0.0.0.0", async () => {
+      console.log(`Backend server running on http://localhost:${port}`);
+      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      await autoInitDatabase();
+    });
+
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`[SERVER] Port ${port} is currently busy (attempt ${attempt}/${maxRetries}). Freeing and retrying...`);
+        killPortOwner(port);
+        try { server.close(); } catch {}
+        if (attempt < maxRetries) {
+          setTimeout(attemptListen, 1200);
+        } else {
+          console.error(`[SERVER] Port ${port} is persistently in use. Exiting.`);
+          process.exit(1);
+        }
+      } else {
+        console.error("[SERVER] Unhandled server error:", err);
+      }
+    });
+
+    const shutdown = () => {
+      try {
+        server.close(() => {
+          process.exit(0);
+        });
+      } catch {
+        process.exit(0);
+      }
+    };
+
+    process.once("SIGTERM", shutdown);
+    process.once("SIGINT", shutdown);
+  }
+
+  attemptListen();
+}
+
+startListening(PORT);
