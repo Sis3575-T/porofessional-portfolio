@@ -46,9 +46,11 @@ async function runWithRetry(cmd, label, attempts = 2) {
 }
 
 function ensureConnectTimeout(url) {
-  if (!url || url.includes("connect_timeout=")) return url;
-  const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}connect_timeout=60`;
+  if (!url) return url;
+  let cleaned = url.replace(/[?&]channel_binding=[^&]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+  if (cleaned.includes("connect_timeout=")) return cleaned;
+  const sep = cleaned.includes("?") ? "&" : "?";
+  return `${cleaned}${sep}connect_timeout=60`;
 }
 
 async function ensureAdminUser() {
@@ -113,7 +115,7 @@ async function autoInitDatabase() {
   }
 
   // If essential tables are missing or AUTO_DB_PUSH=true, run prisma db push
-  const essentialTables = ["users", "projects", "hero", "about", "skills", "settings"];
+  const essentialTables = ["users", "projects", "hero", "about", "skills", "settings", "avatar3d", "visitors", "visits", "contact_messages", "media_assets"];
   const missingTables = essentialTables.filter((t) => !tables.includes(t));
 
   if (process.env.AUTO_DB_PUSH === "true" || missingTables.length > 0) {

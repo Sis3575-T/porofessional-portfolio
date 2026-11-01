@@ -88,7 +88,13 @@ const corsOptions = {
     if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
       cb(null, true); return;
     }
-    cb(new Error("Not allowed by CORS"));
+    if (/^https:\/\/.*\.onrender\.com$/.test(origin)) {
+      cb(null, true); return;
+    }
+    if (/^https:\/\/.*\.onrender\.com$/.test(origin)) {
+      cb(null, true); return;
+    }
+    const corsErr = new Error("Not allowed by CORS"); corsErr.statusCode = 403; cb(corsErr);
   },
   credentials: true,
 };

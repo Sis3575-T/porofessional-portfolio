@@ -1,3 +1,4 @@
+import { getSnapshotData } from "../services/snapshotFallback.js";
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
 import { invalidatePortfolioCache } from "../services/portfolioCache.js";
@@ -44,7 +45,8 @@ router.get("/", async (req, res) => {
     });
     res.json({ success: true, data: education });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch education" });
+    const fallback = getSnapshotData("education") || [];
+    return res.json({ success: true, data: fallback });
   }
 });
 

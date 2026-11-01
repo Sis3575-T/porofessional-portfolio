@@ -1,3 +1,4 @@
+import { getSnapshotData } from "../services/snapshotFallback.js";
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
 import { invalidatePortfolioCache } from "../services/portfolioCache.js";

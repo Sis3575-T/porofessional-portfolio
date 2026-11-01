@@ -1,3 +1,4 @@
+import { getSnapshotData } from "../services/snapshotFallback.js";
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
 import { invalidatePortfolioCache } from "../services/portfolioCache.js";
@@ -27,7 +28,8 @@ router.get("/", async (req, res) => {
     res.json({ success: true, data: projects });
   } catch (error) {
     console.error("Fetch projects error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch projects", error: error.message });
+    const fallback = getSnapshotData("project") || [];
+    return res.json({ success: true, data: fallback });
   }
 });
 
@@ -64,7 +66,10 @@ router.get("/:slug", async (req, res) => {
     res.json({ success: true, data: project });
   } catch (error) {
     console.error("Fetch project by slug error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch project" });
+    const fallbackList = getSnapshotData("project") || [];
+    const fallback = fallbackList.find(p => p.slug === req.params.slug);
+    if (fallback) return res.json({ success: true, data: fallback });
+    res.status(404).json({ success: false, message: "Project not found" });
   }
 });
 

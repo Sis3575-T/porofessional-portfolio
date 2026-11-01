@@ -1,3 +1,4 @@
+import { getSnapshotData } from "../services/snapshotFallback.js";
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
 import { invalidatePortfolioCache } from "../services/portfolioCache.js";
@@ -19,7 +20,8 @@ const fetchSettings = async (req, res) => {
     res.json({ success: true, data: settings });
   } catch (error) {
     console.error("Fetch settings error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch settings" });
+    const fallback = getSnapshotData("setting")?.[0] || null;
+    return res.json({ success: true, data: fallback });
   }
 };
 

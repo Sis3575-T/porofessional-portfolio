@@ -33,7 +33,8 @@ async function migrate() {
     .filter((s) => s.length > 0);
 
   console.log(`Found ${statements.length} DDL statements to execute.`);
-  const sql = neon(url);
+  const cleanUrl = url.replace(/[?&]channel_binding=[^&]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+  const sql = neon(cleanUrl);
 
   for (let i = 0; i < statements.length; i++) {
     const stmt = statements[i];

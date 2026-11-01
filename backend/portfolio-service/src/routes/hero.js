@@ -1,3 +1,4 @@
+import { getSnapshotData } from "../services/snapshotFallback.js";
 import express from "express";
 import { authenticateToken, requireAdmin, prisma } from "shared";
 import { invalidatePortfolioCache } from "../services/portfolioCache.js";
@@ -17,6 +18,8 @@ router.get("/", async (req, res) => {
     res.json({ success: true, data: hero });
   } catch (error) {
     console.error("Fetch hero error:", error);
+    const fallback = getSnapshotData("hero")?.[0] || null;
+    if (fallback) return res.json({ success: true, data: fallback });
     res.status(500).json({ success: false, message: "Failed to fetch hero", error: error.message });
   }
 });

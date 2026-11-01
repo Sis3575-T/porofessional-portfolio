@@ -41,10 +41,14 @@ router.get("/", async (req, res) => {
   try {
     const avatar = await prisma.avatar3D.findFirst({
       orderBy: { createdAt: "desc" },
+    }).catch((err) => {
+      console.warn("[AVATAR] Database fetch warning:", err.message);
+      return null;
     });
-    res.json({ success: true, data: avatar });
+    return res.json({ success: true, data: avatar || null });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch avatar" });
+    console.warn("[AVATAR] Safe fallback for avatar:", error.message);
+    return res.json({ success: true, data: null });
   }
 });
 

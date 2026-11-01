@@ -326,8 +326,8 @@ router.post("/track", trackRateLimit, async (req, res) => {
 
     res.json({ success: true, data: { isNew: false, visitorId: visitor.visitorId } });
   } catch (error) {
-    console.error("Track error:", error);
-    res.status(500).json({ success: false, message: "Failed to track" });
+    console.warn("[ANALYTICS] Track warning (non-critical):", error.message);
+    return res.status(200).json({ success: true, data: { skipped: true, error: error.message } });
   }
 });
 
@@ -359,8 +359,8 @@ router.post("/session/start", async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Session start error:", error);
-    res.status(500).json({ success: false, message: "Failed to start session" });
+    console.warn("[ANALYTICS] Session start warning (non-critical):", error.message);
+    return res.status(200).json({ success: true, data: { skipped: true } });
   }
 });
 

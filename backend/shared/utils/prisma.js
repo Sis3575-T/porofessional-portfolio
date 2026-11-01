@@ -7,8 +7,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function cleanDatabaseUrl(rawUrl) {
+  if (!rawUrl) return rawUrl;
+  return rawUrl.replace(/[?&]channel_binding=[^&]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+}
 dotenv.config({ path: path.join(__dirname, "../../../backend/.env") });
 dotenv.config({ path: path.join(__dirname, "../../../.env") });
+if (process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = cleanDatabaseUrl(process.env.DATABASE_URL);
+}
 
 if (process.env.NODE_ENV !== "production" && !process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -122,7 +130,7 @@ function callWithRetry(operation, attempt = 1) {
 function createPrismaClient() {
   if (_prisma) return _prisma;
 
-  const url = process.env.DATABASE_URL || "";
+  const url = cleanDatabaseUrl(process.env.DATABASE_URL || "");
   const isNeon = url.includes("neon.tech") && process.env.PRISMA_FORCE_NATIVE !== "true";
   const logConfig = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
 

@@ -1,3 +1,8 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import express from "express";
 import { prisma } from "shared";
 import { getCachedPortfolio, setCachedPortfolio } from "../services/portfolioCache.js";
@@ -170,8 +175,32 @@ router.get("/", async (req, res) => {
 
     return res.json({ success: true, data: payload });
   } catch (error) {
-    console.error("Consolidated portfolio fetch error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch portfolio data" });
+    console.warn("[PORTFOLIO] Consolidated fetch failed, serving snapshot fallback:", error.message);
+    try {
+      const snapshotPath = path.join(__dirname, "../../../prisma/database-snapshot.json");
+      if (fs.existsSync(snapshotPath)) {
+        const snapshot = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
+        const d = snapshot.data || {};
+        return res.json({
+          success: true,
+          data: {
+            hero: d.hero?.[0] || null,
+            about: d.about?.[0] || null,
+            skills: d.skill || [],
+            services: d.service || [],
+            experiences: d.experience || [],
+            education: d.education || [],
+            projects: d.project || [],
+            testimonials: d.testimonial || [],
+            settings: d.setting?.[0] || null,
+          },
+          fromFallback: true,
+        });
+      }
+    } catch (fallbackErr) {
+      console.error("[PORTFOLIO] Snapshot fallback failed:", fallbackErr.message);
+    }
+    return res.status(500).json({ success: false, message: "Failed to fetch portfolio data" });
   }
 });
 
