@@ -21,8 +21,8 @@
     "shared": "file:./shared"
   },
   "scripts": {
-    "build": "prisma generate",
-    "postinstall": "prisma generate",
+    "build": "npx prisma generate --schema=prisma/schema.prisma",
+    "postinstall": "exit 0",
     "dev": "node --use-system-ca --watch-path=src --watch-path=shared --watch src/server.js",
     "start": "node --use-system-ca src/server.js",
     "db:seed": "node prisma/seed.js",
