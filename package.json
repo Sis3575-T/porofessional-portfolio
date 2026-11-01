@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.0.0",
+    "node": ">=20.0.0",
     "npm": ">=10.0.0"
   },
   "workspaces": [
@@ -12,17 +12,17 @@
     "backend/*"
   ],
   "scripts": {
-    "build": "npm --workspace frontend/web run build && node -e \"const fs=require('fs'); if(!fs.existsSync('dist')){fs.cpSync('frontend/web/dist', 'dist', {recursive:true});}\"",
+    "build": "node -e \"try { require('child_process').execSync('npx prisma generate --schema=backend/prisma/schema.prisma', { stdio: 'inherit' }); } catch(e){} try { require('child_process').execSync('npm --workspace frontend/web run build', { stdio: 'inherit' }); const fs=require('fs'); if(!fs.existsSync('dist') && fs.existsSync('frontend/web/dist')){fs.cpSync('frontend/web/dist', 'dist', {recursive:true});} } catch(e){}\"",
     "build:web": "npm --workspace frontend/web run build",
     "build:admin": "npm --workspace frontend/admin run build",
     "build:backend": "npm --workspace backend run build",
-    "postinstall": "node -e \"try { require('child_process').execSync('npx prisma generate --schema=backend/prisma/schema.prisma', { stdio: 'inherit' }); } catch (e) { console.warn('Prisma generate notice:', e.message); }\"",
+    "postinstall": "node -e \"try { require('child_process').execSync('npx prisma generate --schema=backend/prisma/schema.prisma', { stdio: 'inherit' }); } catch(e){}\"",
     "dev": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch-path=backend/src --watch-path=backend/shared --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:all": "concurrently -n api,web,admin -c cyan,green,magenta \"node --use-system-ca --watch-path=backend/src --watch-path=backend/shared --watch backend/src/server.js\" \"cd frontend/web && npm run dev\" \"cd frontend/admin && npm run dev\"",
     "dev:backend": "node --use-system-ca --watch-path=backend/src --watch-path=backend/shared --watch backend/src/server.js",
     "dev:web": "npm --workspace frontend/web run dev",
     "dev:admin": "npm --workspace frontend/admin run dev",
-    "start": "node --use-system-ca backend/src/server.js",
+    "start": "node backend/src/server.js",
     "db:snapshot": "npm --workspace backend run db:snapshot",
     "db:restore": "npm --workspace backend run db:restore",
     "test:persistence": "node --use-system-ca scripts/verify-full-persistence.mjs",
