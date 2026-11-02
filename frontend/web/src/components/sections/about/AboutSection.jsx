@@ -75,7 +75,8 @@ export default function AboutSection() {
   };
 
   // Two concise, reference-matched paragraphs
-  const bioLines = about?.biography ? about.biography.split("\n").filter((l) => l.trim().length > 0) : [];
+  const cleanBio = about?.biography && !about.biography.includes("Updated Biography") ? about.biography : "";
+  const bioLines = cleanBio ? cleanBio.split("\n").filter((l) => l.trim().length > 0) : [];
   const paragraph1 =
     about?.biographyParagraph1 ||
     (bioLines.length > 0
@@ -86,7 +87,7 @@ export default function AboutSection() {
     about?.biographyParagraph2 ||
     (bioLines.length > 1
       ? bioLines.slice(1).join(" ")
-      : (about?.biography ? "" : "I enjoy building full-stack applications, exploring AI, and continuously learning new tools and technologies to create useful and impactful solutions."));
+      : "I enjoy building full-stack applications, exploring AI, and continuously learning new tools and technologies to create useful and impactful solutions.");
 
   // Image source: 3D developer illustration with clean studio white background, or custom admin uploaded illustration
   const illustrationSrc =
