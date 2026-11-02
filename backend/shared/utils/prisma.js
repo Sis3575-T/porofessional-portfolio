@@ -39,8 +39,6 @@ class SafeWebSocket extends ws {
     super(address, protos, {
       ...opts,
       rejectUnauthorized: false,
-      family: 4,
-      handshakeTimeout: 20000,
     });
   }
 }
