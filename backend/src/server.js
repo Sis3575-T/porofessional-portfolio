@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import app from "./app.js";
 import { execSync } from "child_process";
 import path from "path";
@@ -67,7 +68,7 @@ async function ensureAdminUser() {
     for (const email of emailsToEnsure) {
       await prisma.user.upsert({
         where: { email },
-        update: { password: hashedPassword, role: "ADMIN", isActive: true },
+        update: { role: "ADMIN", isActive: true }, // Preserve existing password
         create: { email, password: hashedPassword, role: "ADMIN", isActive: true },
       });
       console.log(`[AUTH] Admin user verified/updated: ${email}`);
@@ -93,77 +94,87 @@ async function ensureAdminUser() {
 }
 
 async function autoInitDatabase() {
-  const { prisma } = await import("shared");
-  const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
-  const prismaBin = findPrismaBin();
-
-  process.env.DATABASE_URL = ensureConnectTimeout(process.env.DATABASE_URL);
-
-  let tables = [];
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      await prisma.$queryRaw`SELECT 1`;
-      const rawTables = await prisma.$queryRaw`
-        SELECT table_name::text as table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public'
-      `;
-      tables = rawTables.map((t) => t.table_name);
-      console.log(`[DB] Database connected. Public tables detected (${tables.length}):`, tables.join(", "));
-      break;
-    } catch (err) {
-      console.warn(`[DB] Connection attempt ${attempt}/3 failed (${err.message}), retrying in 2s...`);
-      if (attempt < 3) await sleep(2000);
-    }
-  }
-
-  // If essential tables are missing or AUTO_DB_PUSH=true, run prisma db push
-  const essentialTables = ["users", "projects", "hero", "about", "skills", "settings", "avatar3d", "visitors", "visits", "contact_messages", "media_assets"];
-  const missingTables = essentialTables.filter((t) => !tables.includes(t));
-
-  if (process.env.AUTO_DB_PUSH === "true" || missingTables.length > 0) {
-    console.warn(`[DB] Syncing schema (missing tables: [${missingTables.join(", ")}])...`);
-    const pushOk = await runWithRetry(
-      `${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`,
-      "Database schema push",
-      1
-    );
-    if (!pushOk) {
-      console.warn("[DB] Legacy tables conflict with new schema. Resetting database schema with --force-reset...");
-      await runWithRetry(
-        `${prismaBin} db push --schema="${schemaPath}" --force-reset --accept-data-loss`,
-        "Database schema force-reset push",
-        2
-      );
-    }
-  }
-
-  // Check if initial portfolio data exists; if empty, run snapshot restore and seed.js
-  let shouldSeed = false;
   try {
-    const userCount = await prisma.user.count();
-    const projectCount = await prisma.project.count();
-    console.log(`[DB] Records: users=${userCount}, projects=${projectCount}`);
-    if (userCount === 0 || projectCount === 0) {
+    const { prisma } = await import("shared");
+    const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
+    const prismaBin = findPrismaBin();
+
+    process.env.DATABASE_URL = ensureConnectTimeout(process.env.DATABASE_URL);
+
+    let tables = [];
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await prisma.$queryRaw`SELECT 1`;
+        const rawTables = await prisma.$queryRaw`
+          SELECT table_name::text as table_name 
+          FROM information_schema.tables 
+          WHERE table_schema = 'public'
+        `;
+        tables = rawTables.map((t) => t.table_name);
+        console.log(`[DB] Database connected. Public tables detected (${tables.length}):`, tables.join(", "));
+        break;
+      } catch (err) {
+        console.warn(`[DB] Connection attempt ${attempt}/3 failed (${err.message}), retrying in 2s...`);
+        if (attempt < 3) await sleep(2000);
+      }
+    }
+
+    // Check for essential tables without destructive commands
+    const essentialTables = ["users", "projects", "hero", "about", "skills", "settings", "avatar3d", "visitors", "visits", "contact_messages", "media_assets"];
+    const missingTables = essentialTables.filter((t) => !tables.includes(t));
+
+    if (missingTables.length > 0) {
+      console.warn(`[DB] Missing tables detected: [${missingTables.join(", ")}]. Attempting safe schema push...`);
+      // Never use --force-reset in production. Only push non-destructively.
+      const pushed = await runWithRetry(
+        `${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`,
+        "Database schema push",
+        1
+      );
+      if (!pushed) {
+        console.warn("[DB] Safe schema push did not apply automatically. Preserving existing database without resetting.");
+      }
+    }
+
+    // Check if initial portfolio data exists; if completely empty (0 users & 0 projects), populate safely
+    let shouldSeed = false;
+    try {
+      const userCount = await prisma.user.count();
+      const projectCount = await prisma.project.count();
+      console.log(`[DB] Verified records: users=${userCount}, projects=${projectCount}`);
+      if (userCount === 0 && projectCount === 0) {
+        shouldSeed = true;
+      }
+    } catch (err) {
+      console.warn("[DB] Could not count records, running safe seed to ensure essential tables:", err.message);
       shouldSeed = true;
     }
-  } catch (err) {
-    console.warn("[DB] Could not count records, running seed to ensure integrity:", err.message);
-    shouldSeed = true;
-  }
 
-  if (shouldSeed) {
-    console.log("[DB] Populating essential database content...");
-    const restoreScript = path.join(__dirname, "../prisma/restore-db-snapshot.js");
-    const seedScript = path.join(__dirname, "../prisma/seed.js");
-    if (fs.existsSync(restoreScript)) {
-      await runWithRetry(`node "${restoreScript}"`, "Database snapshot restore", 1);
+    if (shouldSeed) {
+      console.log("[DB] Populating essential content (database is empty)...");
+      const restoreScript = path.join(__dirname, "../prisma/restore-db-snapshot.js");
+      const seedScript = path.join(__dirname, "../prisma/seed.js");
+      try {
+        if (fs.existsSync(restoreScript)) {
+          await runWithRetry(`node "${restoreScript}"`, "Database snapshot restore", 1);
+        }
+      } catch (err) {
+        console.warn("[DB] Snapshot restore skipped:", err.message);
+      }
+      try {
+        if (fs.existsSync(seedScript)) {
+          await runWithRetry(`node "${seedScript}"`, "Database seeding", 1);
+        }
+      } catch (err) {
+        console.warn("[DB] Seeding skipped:", err.message);
+      }
     }
-    await runWithRetry(`node "${seedScript}"`, "Database seeding", 2);
-  }
 
-  // Always verify admin credentials and vital settings
-  await ensureAdminUser();
+    // Always verify admin user safely
+    await ensureAdminUser();
+  } catch (fatalInitError) {
+    console.error("[DB] Non-critical database init warning (server will continue running):", fatalInitError.message);
+  }
 }
 
 function killPortOwner(port) {

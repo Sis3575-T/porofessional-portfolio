@@ -53,6 +53,11 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
+const envOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -60,44 +65,61 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
   "http://127.0.0.1:5175",
+  "https://porofessional-portfolio-admin.vercel.app",
+  "https://porofessional-portfolio-web.vercel.app",
+  "https://sisay-temesgen.vercel.app",
+  "https://sisaytemesgen.dev",
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
+  ...envOrigins,
 ].filter(Boolean);
+
+export function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  const clean = origin.replace(/\/+$/, "");
+  if (allowedOrigins.some((o) => clean === o.replace(/\/+$/, ""))) {
+    return true;
+  }
+  if (/^https?:\/\/localhost(:\d+)?$/.test(clean)) return true;
+  if (/^https?:\/\/127\.\d+\.\d+\.\d+(:\d+)?$/.test(clean)) return true;
+  if (/^https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/.test(clean)) return true;
+  if (/^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+(:\d+)?$/.test(clean)) return true;
+  if (/^https?:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(clean)) return true;
+  if (/^https:\/\/([a-zA-Z0-9-]+\.)*vercel\.app$/.test(clean)) return true;
+  if (/^https:\/\/([a-zA-Z0-9-]+\.)*onrender\.com$/.test(clean)) return true;
+  return false;
+}
 
 const corsOptions = {
   origin: (origin, cb) => {
-    if (!origin) { cb(null, true); return; }
-    if (allowedOrigins.some((o) => origin.startsWith(o.replace(/\/$/, "")))) {
-      cb(null, true); return;
+    if (isAllowedOrigin(origin)) {
+      return cb(null, true);
     }
-    if (/^https?:\/\/localhost:\d+/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https?:\/\/127\.\d+\.\d+\.\d+:\d+/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https?:\/\/172\.\d+\.\d+\.\d+:\d+/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https?:\/\/192\.168\.\d+\.\d+:\d+/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https?:\/\/10\.\d+\.\d+\.\d+:\d+/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https:\/\/.*\.onrender\.com$/.test(origin)) {
-      cb(null, true); return;
-    }
-    if (/^https:\/\/.*\.onrender\.com$/.test(origin)) {
-      cb(null, true); return;
-    }
-    const corsErr = new Error("Not allowed by CORS"); corsErr.statusCode = 403; cb(corsErr);
+    console.warn(`[CORS] Request blocked from origin: ${origin}`);
+    const corsErr = new Error(`CORS blocked origin: ${origin}`);
+    corsErr.statusCode = 403;
+    cb(corsErr);
   },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
   credentials: true,
+  optionsSuccessStatus: 204,
 };
+
+// Ensure CORS headers and OPTIONS preflight responses are handled immediately
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && isAllowedOrigin(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin");
+  }
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
@@ -224,68 +246,19 @@ app.get("/", (req, res) => {
 
 app.get("/health", async (req, res) => {
   let dbOk = false;
-  let dbError = null;
-  let tables = [];
-  let counts = {};
-  let dbHost = null;
-
-  try {
-    const rawUrl = process.env.DATABASE_URL || "";
-    if (rawUrl) {
-      try {
-        const u = new URL(rawUrl.replace("postgresql://", "http://").replace("postgres://", "http://"));
-        dbHost = u.host;
-      } catch {
-        dbHost = "unparseable";
-      }
-    }
-  } catch {}
-
   try {
     await prisma.$queryRaw`SELECT 1`;
     dbOk = true;
-
-    try {
-      const rawTables = await prisma.$queryRaw`
-        SELECT table_name::text as table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public'
-        ORDER BY table_name ASC
-      `;
-      tables = rawTables.map((t) => t.table_name);
-    } catch (tErr) {
-      dbError = `Failed listing tables: ${tErr.message}`;
-    }
-
-    try {
-      counts.users = await prisma.user.count();
-    } catch (uErr) {
-      counts.usersError = uErr.message;
-    }
-
-    try {
-      counts.projects = await prisma.project.count();
-    } catch (pErr) {
-      counts.projectsError = pErr.message;
-    }
-
-    try {
-      counts.skills = await prisma.skill.count();
-    } catch (sErr) {
-      counts.skillsError = sErr.message;
-    }
   } catch (e) {
-    dbError = e.message;
+    console.warn("[HEALTH] Database connection check notice:", e.message);
   }
 
-  res.json({
-    status: "ok",
+  const statusCode = dbOk ? 200 : 503;
+  res.status(statusCode).json({
+    status: dbOk ? "ok" : "degraded",
     service: "portfolio-backend",
     database: dbOk ? "connected" : "disconnected",
-    dbHost,
-    tables,
-    counts,
-    dbError,
+    uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
   });
 });

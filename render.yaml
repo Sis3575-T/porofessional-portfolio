@@ -24,6 +24,8 @@ services:
         value: https://porofessional-portfolio-web.vercel.app
       - key: ADMIN_URL
         value: https://porofessional-portfolio-admin.vercel.app
+      - key: CORS_ORIGINS
+        value: https://porofessional-portfolio-admin.vercel.app,https://porofessional-portfolio-web.vercel.app,https://sisay-temesgen.vercel.app,https://sisaytemesgen.dev
       - key: CLOUDINARY_CLOUD_NAME
         value: dto10sv4y
       - key: CLOUDINARY_API_KEY

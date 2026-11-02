@@ -1,6 +1,15 @@
 export const errorHandler = (err, req, res, next) => {
   console.error(`[${new Date().toISOString()}] Error:`, err.message);
-  console.error(err.stack);
+  if (err.stack && process.env.NODE_ENV !== "production") {
+    console.error(err.stack);
+  }
+
+  // Ensure CORS headers are preserved on error responses
+  const origin = req.headers.origin;
+  if (origin && !res.getHeader("Access-Control-Allow-Origin")) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
 
   if (err.name === "ValidationError") {
     return res.status(400).json({
