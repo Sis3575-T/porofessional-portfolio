@@ -39,7 +39,7 @@ export default function Timeline({ experiences }) {
               )}
             </div>
 
-            <div className="bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-4 shadow-soft-xs hover:border-[#78649D]/50 transition-all">
+            <div className="bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-4 shadow-soft-xs transition-all">
               <div className="flex flex-wrap items-baseline gap-2 mb-1">
                 <span className="text-xs text-[#78649D] dark:text-[#B9A4DF] font-semibold">
                   {formatDate(exp.startDate)} — {exp.isCurrent ? "Present" : formatDate(exp.endDate)}

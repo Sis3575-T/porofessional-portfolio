@@ -126,7 +126,7 @@ export default function Projects() {
               return (
                 <div
                   key={project.id}
-                  className="group flex flex-col bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-[28px] overflow-hidden hover:border-rose-500/60 dark:hover:border-rose-500/60 shadow-lg dark:shadow-2xl backdrop-blur-xl hover:shadow-glow-red hover:-translate-y-1.5 transition-all duration-300 cursor-pointer glow-border-red"
+                  className="group flex flex-col bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-[28px] overflow-hidden shadow-lg dark:shadow-2xl backdrop-blur-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer "
                 >
                   {/* Thumbnail / Visual Area */}
                   <div className="relative h-44 sm:h-48 w-full bg-slate-100/70 dark:bg-[#070b12] overflow-hidden border-b border-slate-200/80 dark:border-white/10">
@@ -339,7 +339,7 @@ export default function Projects() {
                     href={selected.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-5 py-2.5 bg-white hover:bg-[#F8FAFC] dark:bg-[#111827] dark:hover:bg-[#161F30] text-[#1E293B] dark:text-[#F8FAFC] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB] text-xs sm:text-sm font-semibold rounded-2xl transition"
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-white hover:bg-[#F8FAFC] dark:bg-[#111827] dark:hover:bg-[#161F30] text-[#1E293B] dark:text-[#F8FAFC] border border-[#E2E8F0] dark:border-[#1E293B] text-xs sm:text-sm font-semibold rounded-2xl transition"
                   >
                     <Github size={14} /> Source Code
                   </a>

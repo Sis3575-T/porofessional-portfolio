@@ -43,7 +43,7 @@ export default function HomeContactStrip() {
     <section className="py-6 sm:py-8 relative bg-transparent transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl glow-border-red p-6 sm:p-7 lg:p-8"
+          className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl p-6 sm:p-7 lg:p-8"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
@@ -93,7 +93,7 @@ export default function HomeContactStrip() {
               {/* Email Card */}
               <a
                 href={`mailto:${email}`}
-                className="p-3 rounded-xl bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] flex items-center gap-3 hover:border-[#246BFD]/60 hover:-translate-y-0.5 transition-all shadow-2xs group"
+                className="p-3 rounded-xl bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] flex items-center gap-3 hover:-translate-y-0.5 transition-all shadow-2xs group"
               >
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#3B82F6]/20 dark:to-[#3B82F6]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25">
                   <Mail size={16} />
@@ -112,7 +112,7 @@ export default function HomeContactStrip() {
               {phone && (
                 <a
                   href={`tel:${phone}`}
-                  className="p-3 rounded-xl bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] flex items-center gap-3 hover:border-[#246BFD]/60 hover:-translate-y-0.5 transition-all shadow-2xs group"
+                  className="p-3 rounded-xl bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] flex items-center gap-3 hover:-translate-y-0.5 transition-all shadow-2xs group"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-b from-[#E7F0FF] to-[#EDF4FD] dark:from-[#3B82F6]/20 dark:to-[#3B82F6]/10 text-[#246BFD] dark:text-[#3B82F6] flex items-center justify-center shrink-0 border border-[#D8E5F8]/70 dark:border-[#246BFD]/25">
                     <Phone size={16} />
@@ -152,7 +152,7 @@ export default function HomeContactStrip() {
                   href={githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition shadow-soft-xs"
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition shadow-soft-xs"
                   aria-label="GitHub Profile"
                 >
                   <Github size={14} />
@@ -161,7 +161,7 @@ export default function HomeContactStrip() {
                   href={linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition shadow-soft-xs"
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition shadow-soft-xs"
                   aria-label="LinkedIn Profile"
                 >
                   <Linkedin size={14} />
@@ -170,21 +170,21 @@ export default function HomeContactStrip() {
                   href={telegramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition shadow-soft-xs"
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition shadow-soft-xs"
                   aria-label="Telegram Channel"
                 >
                   <TelegramIcon size={14} />
                 </a>
                 <a
                   href={`mailto:${email}`}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition shadow-soft-xs"
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition shadow-soft-xs"
                   aria-label="Send Email"
                 >
                   <Mail size={14} />
                 </a>
                 <a
                   href={`tel:${phone}`}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition shadow-soft-xs"
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F7FAFE] dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition shadow-soft-xs"
                   aria-label="Call Phone"
                 >
                   <Phone size={14} />

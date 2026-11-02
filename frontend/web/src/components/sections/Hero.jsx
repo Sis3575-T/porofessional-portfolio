@@ -253,7 +253,7 @@ export default function Hero() {
               <a
                 href="#about"
                 onClick={scrollToAbout}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-[#161F30] text-[#14213D] dark:text-[#F8FAFC] border border-[#D8E5F8] dark:border-[#1E293B] hover:bg-[#EDF4FD] dark:hover:bg-[#111827] hover:border-[#246BFD] font-semibold text-xs sm:text-sm transition-all shadow-soft-xs hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD]"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-[#161F30] text-[#14213D] dark:text-[#F8FAFC] border border-[#D8E5F8] dark:border-[#1E293B] hover:bg-[#EDF4FD] dark:hover:bg-[#111827] font-semibold text-xs sm:text-sm transition-all shadow-soft-xs hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD]"
               >
                 <span>{hero?.secondaryCTA || "About Me"}</span>
                 <User size={13} className="text-[#246BFD] dark:text-[#3B82F6]" />
@@ -286,7 +286,7 @@ export default function Hero() {
                 href={githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] transition shadow-soft-xs hover:-translate-y-0.5"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition shadow-soft-xs hover:-translate-y-0.5"
                 aria-label="GitHub Profile"
                 title="GitHub"
               >
@@ -296,7 +296,7 @@ export default function Hero() {
                 href={linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] transition shadow-soft-xs hover:-translate-y-0.5"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition shadow-soft-xs hover:-translate-y-0.5"
                 aria-label="LinkedIn Profile"
                 title="LinkedIn"
               >
@@ -306,7 +306,7 @@ export default function Hero() {
                 href={telegramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] transition shadow-soft-xs hover:-translate-y-0.5"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition shadow-soft-xs hover:-translate-y-0.5"
                 aria-label="Telegram Channel"
                 title="Telegram @sisaytem"
               >
@@ -314,7 +314,7 @@ export default function Hero() {
               </a>
               <a
                 href={`mailto:${email}`}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] transition shadow-soft-xs hover:-translate-y-0.5"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition shadow-soft-xs hover:-translate-y-0.5"
                 aria-label="Send Email"
                 title="Email: sisay3575@gmail.com"
               >
@@ -322,7 +322,7 @@ export default function Hero() {
               </a>
               <a
                 href={`tel:${phone}`}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] transition shadow-soft-xs hover:-translate-y-0.5"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition shadow-soft-xs hover:-translate-y-0.5"
                 aria-label="Call Phone"
                 title="Phone: 0935756054"
               >
@@ -340,7 +340,7 @@ export default function Hero() {
                 {TECH_STACK.map((tech) => (
                   <div
                     key={tech.name}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] shadow-soft-xs text-xs font-semibold text-[#14213D] dark:text-[#F8FAFC] hover:border-[#246BFD]/60 hover:-translate-y-0.5 transition-all duration-200"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] shadow-soft-xs text-xs font-semibold text-[#14213D] dark:text-[#F8FAFC] hover:-translate-y-0.5 transition-all duration-200"
                   >
                     <span
                       className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0"

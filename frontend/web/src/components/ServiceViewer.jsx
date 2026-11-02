@@ -93,7 +93,7 @@ export default function ServiceViewer() {
         {/* Close button */}
         <motion.button
           onClick={handleClose}
-          className="fixed top-6 right-6 z-50 w-11 h-11 rounded-2xl bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] text-[#51416F] dark:text-[#F6F2F8] hover:border-[#78649D]/50 flex items-center justify-center transition shadow-soft-sm cursor-pointer"
+          className="fixed top-6 right-6 z-50 w-11 h-11 rounded-2xl bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] text-[#51416F] dark:text-[#F6F2F8] flex items-center justify-center transition shadow-soft-sm cursor-pointer"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
@@ -149,7 +149,7 @@ export default function ServiceViewer() {
                   href={service.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-2xl bg-white dark:bg-[#27232D] text-[#51416F] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846] hover:border-[#78649D]/50 transition shadow-soft-xs"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-2xl bg-white dark:bg-[#27232D] text-[#51416F] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846] transition shadow-soft-xs"
                 >
                   <Github size={16} /> Source Code
                 </a>
@@ -157,7 +157,7 @@ export default function ServiceViewer() {
               <button
                 type="button"
                 onClick={handleContact}
-                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-2xl bg-[#EAE3F3] dark:bg-[#B9A4DF]/15 text-[#51416F] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846] hover:border-[#78649D]/50 transition shadow-soft-xs cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-2xl bg-[#EAE3F3] dark:bg-[#B9A4DF]/15 text-[#51416F] dark:text-[#F6F2F8] border border-[#DED7E2] dark:border-[#403846] transition shadow-soft-xs cursor-pointer"
               >
                 <MessageSquare size={16} /> Contact Me
               </button>

@@ -31,7 +31,7 @@ export default function ButtonGroup({ downloadCVUrl, onContact }) {
             href={cvUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-full bg-white dark:bg-[#272530] hover:bg-[#FAF9F7] dark:hover:bg-[#211F28] text-[#504172] dark:text-[#F6F4FA] border border-[#DED9E5] dark:border-[#3E394A] hover:border-[#7865A6] font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7865A6] cursor-pointer"
+            className="px-5 py-2.5 rounded-full bg-white dark:bg-[#272530] hover:bg-[#FAF9F7] dark:hover:bg-[#211F28] text-[#504172] dark:text-[#F6F4FA] border border-[#DED9E5] dark:border-[#3E394A] font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7865A6] cursor-pointer"
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.98 }}
             aria-label="View Resume in new tab"
@@ -45,7 +45,7 @@ export default function ButtonGroup({ downloadCVUrl, onContact }) {
       <motion.button
         type="button"
         onClick={onContact}
-        className="px-5 py-2.5 rounded-full bg-white dark:bg-[#272530] hover:bg-[#FAF9F7] dark:hover:bg-[#211F28] text-[#504172] dark:text-[#F6F4FA] border border-[#DED9E5] dark:border-[#3E394A] hover:border-[#7865A6] font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-soft-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7865A6] cursor-pointer"
+        className="px-5 py-2.5 rounded-full bg-white dark:bg-[#272530] hover:bg-[#FAF9F7] dark:hover:bg-[#211F28] text-[#504172] dark:text-[#F6F4FA] border border-[#DED9E5] dark:border-[#3E394A] font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-soft-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7865A6] cursor-pointer"
         whileHover={{ y: -1 }}
         whileTap={{ scale: 0.98 }}
       >

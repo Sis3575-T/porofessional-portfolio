@@ -93,7 +93,7 @@ export default function CustomCursor({ enabled = true }) {
       <div
         className={`pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-transform duration-75 ease-out ${
           isHovered
-            ? "w-9 h-9 border-2 border-red-500 bg-red-500/20 shadow-lg shadow-red-500/40 scale-100"
+            ? "w-5 h-5 bg-red-500/30 scale-100"
             : "w-3.5 h-3.5 bg-red-500/80 shadow-md shadow-red-500/30 scale-75"
         }`}
         style={{

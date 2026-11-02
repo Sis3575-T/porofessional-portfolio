@@ -60,7 +60,7 @@ export default function StatsCard({ statistics }) {
           viewport={{ once: true }}
           transition={{ delay: i * 0.08, duration: 0.35 }}
           whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-5 shadow-soft-xs hover:border-[#78649D]/50 hover:shadow-soft transition-all text-center sm:text-left"
+          className="bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-5 shadow-soft-xs hover:shadow-soft transition-all text-center sm:text-left"
         >
           <p className="text-3xl font-bold text-[#78649D] dark:text-[#B9A4DF] mb-1 font-mono">
             <AnimatedNumber target={item.target} />

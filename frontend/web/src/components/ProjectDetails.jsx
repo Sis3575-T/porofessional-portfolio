@@ -97,7 +97,7 @@ export default function ProjectDetails() {
           </Link>
 
           {/* Thumbnail Banner */}
-          <div className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-3xl overflow-hidden mb-8 shadow-lg dark:shadow-2xl backdrop-blur-xl glow-border-red">
+          <div className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-3xl overflow-hidden mb-8 shadow-lg dark:shadow-2xl backdrop-blur-xl ">
             <div className="h-64 sm:h-80 md:h-96 bg-slate-100/60 dark:bg-[#070b12] flex items-center justify-center overflow-hidden">
               {project.thumbnail ? (
                 <img
@@ -159,7 +159,7 @@ export default function ProjectDetails() {
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 border border-[#E2E8F0] dark:border-[#1E293B] bg-white dark:bg-[#161F30] text-[#1E293B] dark:text-[#F8FAFC] rounded-full font-semibold text-xs sm:text-sm hover:border-[#2563EB]/50 transition flex items-center gap-2 shadow-soft-xs"
+                    className="px-5 py-2.5 border border-[#E2E8F0] dark:border-[#1E293B] bg-white dark:bg-[#161F30] text-[#1E293B] dark:text-[#F8FAFC] rounded-full font-semibold text-xs sm:text-sm transition flex items-center gap-2 shadow-soft-xs"
                   >
                     <Github size={14} /> Source Code
                   </a>

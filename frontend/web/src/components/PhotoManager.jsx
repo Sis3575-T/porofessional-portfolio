@@ -44,7 +44,7 @@ export default function PhotoManager() {
           ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200"
           : active
           ? "bg-[#78649D] text-white border border-[#78649D] shadow-sm"
-          : "bg-white text-[#51416F] hover:text-[#78649D] border border-[#DED7E2] hover:border-[#78649D]/50"
+          : "bg-white text-[#51416F] hover:text-[#78649D] border border-[#DED7E2] "
       }`}
     >
       <Icon size={16} />
@@ -56,7 +56,7 @@ export default function PhotoManager() {
       <motion.button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-2xl border border-[#DED7E2] bg-white/95 backdrop-blur-xl px-4 py-2.5 text-sm font-semibold text-[#51416F] shadow-soft-sm hover:border-[#78649D]/50 cursor-pointer"
+        className="flex items-center gap-2 rounded-2xl border border-[#DED7E2] bg-white/95 backdrop-blur-xl px-4 py-2.5 text-sm font-semibold text-[#51416F] shadow-soft-sm cursor-pointer"
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.97 }}
       >

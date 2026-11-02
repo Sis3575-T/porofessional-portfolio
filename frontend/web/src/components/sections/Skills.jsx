@@ -170,7 +170,7 @@ export default function Skills() {
           </div>
         ) : (
           <motion.div
-            className="rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl glow-border-red"
+            className="rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl "
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -188,7 +188,7 @@ export default function Skills() {
                     className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? "bg-[#246BFD] text-white shadow-soft-xs"
-                        : "bg-[#EDF4FD] dark:bg-[#111827] text-[#52607A] dark:text-[#94A3B8] border border-[#D8E5F8] dark:border-[#1E293B] hover:border-[#246BFD]"
+                        : "bg-[#EDF4FD] dark:bg-[#111827] text-[#52607A] dark:text-[#94A3B8] border border-[#D8E5F8] dark:border-[#1E293B] "
                     }`}
                   >
                     {cat.label}
@@ -202,7 +202,7 @@ export default function Skills() {
               {filteredSkills.map((tech) => (
                 <div
                   key={tech.id || tech.name}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 text-xs sm:text-sm font-semibold text-slate-800 dark:text-gray-200 shadow-sm hover:border-rose-500/50 dark:hover:border-rose-500/50 hover:shadow-glow-red hover:-translate-y-0.5 transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 text-xs sm:text-sm font-semibold text-slate-800 dark:text-gray-200 shadow-sm hover:-translate-y-0.5 transition-all duration-200"
                 >
                   <span className="shrink-0 flex items-center justify-center">
                     {getSkillIcon(tech)}

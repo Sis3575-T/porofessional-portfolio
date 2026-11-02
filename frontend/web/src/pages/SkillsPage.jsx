@@ -16,7 +16,7 @@ export default function SkillsPage() {
           <div className="pt-2 pb-1 flex items-center justify-between">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#52607A] dark:text-[#94A3B8] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition py-1.5 px-3 rounded-full hover:bg-white/80 dark:hover:bg-white/10 border border-transparent hover:border-slate-300 dark:hover:border-white/15 shadow-2xs"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#52607A] dark:text-[#94A3B8] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition py-1.5 px-3 rounded-full hover:bg-white/80 dark:hover:bg-white/10 border border-transparent shadow-2xs"
             >
               <ArrowLeft size={16} />
               <span>Back to Home</span>
@@ -30,7 +30,7 @@ export default function SkillsPage() {
           <Skills />
 
           {/* Bottom Call to Action Card */}
-          <div className="mt-6 sm:mt-8 rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl glow-border-red flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="mt-6 sm:mt-8 rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-[#14213D] dark:text-[#F8FAFC]">
                 Want to see these skills in real applications?

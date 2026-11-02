@@ -40,7 +40,7 @@ export default function FeatureCard({ cards: cardsJson }) {
             viewport={{ once: true }}
             transition={{ delay: 0.15 + i * 0.08, duration: 0.35 }}
             whileHover={{ y: -4 }}
-            className="group bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-5 shadow-soft-xs hover:border-[#78649D]/50 hover:shadow-soft transition-all"
+            className="group bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-2xl p-5 shadow-soft-xs hover:shadow-soft transition-all"
           >
             <div className="w-10 h-10 rounded-xl bg-[#EAE3F3] dark:bg-[#B9A4DF]/15 text-[#78649D] dark:text-[#B9A4DF] border border-[#DED7E2] dark:border-[#403846] flex items-center justify-center mb-4">
               <IconComp size={18} />

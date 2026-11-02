@@ -59,7 +59,7 @@ export default function UploadPhoto() {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={processing}
-        className="fixed right-6 bottom-24 z-50 flex items-center gap-2.5 rounded-2xl border border-[#DED7E2] dark:border-[#403846] bg-white/95 dark:bg-[#27232D]/95 backdrop-blur-xl px-5 py-3 text-sm font-semibold text-[#51416F] dark:text-[#F6F2F8] shadow-soft-sm hover:border-[#78649D]/50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        className="fixed right-6 bottom-24 z-50 flex items-center gap-2.5 rounded-2xl border border-[#DED7E2] dark:border-[#403846] bg-white/95 dark:bg-[#27232D]/95 backdrop-blur-xl px-5 py-3 text-sm font-semibold text-[#51416F] dark:text-[#F6F2F8] shadow-soft-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.97 }}
       >

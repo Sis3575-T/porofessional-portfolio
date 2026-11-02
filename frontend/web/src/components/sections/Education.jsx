@@ -81,7 +81,7 @@ export default function Education() {
               return (
                 <motion.div
                   key={edu.id || index}
-                  className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-[28px] p-6 sm:p-7 shadow-lg dark:shadow-2xl backdrop-blur-xl hover:border-rose-500/60 dark:hover:border-rose-500/60 glow-border-red transition-all duration-300 flex flex-col justify-between"
+                  className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-[28px] p-6 sm:p-7 shadow-lg dark:shadow-2xl backdrop-blur-xl transition-all duration-300 flex flex-col justify-between"
                   initial={{ opacity: 0, y: 12 }}
                   animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
                   transition={{ duration: 0.25, delay: index * 0.05 }}

@@ -141,7 +141,7 @@ export default function AboutSection() {
             </div>
 
             {/* Restructured Quick Facts Card with 3D Depth */}
-            <div className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 p-5 sm:p-6 shadow-lg dark:shadow-2xl backdrop-blur-xl glow-border-red max-w-lg transition-all">
+            <div className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 p-5 sm:p-6 shadow-lg dark:shadow-2xl backdrop-blur-xl max-w-lg transition-all">
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D8E5F8]/60 dark:border-[#1E293B]">
                 <h3 className="text-xs font-bold text-[#14213D] dark:text-[#F8FAFC] uppercase tracking-wider">
                   Quick Facts
@@ -320,7 +320,7 @@ export default function AboutSection() {
               <button
                 type="button"
                 onClick={handleDownloadCV}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-[#161F30] text-[#14213D] dark:text-[#F8FAFC] border border-[#D8E5F8] dark:border-[#1E293B] hover:bg-[#EDF4FD] dark:hover:bg-[#111827] hover:border-[#246BFD] font-semibold text-xs sm:text-sm transition-all shadow-soft-xs hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD] min-w-[140px]"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-[#161F30] text-[#14213D] dark:text-[#F8FAFC] border border-[#D8E5F8] dark:border-[#1E293B] hover:bg-[#EDF4FD] dark:hover:bg-[#111827] font-semibold text-xs sm:text-sm transition-all shadow-soft-xs hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#246BFD] min-w-[140px]"
                 aria-label="Download Sisay Temesgen CV PDF"
                 title="Download CV"
               >

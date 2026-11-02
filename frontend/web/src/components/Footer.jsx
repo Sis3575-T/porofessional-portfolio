@@ -62,7 +62,7 @@ export default function Footer() {
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition-all shadow-soft-xs"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition-all shadow-soft-xs"
               aria-label="GitHub Profile"
               title="GitHub"
             >
@@ -72,7 +72,7 @@ export default function Footer() {
               href={linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition-all shadow-soft-xs"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition-all shadow-soft-xs"
               aria-label="LinkedIn Profile"
               title="LinkedIn"
             >
@@ -82,7 +82,7 @@ export default function Footer() {
               href={telegramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition-all shadow-soft-xs"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition-all shadow-soft-xs"
               aria-label="Telegram Channel"
               title="Telegram"
             >
@@ -90,7 +90,7 @@ export default function Footer() {
             </a>
             <a
               href={`mailto:${email}`}
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition-all shadow-soft-xs"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition-all shadow-soft-xs"
               aria-label="Send Email"
               title="Email"
             >
@@ -99,7 +99,7 @@ export default function Footer() {
             {phone && (
               <a
                 href={`tel:${phone}`}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition-all shadow-soft-xs"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition-all shadow-soft-xs"
                 aria-label="Call Phone"
                 title="Phone"
               >
@@ -109,7 +109,7 @@ export default function Footer() {
             <button
               type="button"
               onClick={scrollToTop}
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:border-[#246BFD] hover:-translate-y-0.5 transition-all shadow-soft-xs cursor-pointer ml-1"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] text-[#14213D] dark:text-[#F8FAFC] hover:text-[#246BFD] dark:hover:text-[#3B82F6] hover:-translate-y-0.5 transition-all shadow-soft-xs cursor-pointer ml-1"
               aria-label="Back to top"
               title="Back to top"
             >

@@ -16,7 +16,7 @@ export default function ContactPage() {
           <div className="pt-2 pb-1 flex items-center justify-between">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#52607A] dark:text-[#94A3B8] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition py-1.5 px-3 rounded-full hover:bg-white/80 dark:hover:bg-white/10 border border-transparent hover:border-slate-300 dark:hover:border-white/15 shadow-2xs"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#52607A] dark:text-[#94A3B8] hover:text-[#246BFD] dark:hover:text-[#3B82F6] transition py-1.5 px-3 rounded-full hover:bg-white/80 dark:hover:bg-white/10 border border-transparent shadow-2xs"
             >
               <ArrowLeft size={16} />
               <span>Back to Home</span>

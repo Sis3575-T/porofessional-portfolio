@@ -16,7 +16,7 @@ export default function SkillsPreview({ skills }) {
             y: -2,
             transition: { duration: 0.15 },
           }}
-          className="px-3.5 py-1.5 bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-xl text-xs sm:text-sm font-semibold text-[#29262D] dark:text-[#F6F2F8] hover:border-[#78649D]/50 cursor-default transition-all shadow-soft-xs"
+          className="px-3.5 py-1.5 bg-white dark:bg-[#27232D] border border-[#DED7E2] dark:border-[#403846] rounded-xl text-xs sm:text-sm font-semibold text-[#29262D] dark:text-[#F6F2F8] cursor-default transition-all shadow-soft-xs"
         >
           {skill.name}
         </motion.div>

@@ -78,7 +78,7 @@ export default function Testimonials() {
               <button
                 type="button"
                 onClick={prev}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#272530] border border-[#DED9E5] dark:border-[#3E394A] text-[#504172] dark:text-[#F6F4FA] hover:text-[#7865A6] dark:hover:text-[#BBA7E5] hover:border-[#7865A6]/40 transition cursor-pointer shadow-soft-xs"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#272530] border border-[#DED9E5] dark:border-[#3E394A] text-[#504172] dark:text-[#F6F4FA] hover:text-[#7865A6] dark:hover:text-[#BBA7E5] transition cursor-pointer shadow-soft-xs"
                 aria-label="Previous testimonial"
               >
                 <ChevronLeft size={15} />
@@ -89,7 +89,7 @@ export default function Testimonials() {
               <button
                 type="button"
                 onClick={next}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#272530] border border-[#DED9E5] dark:border-[#3E394A] text-[#504172] dark:text-[#F6F4FA] hover:text-[#7865A6] dark:hover:text-[#BBA7E5] hover:border-[#7865A6]/40 transition cursor-pointer shadow-soft-xs"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-[#272530] border border-[#DED9E5] dark:border-[#3E394A] text-[#504172] dark:text-[#F6F4FA] hover:text-[#7865A6] dark:hover:text-[#BBA7E5] transition cursor-pointer shadow-soft-xs"
                 aria-label="Next testimonial"
               >
                 <ChevronRight size={15} />
