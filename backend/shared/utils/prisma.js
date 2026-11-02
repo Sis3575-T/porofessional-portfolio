@@ -10,7 +10,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function cleanDatabaseUrl(rawUrl) {
   if (!rawUrl) return rawUrl;
-  return rawUrl.replace(/[?&]channel_binding=[^&]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+  let cleaned = rawUrl.replace(/[?&]channel_binding=[^&]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+  if (cleaned.includes("neon.tech")) {
+    cleaned = cleaned.replace("-pooler.", ".");
+  }
+  return cleaned;
 }
 dotenv.config({ path: path.join(__dirname, "../../../backend/.env") });
 dotenv.config({ path: path.join(__dirname, "../../../.env") });

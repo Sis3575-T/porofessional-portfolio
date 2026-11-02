@@ -48,6 +48,9 @@ async function runWithRetry(cmd, label, attempts = 2) {
 function ensureConnectTimeout(url) {
   if (!url) return url;
   let cleaned = url.replace(/[?&]channel_binding=[^&]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+  if (cleaned.includes("neon.tech")) {
+    cleaned = cleaned.replace("-pooler.", ".");
+  }
   if (cleaned.includes("connect_timeout=")) return cleaned;
   const sep = cleaned.includes("?") ? "&" : "?";
   return `${cleaned}${sep}connect_timeout=60`;
