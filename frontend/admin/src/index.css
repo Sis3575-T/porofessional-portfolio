@@ -8,9 +8,20 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  background-color: #ffffff !important;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+.amare-admin-bg {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #ffffff;
+  background: #ffffff !important;
   color: #1e293b;
   -webkit-font-smoothing: antialiased;
 }
