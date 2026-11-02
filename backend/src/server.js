@@ -123,13 +123,22 @@ async function autoInitDatabase() {
 
   if (process.env.AUTO_DB_PUSH === "true" || missingTables.length > 0) {
     console.warn(`[DB] Syncing schema (missing tables: [${missingTables.join(", ")}])...`);
-    await runWithRetry(
+    const pushOk = await runWithRetry(
       `${prismaBin} db push --schema="${schemaPath}" --accept-data-loss`,
-      "Database schema push"
+      "Database schema push",
+      1
     );
+    if (!pushOk) {
+      console.warn("[DB] Legacy tables conflict with new schema. Resetting database schema with --force-reset...");
+      await runWithRetry(
+        `${prismaBin} db push --schema="${schemaPath}" --force-reset --accept-data-loss`,
+        "Database schema force-reset push",
+        2
+      );
+    }
   }
 
-  // Check if initial portfolio data exists; if empty, run seed.js
+  // Check if initial portfolio data exists; if empty, run snapshot restore and seed.js
   let shouldSeed = false;
   try {
     const userCount = await prisma.user.count();
@@ -144,9 +153,13 @@ async function autoInitDatabase() {
   }
 
   if (shouldSeed) {
-    console.log("[DB] Seeding essential database content from seed.js...");
+    console.log("[DB] Populating essential database content...");
+    const restoreScript = path.join(__dirname, "../prisma/restore-db-snapshot.js");
     const seedScript = path.join(__dirname, "../prisma/seed.js");
-    await runWithRetry(`node "${seedScript}"`, "Database seeding");
+    if (fs.existsSync(restoreScript)) {
+      await runWithRetry(`node "${restoreScript}"`, "Database snapshot restore", 1);
+    }
+    await runWithRetry(`node "${seedScript}"`, "Database seeding", 2);
   }
 
   // Always verify admin credentials and vital settings
