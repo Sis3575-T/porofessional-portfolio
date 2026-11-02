@@ -38,8 +38,16 @@ export default function Login({ setIsAuthenticated }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-[#090d14] text-slate-100 amare-admin-bg relative overflow-hidden px-4">
+      {/* Fixed code background texture */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.16] pointer-events-none"
+        style={{ backgroundImage: "url(/hero-code-bg.png)" }}
+      />
+      {/* Ambient luminous glow orbs */}
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-cyan-400">
             Admin Dashboard

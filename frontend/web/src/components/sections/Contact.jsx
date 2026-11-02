@@ -178,7 +178,7 @@ export default function Contact() {
                 {/* Email Card */}
                 <a
                   href={`mailto:${contactEmail}`}
-                  className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/50 hover:shadow-soft transition-all shadow-soft-xs group"
+                  className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 hover:border-rose-500/50 dark:hover:border-rose-500/50 hover:shadow-glow-red transition-all shadow-md group glow-border-red"
                 >
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6] shrink-0">
                     <Mail size={17} />
@@ -194,7 +194,7 @@ export default function Contact() {
                 </a>
 
                 {/* Location Card */}
-                <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-xs">
+                <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 shadow-md">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6] shrink-0">
                     <MapPin size={17} />
                   </div>
@@ -212,7 +212,7 @@ export default function Contact() {
                 {contactPhone && (
                   <a
                     href={`tel:${contactPhone.replace(/\s+/g, "")}`}
-                    className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/50 hover:shadow-soft transition-all shadow-soft-xs group"
+                    className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 hover:border-rose-500/50 dark:hover:border-rose-500/50 hover:shadow-glow-red transition-all shadow-md group glow-border-red"
                   >
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6] shrink-0">
                       <Phone size={17} />
@@ -246,7 +246,7 @@ export default function Contact() {
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
             transition={{ duration: 0.25, delay: 0.05 }}
           >
-            <div className="bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] rounded-2xl p-5 sm:p-6 shadow-soft-sm">
+            <div className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-[28px] p-6 sm:p-7 shadow-lg dark:shadow-2xl backdrop-blur-xl glow-border-red">
               {success ? (
                 <div className="py-10 text-center">
                   <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] dark:bg-[#3B82F6]/15 border border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] dark:text-[#3B82F6] mx-auto flex items-center justify-center mb-3">

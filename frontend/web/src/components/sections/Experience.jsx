@@ -50,7 +50,7 @@ function DetailModal({ experience, onClose }) {
     >
       <div className="absolute inset-0 bg-[#0B0F17]/60 backdrop-blur-xs" />
       <motion.div
-        className="relative w-full max-w-xl rounded-3xl bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-lg overflow-hidden z-10"
+        className="relative w-full max-w-xl rounded-3xl bg-white/95 dark:bg-[#0e1420] border border-slate-200 dark:border-white/20 shadow-2xl backdrop-blur-2xl overflow-hidden z-10 glow-border-red"
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -203,7 +203,7 @@ function ExperienceCard({ experience, index, onOpen }) {
 
   return (
     <div
-      className="group relative rounded-3xl p-6 bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-xs hover:border-[#2563EB]/50 hover:shadow-soft transition-all flex flex-col justify-between shrink-0"
+      className="group relative rounded-[28px] p-6 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 shadow-lg dark:shadow-2xl backdrop-blur-xl hover:border-rose-500/60 dark:hover:border-rose-500/60 glow-border-red transition-all flex flex-col justify-between shrink-0"
       style={{
         width: "min(340px, calc(100vw - 48px))",
         minHeight: 270,

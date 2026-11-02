@@ -105,7 +105,7 @@ export default function Dashboard({ children, title }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="flex h-screen overflow-hidden bg-[#090d14] text-slate-100 amare-admin-bg relative">
       <div className={`fixed inset-y-0 left-0 z-50 bg-slate-900 border-r border-slate-700 transform transition-all duration-300 lg:static lg:inset-auto ${
         sidebarCollapsed ? "w-[68px]" : "w-64"
       } ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
@@ -178,7 +178,7 @@ export default function Dashboard({ children, title }) {
       )}
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="sticky top-0 z-[60] bg-white/90 backdrop-blur border-b border-slate-200 px-6 py-4 lg:hidden">
+        <header className="sticky top-0 z-[60] bg-[#0b0f17]/90 backdrop-blur border-b border-slate-800 px-6 py-4 lg:hidden">
           <button onClick={() => setSidebarOpen(true)} className="text-slate-500 hover:text-slate-900">
             <Menu size={24} />
           </button>
@@ -187,7 +187,7 @@ export default function Dashboard({ children, title }) {
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
           {location.pathname === "/admin" ? (
             <>
-              <h2 className="text-2xl font-bold text-slate-900 mb-8">Dashboard Overview</h2>
+              <h2 className="text-2xl font-bold text-slate-100 mb-8">Dashboard Overview</h2>
               {loading ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[1,2,3,4,5].map(i => (
@@ -208,7 +208,7 @@ export default function Dashboard({ children, title }) {
                     ].map((stat) => (
                       <div key={stat.label} className="card">
                         <p className="text-slate-500 text-sm mb-2">{stat.label}</p>
-                        <p className="text-3xl font-bold text-slate-900">
+                        <p className="text-3xl font-bold text-white">
                           {stat.value}
                         </p>
                       </div>
@@ -217,13 +217,13 @@ export default function Dashboard({ children, title }) {
 
                   <div className="grid lg:grid-cols-2 gap-6">
                     <div className="card">
-                      <h3 className="font-semibold text-slate-900 mb-4">Recent Messages</h3>
+                      <h3 className="font-semibold text-slate-100 mb-4">Recent Messages</h3>
                       {stats.recentMessages?.length > 0 ? (
                         <div className="space-y-3">
                           {stats.recentMessages.map((msg) => (
-                            <div key={msg.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                            <div key={msg.id} className="flex items-center justify-between p-3 bg-white/[0.03] border border-white/5 rounded-xl">
                               <div>
-                                <p className="text-sm text-slate-900">{msg.fullName}</p>
+                                <p className="text-sm text-slate-100">{msg.fullName}</p>
                                 <p className="text-xs text-slate-400">{msg.subject}</p>
                               </div>
                               <span className={`text-xs px-2 py-1 rounded-full ${msg.status === "UNREAD" ? "bg-cyan-50 text-cyan-600" : "bg-slate-100 text-slate-500"}`}>
@@ -238,7 +238,7 @@ export default function Dashboard({ children, title }) {
                     </div>
 
                     <div className="card">
-                      <h3 className="font-semibold text-slate-900 mb-4">Quick Actions</h3>
+                      <h3 className="font-semibold text-slate-100 mb-4">Quick Actions</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {sidebarItems.slice(1).map((item) => {
                           const Icon = item.icon;
@@ -246,7 +246,7 @@ export default function Dashboard({ children, title }) {
                             <button
                               key={item.path}
                               onClick={() => navigate(item.path)}
-                              className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
+                              className="flex items-center gap-2 p-3 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-slate-300 hover:bg-white/[0.08] hover:text-white transition"
                             >
                               <Icon size={16} className="text-cyan-600" />
                               {item.label}

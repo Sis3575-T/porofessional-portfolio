@@ -170,7 +170,7 @@ export default function Skills() {
           </div>
         ) : (
           <motion.div
-            className="rounded-[24px] p-4 sm:p-6 bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] shadow-soft-3d"
+            className="rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl glow-border-red"
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -202,7 +202,7 @@ export default function Skills() {
               {filteredSkills.map((tech) => (
                 <div
                   key={tech.id || tech.name}
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#EDF4FD]/70 dark:bg-[#111827] border border-[#D8E5F8] dark:border-[#1E293B] text-xs sm:text-sm font-semibold text-[#14213D] dark:text-[#F8FAFC] shadow-soft-xs hover:border-[#246BFD]/60 hover:shadow-soft hover:-translate-y-0.5 transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 text-xs sm:text-sm font-semibold text-slate-800 dark:text-gray-200 shadow-sm hover:border-rose-500/50 dark:hover:border-rose-500/50 hover:shadow-glow-red hover:-translate-y-0.5 transition-all duration-200"
                 >
                   <span className="shrink-0 flex items-center justify-center">
                     {getSkillIcon(tech)}

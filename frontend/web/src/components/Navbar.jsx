@@ -215,10 +215,10 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-200 ${
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           scrolled
-            ? "bg-[#F7FAFE]/95 dark:bg-[#0B0F17]/95 backdrop-blur-md shadow-soft-xs border-b border-[#D8E5F8] dark:border-[#1E293B]"
-            : "bg-[#F7FAFE]/90 dark:bg-[#0B0F17]/90 backdrop-blur-xs border-b border-[#D8E5F8]/70 dark:border-[#1E293B]/70"
+            ? "bg-slate-50/85 dark:bg-[#0b0f17]/85 backdrop-blur-xl shadow-md dark:shadow-2xl border-b border-slate-200/80 dark:border-white/10"
+            : "bg-slate-50/70 dark:bg-[#090d14]/70 backdrop-blur-md border-b border-slate-200/40 dark:border-white/5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -420,7 +420,7 @@ export default function Navbar() {
               role="dialog"
               aria-modal="true"
               aria-label="Site Navigation"
-              className="fixed top-0 right-0 h-full w-[310px] max-w-[85vw] z-50 bg-[#F8FAFC] dark:bg-[#0B0F17] border-l border-[#E2E8F0] dark:border-[#1E293B] shadow-soft-lg flex flex-col lg:hidden"
+              className="fixed top-0 right-0 h-full w-[310px] max-w-[85vw] z-50 bg-white/95 dark:bg-[#0d121c]/95 border-l border-slate-200 dark:border-white/10 backdrop-blur-2xl shadow-soft-lg flex flex-col lg:hidden"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}

@@ -17,6 +17,8 @@ import PhotoManager from "./components/PhotoManager";
 import ScreenshotButton from "./components/ScreenshotButton";
 import FaviconUpdater from "./components/FaviconUpdater";
 import HomeContactStrip from "./components/HomeContactStrip";
+import BackgroundEffects from "./components/BackgroundEffects";
+import CustomCursor from "./components/CustomCursor";
 
 import Hero from "./components/sections/Hero";
 import About from "./components/sections/About";
@@ -33,7 +35,7 @@ const ProjectDetails = lazy(() => import("./components/ProjectDetails"));
 
 const SectionLoader = () => (
   <div className="py-20 flex items-center justify-center">
-    <div className="text-xs font-semibold uppercase tracking-wider text-[#475569] dark:text-[#94A3B8] animate-pulse">
+    <div className="text-xs font-semibold uppercase tracking-wider text-rose-500 dark:text-amber-400 animate-pulse">
       Loading...
     </div>
   </div>
@@ -81,7 +83,7 @@ function ScrollManager() {
  * HomePage
  * Strictly adheres to requirement:
  * 1. Compact Navbar (in MainLayout)
- * 2. Home Hero section (viewport-aware 100svh)
+ * 2. Home Hero section
  * 3. Compact About section
  * 4. Social media links and direct contact information (HomeContactStrip)
  * 5. Compact footer (in MainLayout)
@@ -222,14 +224,15 @@ function MainLayout() {
 
   return (
     <div
-      className="min-h-screen flex flex-col relative"
-      style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}
+      className="min-h-screen flex flex-col relative bg-slate-50 dark:bg-[#090d14] text-slate-900 dark:text-slate-100 selection:bg-rose-500 selection:text-white transition-colors duration-300"
     >
+      <BackgroundEffects />
+      <CustomCursor />
       <SkipLink />
       <FaviconUpdater />
       <ScrollManager />
       <Navbar />
-      <div className="w-full flex-1 flex flex-col">
+      <div className="w-full flex-1 flex flex-col relative z-10">
         <main id="main-content" className="flex-1">
           <AppRoutes />
         </main>

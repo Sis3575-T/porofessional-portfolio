@@ -97,8 +97,8 @@ export default function ProjectDetails() {
           </Link>
 
           {/* Thumbnail Banner */}
-          <div className="bg-white dark:bg-[#161F30] border border-[#E2E8F0] dark:border-[#1E293B] rounded-3xl overflow-hidden mb-8 shadow-soft-sm">
-            <div className="h-64 sm:h-80 md:h-96 bg-[#F8FAFC] dark:bg-[#0B0F17] flex items-center justify-center overflow-hidden">
+          <div className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-3xl overflow-hidden mb-8 shadow-lg dark:shadow-2xl backdrop-blur-xl glow-border-red">
+            <div className="h-64 sm:h-80 md:h-96 bg-slate-100/60 dark:bg-[#070b12] flex items-center justify-center overflow-hidden">
               {project.thumbnail ? (
                 <img
                   src={resolveUrl(project.thumbnail)}

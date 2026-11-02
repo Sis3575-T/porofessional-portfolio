@@ -126,10 +126,10 @@ export default function Projects() {
               return (
                 <div
                   key={project.id}
-                  className="group flex flex-col bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] rounded-[24px] overflow-hidden hover:border-[#246BFD] shadow-soft-sm hover:shadow-soft-3d hover:-translate-y-1 transition-all duration-200"
+                  className="group flex flex-col bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-[28px] overflow-hidden hover:border-rose-500/60 dark:hover:border-rose-500/60 shadow-lg dark:shadow-2xl backdrop-blur-xl hover:shadow-glow-red hover:-translate-y-1.5 transition-all duration-300 cursor-pointer glow-border-red"
                 >
                   {/* Thumbnail / Visual Area */}
-                  <div className="relative h-44 sm:h-48 w-full bg-[#F7FAFE] dark:bg-[#0B0F17] overflow-hidden border-b border-[#D8E5F8] dark:border-[#1E293B]">
+                  <div className="relative h-44 sm:h-48 w-full bg-slate-100/70 dark:bg-[#070b12] overflow-hidden border-b border-slate-200/80 dark:border-white/10">
                     {project.thumbnail ? (
                       <img
                         src={resolveUrl(project.thumbnail)}

@@ -6,7 +6,7 @@ export default function NotFoundPage() {
   return (
     <>
       <SEO title="404 - Page Not Found | Sisay Temesgen" />
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0B0F17] text-[#0F172A] dark:text-[#F8FAFC] px-4 transition-colors">
+      <div className="min-h-screen flex items-center justify-center bg-transparent text-[#0F172A] dark:text-[#F8FAFC] px-4 transition-colors">
         <div className="text-center max-w-md">
           <div className="text-7xl font-bold font-mono text-[#2563EB] dark:text-[#3B82F6] mb-4" aria-hidden="true">
             404

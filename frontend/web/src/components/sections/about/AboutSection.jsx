@@ -140,7 +140,7 @@ export default function AboutSection() {
             </div>
 
             {/* Restructured Quick Facts Card with 3D Depth */}
-            <div className="rounded-2xl bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] p-4 sm:p-5 shadow-soft-3d max-w-lg transition-all">
+            <div className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 p-5 sm:p-6 shadow-lg dark:shadow-2xl backdrop-blur-xl glow-border-red max-w-lg transition-all">
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D8E5F8]/60 dark:border-[#1E293B]">
                 <h3 className="text-xs font-bold text-[#14213D] dark:text-[#F8FAFC] uppercase tracking-wider">
                   Quick Facts

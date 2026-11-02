@@ -40,10 +40,10 @@ export default function HomeContactStrip() {
     "https://t.me/sisaytem";
 
   return (
-    <section className="py-6 sm:py-8 relative bg-[#F7FAFE] dark:bg-[#0B0F17] transition-colors">
+    <section className="py-6 sm:py-8 relative bg-transparent transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="rounded-[24px] bg-white dark:bg-[#161F30] border border-[#D8E5F8] dark:border-[#1E293B] shadow-soft-3d p-5 sm:p-6 lg:p-7"
+          className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl glow-border-red p-6 sm:p-7 lg:p-8"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
