@@ -105,21 +105,21 @@ export default function Dashboard({ children, title }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#090d14] text-slate-100 amare-admin-bg relative">
-      <div className={`fixed inset-y-0 left-0 z-50 bg-slate-900 border-r border-slate-700 transform transition-all duration-300 lg:static lg:inset-auto ${
+    <div className="flex h-screen overflow-hidden bg-white text-slate-900">
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 transform transition-all duration-300 lg:static lg:inset-auto ${
         sidebarCollapsed ? "w-[68px]" : "w-64"
       } ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="flex flex-col h-full">
-          <div className={`p-4 border-b border-slate-700 flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
+          <div className={`p-4 border-b border-slate-200 flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
             {!sidebarCollapsed && (
               <div>
-                <h1 className="text-lg font-bold text-cyan-400">Portfolio Pro</h1>
-                <p className="text-xs text-slate-400 mt-0.5">Admin Dashboard</p>
+                <h1 className="text-lg font-bold text-blue-600">Portfolio Pro</h1>
+                <p className="text-xs text-slate-500 mt-0.5">Admin Dashboard</p>
               </div>
             )}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition"
+              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
@@ -147,26 +147,26 @@ export default function Dashboard({ children, title }) {
               );
             })}
           </nav>
-          <div className={`p-3 border-t border-slate-700 space-y-2 ${sidebarCollapsed ? "px-2" : ""}`}>
+          <div className={`p-3 border-t border-slate-200 space-y-2 ${sidebarCollapsed ? "px-2" : ""}`}>
             {!sidebarCollapsed && (
-              <div className="flex items-center gap-3 px-3 py-2">
-                <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
+              <div className="flex items-center gap-3 px-3 py-2 bg-slate-50 rounded-xl">
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {profile.initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-200 truncate">{profile.name || profile.email || "Admin"}</p>
-                  <p className="text-xs text-slate-400 truncate">{profile.email}</p>
+                  <p className="text-sm font-medium text-slate-800 truncate">{profile.name || profile.email || "Admin"}</p>
+                  <p className="text-xs text-slate-500 truncate">{profile.email}</p>
                 </div>
               </div>
             )}
             {sidebarCollapsed && (
               <div className="flex justify-center py-2">
-                <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-xs font-bold text-white">
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">
                   {profile.initials}
                 </div>
               </div>
             )}
-            <button onClick={handleLogout} className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-slate-700/50 rounded-lg transition ${sidebarCollapsed ? "justify-center" : ""}`}>
+            <button onClick={handleLogout} className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition ${sidebarCollapsed ? "justify-center" : ""}`}>
               <LogOut size={16} /> {!sidebarCollapsed && "Sign Out"}
             </button>
           </div>
@@ -174,20 +174,20 @@ export default function Dashboard({ children, title }) {
       </div>
 
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="sticky top-0 z-[60] bg-[#0b0f17]/90 backdrop-blur border-b border-slate-800 px-6 py-4 lg:hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+        <header className="sticky top-0 z-[60] bg-white/95 backdrop-blur border-b border-slate-200 px-6 py-4 lg:hidden">
           <button onClick={() => setSidebarOpen(true)} className="text-slate-500 hover:text-slate-900">
             <Menu size={24} />
           </button>
         </header>
 
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-6 lg:p-8 overflow-y-auto bg-white">
           {location.pathname === "/admin" ? (
             <>
-              <h2 className="text-2xl font-bold text-slate-100 mb-8">Dashboard Overview</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-8">Dashboard Overview</h2>
               {loading ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[1,2,3,4,5].map(i => (
@@ -208,7 +208,7 @@ export default function Dashboard({ children, title }) {
                     ].map((stat) => (
                       <div key={stat.label} className="card">
                         <p className="text-slate-500 text-sm mb-2">{stat.label}</p>
-                        <p className="text-3xl font-bold text-white">
+                        <p className="text-3xl font-bold text-slate-900">
                           {stat.value}
                         </p>
                       </div>
@@ -217,28 +217,28 @@ export default function Dashboard({ children, title }) {
 
                   <div className="grid lg:grid-cols-2 gap-6">
                     <div className="card">
-                      <h3 className="font-semibold text-slate-100 mb-4">Recent Messages</h3>
+                      <h3 className="font-semibold text-slate-900 mb-4">Recent Messages</h3>
                       {stats.recentMessages?.length > 0 ? (
                         <div className="space-y-3">
                           {stats.recentMessages.map((msg) => (
-                            <div key={msg.id} className="flex items-center justify-between p-3 bg-white/[0.03] border border-white/5 rounded-xl">
+                            <div key={msg.id} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200/60 rounded-xl">
                               <div>
-                                <p className="text-sm text-slate-100">{msg.fullName}</p>
-                                <p className="text-xs text-slate-400">{msg.subject}</p>
+                                <p className="text-sm font-medium text-slate-900">{msg.fullName}</p>
+                                <p className="text-xs text-slate-500">{msg.subject}</p>
                               </div>
-                              <span className={`text-xs px-2 py-1 rounded-full ${msg.status === "UNREAD" ? "bg-cyan-50 text-cyan-600" : "bg-slate-100 text-slate-500"}`}>
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${msg.status === "UNREAD" ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-600"}`}>
                                 {msg.status === "UNREAD" ? "New" : msg.status === "REPLIED" ? "Replied" : "Read"}
                               </span>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-slate-400">No messages yet</p>
+                        <p className="text-sm text-slate-500">No messages yet</p>
                       )}
                     </div>
 
                     <div className="card">
-                      <h3 className="font-semibold text-slate-100 mb-4">Quick Actions</h3>
+                      <h3 className="font-semibold text-slate-900 mb-4">Quick Actions</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {sidebarItems.slice(1).map((item) => {
                           const Icon = item.icon;
@@ -246,9 +246,9 @@ export default function Dashboard({ children, title }) {
                             <button
                               key={item.path}
                               onClick={() => navigate(item.path)}
-                              className="flex items-center gap-2 p-3 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-slate-300 hover:bg-white/[0.08] hover:text-white transition"
+                              className="flex items-center gap-2 p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl text-sm font-medium text-slate-700 hover:text-slate-900 transition"
                             >
-                              <Icon size={16} className="text-cyan-600" />
+                              <Icon size={16} className="text-blue-600" />
                               {item.label}
                             </button>
                           );
@@ -258,7 +258,7 @@ export default function Dashboard({ children, title }) {
                   </div>
                 </div>
               ) : (
-                <p className="text-slate-400">Failed to load dashboard data</p>
+                <p className="text-slate-500">Failed to load dashboard data</p>
               )}
             </>
           ) : (
