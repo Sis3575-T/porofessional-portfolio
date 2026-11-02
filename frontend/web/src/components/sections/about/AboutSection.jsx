@@ -280,7 +280,7 @@ export default function AboutSection() {
             >
               <img
                 src={illustrationSrc}
-                alt="3D illustration of a developer working at a laptop"
+                alt="3D illustration of Sisay Temesgen working at a laptop"
                 width={480}
                 height={390}
                 loading="eager"
