@@ -40,7 +40,7 @@ export default function HomeContactStrip() {
     "https://t.me/sisaytem";
 
   return (
-    <section className="py-6 sm:py-8 relative bg-transparent transition-colors">
+    <section className="pt-2 pb-5 sm:pb-6 relative bg-transparent transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="rounded-[28px] bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl p-6 sm:p-7 lg:p-8"

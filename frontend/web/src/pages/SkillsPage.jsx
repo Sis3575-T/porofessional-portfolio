@@ -10,7 +10,7 @@ export default function SkillsPage() {
         title="Technical Skills & Stack | Sisay Temesgen"
         description="Comprehensive overview of Sisay Temesgen's technical capabilities across JavaScript, React, Node.js, Express, PostgreSQL, MongoDB, and AI."
       />
-      <div className="pt-6 sm:pt-8 pb-8 sm:pb-10 min-h-[calc(100vh-140px)] bg-transparent transition-colors">
+      <div className="pt-3 sm:pt-4 pb-6 sm:pb-8 min-h-[calc(100vh-140px)] bg-transparent transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Breadcrumb & Back Navigation */}
           <div className="pt-2 pb-1 flex items-center justify-between">
@@ -30,7 +30,7 @@ export default function SkillsPage() {
           <Skills />
 
           {/* Bottom Call to Action Card */}
-          <div className="mt-6 sm:mt-8 rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="mt-4 sm:mt-5 rounded-[28px] p-5 sm:p-7 bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-[#14213D] dark:text-[#F8FAFC]">
                 Want to see these skills in real applications?

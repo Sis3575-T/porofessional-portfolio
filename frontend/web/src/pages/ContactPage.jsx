@@ -10,7 +10,7 @@ export default function ContactPage() {
         title="Get In Touch | Sisay Temesgen - Full-Stack Developer"
         description="Contact Sisay Temesgen for full-stack engineering roles, software projects, AI integration opportunities, and technical collaborations."
       />
-      <div className="pt-6 sm:pt-8 pb-8 sm:pb-10 min-h-[calc(100vh-140px)] bg-transparent transition-colors">
+      <div className="pt-3 sm:pt-4 pb-6 sm:pb-8 min-h-[calc(100vh-140px)] bg-transparent transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Breadcrumb & Back Navigation */}
           <div className="pt-2 pb-1 flex items-center justify-between">

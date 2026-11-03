@@ -43,7 +43,7 @@ export default function Services() {
   return (
     <section
       id="services"
-      className="py-6 sm:py-8 relative transition-colors scroll-mt-16"
+      className="pt-2 pb-4 sm:pb-5 relative transition-colors scroll-mt-16"
       style={{ background: "var(--section-services)" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" ref={sectionRef}>

@@ -87,17 +87,17 @@ export default function ProjectDetails() {
   return (
     <>
       <SEO title={`${project.title} | Projects`} description={project.shortDescription || project.description} />
-      <div className="min-h-screen pt-20 pb-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen pt-12 pb-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <Link
             to="/projects"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#475569] hover:text-[#2563EB] dark:text-[#94A3B8] dark:hover:text-[#3B82F6] transition mb-8"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#475569] hover:text-[#2563EB] dark:text-[#94A3B8] dark:hover:text-[#3B82F6] transition mb-4"
           >
             <ArrowLeft size={15} /> Back to Projects
           </Link>
 
           {/* Thumbnail Banner */}
-          <div className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-3xl overflow-hidden mb-8 shadow-lg dark:shadow-2xl backdrop-blur-xl ">
+          <div className="bg-white/95 dark:bg-[#0e1420]/85 border border-slate-200/80 dark:border-white/10 rounded-3xl overflow-hidden mb-5 shadow-lg dark:shadow-2xl backdrop-blur-xl ">
             <div className="h-64 sm:h-80 md:h-96 bg-slate-100/60 dark:bg-[#070b12] flex items-center justify-center overflow-hidden">
               {project.thumbnail ? (
                 <img

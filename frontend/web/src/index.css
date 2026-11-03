@@ -145,7 +145,7 @@ h1, h2, h3, h4, h5, h6 {
   border-width: 1px;
   border-color: #E2E8F0;
   background-color: rgba(255, 255, 255, 0.90);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.055);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
@@ -201,12 +201,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Technical grid pattern background utility */
 .amare-grid-pattern {
-  background-size: 4rem 4rem;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(15, 23, 42, 0.055) 1px, transparent 1px);
 }
 .dark .amare-grid-pattern {
-  background-size: 4rem 4rem;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.065) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.065) 1px, transparent 1px);
 }

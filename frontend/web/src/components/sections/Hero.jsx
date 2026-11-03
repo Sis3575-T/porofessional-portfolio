@@ -162,10 +162,10 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full min-h-[calc(100svh-56px)] sm:min-h-[calc(100svh-64px)] flex flex-col justify-center overflow-hidden transition-colors"
+      className="relative w-full flex flex-col justify-center overflow-hidden transition-colors pt-3 sm:pt-5 pb-2 sm:pb-3"
       style={{ background: "var(--section-hero)" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 w-full flex-1 flex flex-col justify-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 w-full flex flex-col justify-center">
         {/* Two-column layout: LEFT = Real Photo Portrait (~40%), RIGHT = Introduction & Controls (~60%) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
           {/* LEFT COLUMN: Real Photo Portrait with Professional Borderless 3D Depth */}

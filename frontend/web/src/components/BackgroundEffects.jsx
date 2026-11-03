@@ -3,17 +3,17 @@ export default function BackgroundEffects({ enabled = true }) {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-      {/* Layer 1: Code background texture from reference */}
+      {/* Layer 1: Noticeable code background texture from reference */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-[0.10] dark:opacity-[0.24] filter contrast-115 saturate-125 pointer-events-none transition-opacity duration-300"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-[0.22] dark:opacity-[0.38] filter contrast-125 saturate-125 pointer-events-none transition-opacity duration-300"
         style={{ backgroundImage: "url(/hero-code-bg.png)" }}
       />
 
-      {/* Layer 2: Seamless ambient overlay tint */}
-      <div className="fixed inset-0 z-0 bg-slate-50/80 dark:bg-[#090d14]/75 pointer-events-none transition-colors duration-300" />
+      {/* Layer 2: Subtle ambient overlay tint maintaining high contrast */}
+      <div className="fixed inset-0 z-0 bg-slate-50/30 dark:bg-[#090d14]/35 pointer-events-none transition-colors duration-300" />
 
-      {/* Layer 3: Technical grid pattern (4rem x 4rem) */}
-      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      {/* Layer 3: Technical grid pattern crisply visible across public website */}
+      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.055)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.065)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.065)_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] pointer-events-none" />
 
       {/* Layer 4: Ambient luminous blur orbs from reference */}
       {/* Top-left Crimson / Rose blur orb */}
