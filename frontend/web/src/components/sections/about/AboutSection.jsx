@@ -264,7 +264,7 @@ export default function AboutSection() {
           <div className="lg:col-span-6 flex flex-col items-center justify-center relative mt-4 lg:mt-0 w-full">
             {/* Transparent Genuine 3D Coding Environment with no colored box or card background */}
             <div className="w-full flex items-center justify-center relative">
-              <About3DScene />
+              <About3DScene glbModel={about?.glbModel ? resolveUrl(about.glbModel) : "/models/sisay-developer.glb"} />
             </div>
 
             {/* View CV & Download CV Action Buttons Directly Below the 3D Scene */}

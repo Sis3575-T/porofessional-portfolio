@@ -1,244 +1,68 @@
-import { useRef, useState, useEffect, useMemo, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useState, useEffect, useMemo, Suspense, Component } from "react";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
-import { Move3d, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { createCodeTexture } from "../../three/office/CodeTexture";
 import { useDeviceDetect } from "../../../hooks/useDeviceDetect";
 import { useTheme } from "../../../context/ThemeContext";
+import PersonalizedSisayDeveloper from "./PersonalizedSisayDeveloper";
 
-/* --- 3D Developer Avatar sitting at the desk --- */
-function DeveloperAvatar() {
-  const avatarRef = useRef();
-  const headRef = useRef();
-  const leftHandRef = useRef();
-  const rightHandRef = useRef();
-  const chestRef = useRef();
-  const timeRef = useRef(0);
-
-  const materials = useMemo(
-    () => ({
-      skin: new THREE.MeshStandardMaterial({ color: "#c89d7c", roughness: 0.65, metalness: 0.02 }),
-      hair: new THREE.MeshStandardMaterial({ color: "#18181b", roughness: 0.85, metalness: 0.05 }),
-      shirt: new THREE.MeshStandardMaterial({ color: "#1e293b", roughness: 0.7, metalness: 0.05 }),
-      pants: new THREE.MeshStandardMaterial({ color: "#0f172a", roughness: 0.75, metalness: 0.03 }),
-      shoes: new THREE.MeshStandardMaterial({ color: "#e2e8f0", roughness: 0.4, metalness: 0.1 }),
-      collar: new THREE.MeshStandardMaterial({ color: "#38bdf8", roughness: 0.6 }),
-      eyes: new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.2 }),
-      pupils: new THREE.MeshStandardMaterial({ color: "#0f172a", roughness: 0.1 }),
-    }),
-    []
-  );
-
-  useFrame((_, delta) => {
-    timeRef.current += delta;
-    const t = timeRef.current;
-
-    // Subtle natural breathing in chest
-    if (chestRef.current) {
-      chestRef.current.position.y = 0.74 + Math.sin(t * 1.6) * 0.003;
-      chestRef.current.scale.set(
-        1 + Math.sin(t * 1.6) * 0.005,
-        1,
-        1 + Math.sin(t * 1.6) * 0.005
-      );
+/* --- Error Boundary for 3D Scene Components --- */
+class SceneErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error) {
+    console.warn("3D Scene Warning:", error);
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null;
     }
+    return this.props.children;
+  }
+}
 
-    // Natural head micro-movement looking between monitor and laptop
-    if (headRef.current) {
-      headRef.current.rotation.y = Math.sin(t * 0.8) * 0.04;
-      headRef.current.rotation.x = -0.06 + Math.sin(t * 1.2) * 0.015;
-    }
+/* --- WebGL Support Detection & Graceful Fallback --- */
+function isWebGLAvailable() {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
+}
 
-    // Hands micro-movement typing on keyboard and mouse
-    if (leftHandRef.current) {
-      leftHandRef.current.position.y = 0.745 + Math.sin(t * 7) * 0.003;
-      leftHandRef.current.position.x = -0.06 + Math.sin(t * 5) * 0.004;
-    }
-    if (rightHandRef.current) {
-      rightHandRef.current.position.y = 0.745 + Math.sin(t * 6.5 + 1) * 0.003;
-      rightHandRef.current.position.x = 0.28 + Math.sin(t * 4) * 0.003;
-    }
-  });
-
+function WebGLFallback() {
   return (
-    <group ref={avatarRef} position={[0, 0, 0.46]} rotation={[0, Math.PI, 0]}>
-      {/* Pelvis - seated directly on chair cushion */}
-      <mesh position={[0, 0.52, 0]} castShadow>
-        <boxGeometry args={[0.26, 0.09, 0.24]} />
-        <meshStandardMaterial {...materials.pants} />
-      </mesh>
-
-      {/* Torso & Chest with breathing motion */}
-      <group ref={chestRef} position={[0, 0.74, 0]}>
-        <mesh castShadow>
-          <cylinderGeometry args={[0.15, 0.17, 0.38, 16]} />
-          <meshStandardMaterial {...materials.shirt} />
-        </mesh>
-        {/* Modern shirt collar / accent line */}
-        <mesh position={[0, 0.18, 0.08]} castShadow>
-          <boxGeometry args={[0.13, 0.025, 0.05]} />
-          <meshStandardMaterial {...materials.collar} />
-        </mesh>
-      </group>
-
-      {/* Neck */}
-      <mesh position={[0, 0.95, 0]} castShadow>
-        <cylinderGeometry args={[0.045, 0.05, 0.09, 12]} />
-        <meshStandardMaterial {...materials.skin} />
-      </mesh>
-
-      {/* Head with detailed facial features & styled hair */}
-      <group ref={headRef} position={[0, 1.07, 0]}>
-        {/* Head base */}
-        <mesh castShadow>
-          <sphereGeometry args={[0.095, 20, 20]} />
-          <meshStandardMaterial {...materials.skin} />
-        </mesh>
-
-        {/* Eyes (white sclera) */}
-        <mesh position={[-0.034, 0.015, 0.084]}>
-          <sphereGeometry args={[0.014, 10, 10]} />
-          <meshStandardMaterial {...materials.eyes} />
-        </mesh>
-        <mesh position={[0.034, 0.015, 0.084]}>
-          <sphereGeometry args={[0.014, 10, 10]} />
-          <meshStandardMaterial {...materials.eyes} />
-        </mesh>
-
-        {/* Pupils */}
-        <mesh position={[-0.034, 0.015, 0.096]}>
-          <sphereGeometry args={[0.007, 8, 8]} />
-          <meshStandardMaterial {...materials.pupils} />
-        </mesh>
-        <mesh position={[0.034, 0.015, 0.096]}>
-          <sphereGeometry args={[0.007, 8, 8]} />
-          <meshStandardMaterial {...materials.pupils} />
-        </mesh>
-
-        {/* Eyebrows */}
-        <mesh position={[-0.034, 0.035, 0.085]} rotation={[0, 0, 0.08]}>
-          <boxGeometry args={[0.028, 0.005, 0.005]} />
-          <meshStandardMaterial {...materials.hair} />
-        </mesh>
-        <mesh position={[0.034, 0.035, 0.085]} rotation={[0, 0, -0.08]}>
-          <boxGeometry args={[0.028, 0.005, 0.005]} />
-          <meshStandardMaterial {...materials.hair} />
-        </mesh>
-
-        {/* Nose */}
-        <mesh position={[0, -0.005, 0.096]}>
-          <sphereGeometry args={[0.011, 8, 8]} />
-          <meshStandardMaterial {...materials.skin} />
-        </mesh>
-
-        {/* Mouth - subtle focused smile */}
-        <mesh position={[0, -0.032, 0.086]} rotation={[0.15, 0, 0]}>
-          <boxGeometry args={[0.028, 0.004, 0.004]} />
-          <meshStandardMaterial color="#b45309" roughness={0.7} />
-        </mesh>
-
-        {/* Hair - modern textured top crop */}
-        <mesh position={[0, 0.05, -0.015]} castShadow>
-          <sphereGeometry args={[0.096, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.58]} />
-          <meshStandardMaterial {...materials.hair} />
-        </mesh>
-        <mesh position={[-0.075, 0.02, -0.015]} castShadow>
-          <sphereGeometry args={[0.06, 10, 10, 0, Math.PI, 0, Math.PI * 0.6]} />
-          <meshStandardMaterial {...materials.hair} />
-        </mesh>
-        <mesh position={[0.075, 0.02, -0.015]} castShadow>
-          <sphereGeometry args={[0.06, 10, 10, 0, Math.PI, 0, Math.PI * 0.6]} />
-          <meshStandardMaterial {...materials.hair} />
-        </mesh>
-
-        {/* Ears */}
-        <mesh position={[-0.098, 0.002, 0]} castShadow>
-          <sphereGeometry args={[0.018, 8, 8]} />
-          <meshStandardMaterial {...materials.skin} />
-        </mesh>
-        <mesh position={[0.098, 0.002, 0]} castShadow>
-          <sphereGeometry args={[0.018, 8, 8]} />
-          <meshStandardMaterial {...materials.skin} />
-        </mesh>
-      </group>
-
-      {/* Arms & Hands positioned naturally on keyboard and mouse */}
-      {/* Left arm -> keyboard */}
-      <group position={[-0.2, 0.85, 0.02]} rotation={[0.45, 0.15, 0.15]}>
-        <mesh position={[0, -0.1, 0]} castShadow>
-          <capsuleGeometry args={[0.032, 0.16, 6, 10]} />
-          <meshStandardMaterial {...materials.shirt} />
-        </mesh>
-        <group position={[0, -0.22, 0.04]} rotation={[-1.25, 0, 0]}>
-          <mesh position={[0, -0.08, 0]} castShadow>
-            <capsuleGeometry args={[0.028, 0.14, 6, 10]} />
-            <meshStandardMaterial {...materials.skin} />
-          </mesh>
-        </group>
-      </group>
-      {/* Left hand resting on keyboard */}
-      <mesh ref={leftHandRef} position={[-0.06, 0.745, 0.28]} castShadow>
-        <boxGeometry args={[0.055, 0.02, 0.06]} />
-        <meshStandardMaterial {...materials.skin} />
-      </mesh>
-
-      {/* Right arm -> mouse */}
-      <group position={[0.2, 0.85, 0.02]} rotation={[0.42, -0.18, -0.15]}>
-        <mesh position={[0, -0.1, 0]} castShadow>
-          <capsuleGeometry args={[0.032, 0.16, 6, 10]} />
-          <meshStandardMaterial {...materials.shirt} />
-        </mesh>
-        <group position={[0, -0.22, 0.04]} rotation={[-1.2, 0, 0]}>
-          <mesh position={[0, -0.08, 0]} castShadow>
-            <capsuleGeometry args={[0.028, 0.14, 6, 10]} />
-            <meshStandardMaterial {...materials.skin} />
-          </mesh>
-        </group>
-      </group>
-      {/* Right hand resting on mouse */}
-      <mesh ref={rightHandRef} position={[0.28, 0.745, 0.28]} castShadow>
-        <boxGeometry args={[0.055, 0.02, 0.06]} />
-        <meshStandardMaterial {...materials.skin} />
-      </mesh>
-
-      {/* Legs naturally bent under desk */}
-      {/* Left Leg */}
-      <group position={[-0.08, 0.5, 0.04]} rotation={[-1.4, 0, 0]}>
-        <mesh position={[0, -0.12, 0]} castShadow>
-          <capsuleGeometry args={[0.045, 0.22, 6, 10]} />
-          <meshStandardMaterial {...materials.pants} />
-        </mesh>
-        <group position={[0, -0.28, 0]} rotation={[1.4, 0, 0]}>
-          <mesh position={[0, -0.1, 0]} castShadow>
-            <capsuleGeometry args={[0.04, 0.18, 6, 10]} />
-            <meshStandardMaterial {...materials.pants} />
-          </mesh>
-          <mesh position={[0, -0.22, 0.02]} castShadow>
-            <boxGeometry args={[0.065, 0.038, 0.11]} />
-            <meshStandardMaterial {...materials.shoes} />
-          </mesh>
-        </group>
-      </group>
-
-      {/* Right Leg */}
-      <group position={[0.08, 0.5, 0.04]} rotation={[-1.4, 0, 0]}>
-        <mesh position={[0, -0.12, 0]} castShadow>
-          <capsuleGeometry args={[0.045, 0.22, 6, 10]} />
-          <meshStandardMaterial {...materials.pants} />
-        </mesh>
-        <group position={[0, -0.28, 0]} rotation={[1.4, 0, 0]}>
-          <mesh position={[0, -0.1, 0]} castShadow>
-            <capsuleGeometry args={[0.04, 0.18, 6, 10]} />
-            <meshStandardMaterial {...materials.pants} />
-          </mesh>
-          <mesh position={[0, -0.22, 0.02]} castShadow>
-            <boxGeometry args={[0.065, 0.038, 0.11]} />
-            <meshStandardMaterial {...materials.shoes} />
-          </mesh>
-        </group>
-      </group>
-    </group>
+    <div className="w-full h-full min-h-[320px] rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-[#0e1420]/60 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center shadow-lg transition-all">
+      <div className="relative w-44 h-44 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-md mb-4 bg-slate-900">
+        <img
+          src="/models/sisay-developer-preview.jpg"
+          alt="Sisay Temesgen - Personalized 3D Developer"
+          className="w-full h-full object-cover object-top select-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-2.5">
+          <span className="text-[11px] font-mono font-semibold text-blue-400">
+            Sisay Temesgen · 3D Developer
+          </span>
+        </div>
+      </div>
+      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+        Personalized 3D Developer Environment
+      </p>
+      <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xs">
+        Seated at modern workstation actively developing React & full-stack web solutions.
+      </p>
+    </div>
   );
 }
 
@@ -361,7 +185,6 @@ function DeveloperDesk() {
       </mesh>
 
       {/* Metal Frame Legs (Left & Right) */}
-      {/* Left Frame */}
       <mesh position={[-0.78, 0.35, -0.32]} castShadow>
         <boxGeometry args={[0.035, 0.7, 0.035]} />
         <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.8} />
@@ -375,7 +198,6 @@ function DeveloperDesk() {
         <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.8} />
       </mesh>
 
-      {/* Right Frame */}
       <mesh position={[0.78, 0.35, -0.32]} castShadow>
         <boxGeometry args={[0.035, 0.7, 0.035]} />
         <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.8} />
@@ -524,18 +346,16 @@ function DeskItems() {
         </mesh>
       </group>
 
-      {/* Ceramic Coffee Mug with Steam Hint */}
+      {/* Ceramic Coffee Mug */}
       <group position={[-0.34, 0, 0.12]}>
         <mesh castShadow>
           <cylinderGeometry args={[0.03, 0.026, 0.075, 14]} />
           <meshStandardMaterial color="#f8fafc" roughness={0.4} />
         </mesh>
-        {/* Coffee surface */}
         <mesh position={[0, 0.033, 0]}>
           <circleGeometry args={[0.026, 12]} />
           <meshStandardMaterial color="#451a03" roughness={0.2} />
         </mesh>
-        {/* Handle */}
         <mesh position={[0.035, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
           <torusGeometry args={[0.016, 0.004, 6, 12, Math.PI]} />
           <meshStandardMaterial color="#f8fafc" roughness={0.4} />
@@ -544,17 +364,14 @@ function DeskItems() {
 
       {/* Ceramic Potted Succulent Plant */}
       <group position={[-0.55, 0, 0.1]}>
-        {/* Pot */}
         <mesh castShadow>
           <cylinderGeometry args={[0.032, 0.024, 0.055, 12]} />
           <meshStandardMaterial color="#e2e8f0" roughness={0.7} />
         </mesh>
-        {/* Soil */}
         <mesh position={[0, 0.025, 0]}>
           <circleGeometry args={[0.028, 12]} />
           <meshStandardMaterial color="#292524" roughness={0.9} />
         </mesh>
-        {/* Succulent Leaves */}
         {[0, 45, 90, 135, 180, 225, 270, 315].map((ang, i) => {
           const r = (ang * Math.PI) / 180;
           return (
@@ -576,13 +393,11 @@ function DeskItems() {
           <cylinderGeometry args={[0.038, 0.042, 0.014, 16]} />
           <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.7} />
         </mesh>
-        {/* Angled Neck */}
         <group position={[0, 0.02, 0]} rotation={[0.2, 0.3, 0.15]}>
           <mesh position={[0, 0.12, 0]}>
             <cylinderGeometry args={[0.005, 0.005, 0.24, 8]} />
             <meshStandardMaterial color="#334155" roughness={0.3} metalness={0.8} />
           </mesh>
-          {/* Lamp Shade & Bulb */}
           <group position={[0, 0.22, 0]} rotation={[0.4, 0, -0.3]}>
             <mesh position={[0, 0.03, 0]}>
               <coneGeometry args={[0.038, 0.035, 12, 1, true]} />
@@ -604,13 +419,10 @@ function DeskItems() {
 function SceneLighting() {
   return (
     <>
-      {/* Soft Ambient Fill */}
-      <ambientLight intensity={0.6} color="#f8fafc" />
-
-      {/* Main Daylight Key Light */}
+      <ambientLight intensity={0.65} color="#f8fafc" />
       <directionalLight
-        position={[2.5, 4, 2.5]}
-        intensity={0.85}
+        position={[2.5, 4, -2]}
+        intensity={0.9}
         color="#ffffff"
         castShadow
         shadow-mapSize-width={1024}
@@ -622,18 +434,14 @@ function SceneLighting() {
         shadow-camera-bottom={-2}
         shadow-bias={-0.0005}
       />
-
-      {/* Back Rim Light (creates crisp silhouette definition against transparent background) */}
-      <directionalLight position={[-2, 3, -2.5]} intensity={0.45} color="#38bdf8" />
-
-      {/* Fill Light from Left */}
-      <pointLight position={[-2, 2, 1]} intensity={0.3} color="#ffffff" distance={6} />
+      <directionalLight position={[-2, 3, 2.5]} intensity={0.45} color="#38bdf8" />
+      <pointLight position={[-2, 2, -1]} intensity={0.35} color="#ffffff" distance={6} />
     </>
   );
 }
 
 /* --- Entire Genuine 3D Workspace Scene --- */
-function CodingEnvironment() {
+function CodingEnvironment({ faceTextureUrl = "/models/sisay-face.jpg" }) {
   return (
     <group position={[0, -0.42, 0]}>
       <SceneLighting />
@@ -642,12 +450,16 @@ function CodingEnvironment() {
       <MacBookLaptop />
       <DeskItems />
       <ErgonomicChair />
-      <DeveloperAvatar />
+      <Suspense fallback={null}>
+        <SceneErrorBoundary>
+          <PersonalizedSisayDeveloper faceTextureUrl={faceTextureUrl} />
+        </SceneErrorBoundary>
+      </Suspense>
 
       {/* Soft grounding contact shadow underneath desk & chair on transparent background */}
       <ContactShadows
         position={[0, 0.001, 0.05]}
-        opacity={0.4}
+        opacity={0.42}
         scale={4.2}
         blur={2.4}
         far={1.6}
@@ -659,11 +471,16 @@ function CodingEnvironment() {
 }
 
 /* --- Main Exported Component --- */
-export default function About3DScene() {
+export default function About3DScene({ glbModel }) {
   const { isLowEnd } = useDeviceDetect();
   const containerRef = useRef(null);
   const [isVisible, setIsVisible] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [webglSupported, setWebglSupported] = useState(true);
+
+  useEffect(() => {
+    setWebglSupported(isWebGLAvailable());
+  }, []);
 
   // IntersectionObserver to pause rendering when scrolled out of view (0% CPU/GPU)
   useEffect(() => {
@@ -681,61 +498,71 @@ export default function About3DScene() {
     return () => observer.disconnect();
   }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-[360px] sm:h-[420px] lg:h-[470px] flex items-center justify-center bg-transparent select-none cursor-grab active:cursor-grabbing"
-      aria-label="Interactive 3D coding environment. Drag with mouse or touch to rotate 360 degrees, scroll to zoom."
-      role="region"
-      onPointerDown={() => setHasInteracted(true)}
-    >
-      <Canvas
-        camera={{
-          position: [1.9, 1.45, 1.9],
-          fov: 38,
-          near: 0.1,
-          far: 25,
-        }}
-        dpr={isLowEnd ? [1, 1] : [1, 1.5]}
-        gl={{
-          alpha: true,
-          antialias: !isLowEnd,
-          powerPreference: "high-performance",
-        }}
-        style={{ background: "transparent", width: "100%", height: "100%" }}
-        frameloop={isVisible ? "always" : "never"}
-        shadows={!isLowEnd}
-      >
-        <Suspense fallback={null}>
-          <CodingEnvironment />
-        </Suspense>
-
-        <OrbitControls
-          makeDefault
-          enablePan={false}
-          enableZoom={true}
-          minDistance={1.3}
-          maxDistance={3.8}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 2.05}
-          autoRotate={!hasInteracted}
-          autoRotateSpeed={0.35}
-          enableDamping
-          dampingFactor={0.06}
-          rotateSpeed={0.8}
-          target={[0, 0.28, 0]}
-        />
-      </Canvas>
-
-      {/* Subtle Floating Interactive Instruction Pill */}
-      <div
-        className={`absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none transition-opacity duration-500 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/60 dark:bg-white/10 text-white/90 text-[10px] sm:text-xs font-medium backdrop-blur-md border border-white/10 shadow-sm ${
-          hasInteracted ? "opacity-0" : "opacity-90"
-        }`}
-      >
-        <RotateCcw size={11} className="shrink-0 animate-spin" style={{ animationDuration: "6s" }} />
-        <span>Drag to rotate 360° · Scroll to zoom</span>
+  if (!webglSupported) {
+    return (
+      <div className="relative w-full h-[360px] sm:h-[420px] lg:h-[470px] flex items-center justify-center">
+        <WebGLFallback />
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <SceneErrorBoundary fallback={<WebGLFallback />}>
+      <div
+        ref={containerRef}
+        className="relative w-full h-[360px] sm:h-[420px] lg:h-[470px] flex items-center justify-center bg-transparent select-none cursor-grab active:cursor-grabbing"
+        aria-label="Interactive 3D coding environment with Sisay Temesgen. Drag with mouse or touch to rotate 360 degrees, scroll to zoom."
+        role="region"
+        onPointerDown={() => setHasInteracted(true)}
+      >
+        <Canvas
+          camera={{
+            position: [1.65, 1.3, -1.45],
+            fov: 38,
+            near: 0.1,
+            far: 25,
+          }}
+          dpr={isLowEnd ? [1, 1] : [1, 1.5]}
+          gl={{
+            alpha: true,
+            antialias: !isLowEnd,
+            powerPreference: "high-performance",
+          }}
+          style={{ background: "transparent", width: "100%", height: "100%" }}
+          frameloop={isVisible ? "always" : "never"}
+          shadows={!isLowEnd}
+        >
+          <Suspense fallback={null}>
+            <CodingEnvironment faceTextureUrl="/models/sisay-face.jpg" />
+          </Suspense>
+
+          <OrbitControls
+            makeDefault
+            enablePan={false}
+            enableZoom={true}
+            minDistance={1.2}
+            maxDistance={3.8}
+            minPolarAngle={Math.PI / 6}
+            maxPolarAngle={Math.PI / 2.05}
+            autoRotate={!hasInteracted}
+            autoRotateSpeed={0.35}
+            enableDamping
+            dampingFactor={0.06}
+            rotateSpeed={0.8}
+            target={[0, 0.45, 0.1]}
+          />
+        </Canvas>
+
+        {/* Subtle Floating Interactive Instruction Pill */}
+        <div
+          className={`absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none transition-opacity duration-500 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/60 dark:bg-white/10 text-white/90 text-[10px] sm:text-xs font-medium backdrop-blur-md border border-white/10 shadow-sm ${
+            hasInteracted ? "opacity-0" : "opacity-90"
+          }`}
+        >
+          <RotateCcw size={11} className="shrink-0 animate-spin" style={{ animationDuration: "6s" }} />
+          <span>Drag to rotate 360° · Scroll to zoom</span>
+        </div>
+      </div>
+    </SceneErrorBoundary>
   );
 }
