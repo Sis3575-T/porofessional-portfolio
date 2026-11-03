@@ -76,6 +76,9 @@ function isConnectionError(error) {
     msg.includes("p1002") ||
     msg.includes("p1017") ||
     msg.includes("aggregateerror") ||
+    msg.includes("calling end on the pool") ||
+    msg.includes("cannot use a pool after calling end") ||
+    msg.includes("closed pool") ||
     error?.name === "ErrorEvent" ||
     error?.constructor?.name === "ErrorEvent" ||
     Boolean(error?.error)
@@ -91,15 +94,17 @@ async function debounceReset() {
   _resetPromise = (async () => {
     try {
       console.warn("[PRISMA] Recycling database connection pool after persistent connection errors...");
-      if (_pool) {
-        try { await _pool.end(); } catch {}
-        _pool = null;
-      }
-      if (_prisma) {
-        try { await _prisma.$disconnect(); } catch {}
-        _prisma = null;
-      }
+      const oldPool = _pool;
+      const oldPrisma = _prisma;
+      _pool = null;
+      _prisma = null;
       globalForPrisma.prisma = null;
+      if (oldPool) {
+        try { await oldPool.end(); } catch {}
+      }
+      if (oldPrisma) {
+        try { await oldPrisma.$disconnect(); } catch {}
+      }
     } finally {
       await new Promise((r) => setTimeout(r, 400));
       _resetPromise = null;
